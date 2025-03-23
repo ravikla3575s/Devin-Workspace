@@ -31,7 +31,7 @@ VBAモジュールには以下の依存関係があります：
 ### DrugNameConverter.bas
 UIとワークブック初期化のためのヘルパー関数を含みます：
 - RunDrugNameComparison: 医薬品名比較を実行するエントリーポイント
-- SetupPackageTypeDropdown: UIにパッケージタイプのドロップダウンを設定する
+- SetupDirectPackageExtraction: 医薬品名から直接包装形態を抽出する機能を初期化する
 - AddInstructions: Sheet1に指示を追加する
 - InitWorkbook: ワークブックの書式設定と設定を初期化する
 

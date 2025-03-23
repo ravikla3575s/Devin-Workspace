@@ -1,7 +1,7 @@
 Attribute VB_Name = "MainModule"
 Option Explicit
 
-' ���C���̏����֐��F��i���̈�v���Ɋ�Â��ē]�L
+' メインの処理関数：医薬品名の一致度に基づいて転記
 Public Sub MainProcess()
     On Error GoTo ErrorHandler
     
@@ -16,7 +16,7 @@ Public Sub MainProcess()
     lastRow1 = ws1.Cells(ws1.Rows.Count, "B").End(xlUp).Row
     lastRow2 = ws2.Cells(ws2.Rows.Count, "B").End(xlUp).Row
     
-    Const MATCH_THRESHOLD As Double = 80 ' ��v���̂������l�i80%�j
+    Const MATCH_THRESHOLD As Double = 80 ' 一致率のしきい値（80%）
     
     Dim i As Long, j As Long
     For i = 2 To lastRow1
@@ -42,48 +42,48 @@ Public Sub MainProcess()
                 End If
             Next j
             
-            ' ���ʂ̏o��
+            ' 結果の出力
             If maxMatchRate >= MATCH_THRESHOLD Then
                 ws1.Cells(i, "C").Value = ws2.Cells(bestMatchIndex, "B").Value
                 ws1.Cells(i, "D").Value = maxMatchRate & "%"
                 
-                ' ��v�����e�v�f�̏ڍׂ��o�́i�f�o�b�O�p�j
+                ' 一致した各要素の詳細を出力（デバッグ用）
                 Dim sourceParts As DrugNameParts
                 Dim targetParts As DrugNameParts
                 sourceParts = ParseDrugString(sourceStr)
                 targetParts = ParseDrugString(ws2.Cells(bestMatchIndex, "B").Value)
                 
-                ws1.Cells(i, "E").Value = "��{��:" & sourceParts.BaseName & _
-                                         " �܌^:" & sourceParts.formType & _
-                                         " �K�i:" & sourceParts.strength & _
-                                         " ���[�J�[:" & sourceParts.maker
+                ws1.Cells(i, "E").Value = "基本名:" & sourceParts.BaseName & _
+                                         " 剤形:" & sourceParts.formType & _
+                                         " 規格:" & sourceParts.strength & _
+                                         " メーカー:" & sourceParts.maker
             End If
         End If
     Next i
     
     Application.ScreenUpdating = True
-    MsgBox "�������������܂����B"
+    MsgBox "処理が完了しました。"
     Exit Sub
     
 ErrorHandler:
     Application.ScreenUpdating = True
-    MsgBox "�G���[���������܂���: " & Err.Description
+    MsgBox "エラーが発生しました: " & Err.Description
 End Sub
 
-' ��i���̌����Ɠ]�L�֐�
+' 医薬品名の検索と転記関数
 Public Sub SearchAndTransferDrugData()
     On Error GoTo ErrorHandler
     
-    '��ʍX�V���ꎞ��~���ăp�t�H�[�}���X����
+    '画面更新を一時停止してパフォーマンス向上
     Application.ScreenUpdating = False
     
-    '���[�N�V�[�g�̐ݒ�
+    'ワークシートの設定
     Dim ws1 As Worksheet, ws2 As Worksheet, ws3 As Worksheet
     Set ws1 = ThisWorkbook.Worksheets(1)
     Set ws2 = ThisWorkbook.Worksheets(2)
     Set ws3 = ThisWorkbook.Worksheets(3)
     
-    '�ŏI�s�̎擾
+    '最終行の取得
     Dim lastRow1 As Long, lastRow2 As Long, lastRow3 As Long
     lastRow1 = ws1.Cells(ws1.Rows.Count, "A").End(xlUp).Row
     lastRow2 = ws2.Cells(ws2.Rows.Count, "B").End(xlUp).Row
@@ -92,24 +92,24 @@ Public Sub SearchAndTransferDrugData()
     Dim i As Long
     Dim inputValue As Variant
     
-    '�e�s��A��̒l������
-    For i = 2 To lastRow1  '�w�b�_�[���X�L�b�v
+    '各行で、列の値を処理
+    For i = 2 To lastRow1  'ヘッダーをスキップ
         inputValue = ws1.Cells(i, "A").Value
         
-        '���͒l����������֐����Ăяo��
+        '入力値を処理する関数を呼び出し
         ProcessInputValue inputValue, ws1, ws2, ws3, i, lastRow2, lastRow3
     Next i
     
     Application.ScreenUpdating = True
-    MsgBox "�������������܂����B"
+    MsgBox "処理が完了しました。"
     Exit Sub
     
 ErrorHandler:
     Application.ScreenUpdating = True
-    MsgBox "�G���[���������܂���: " & Err.Description
+    MsgBox "エラーが発生しました: " & Err.Description
 End Sub
 
-' ���͒l����������֐�
+' 入力値を処理する関数
 Private Sub ProcessInputValue(ByVal inputValue As Variant, _
                             ByRef ws1 As Worksheet, _
                             ByRef ws2 As Worksheet, _
@@ -123,18 +123,18 @@ Private Sub ProcessInputValue(ByVal inputValue As Variant, _
     Dim packageType As String
     Dim j As Long, k As Long
     
-    'Sheet3�����ܖ�������
+    'Sheet3から薬品名を検索
     For k = 2 To lastRow3
         drugNameFromSheet3 = ws3.Cells(k, "F").Value
         If InStr(1, inputValue, drugNameFromSheet3) > 0 Then
-            'Sheet2����Ή������ܖ�������
+            'Sheet2から対応する薬品名を検索
             For j = 2 To lastRow2
                 drugNameFromSheet2 = ws2.Cells(j, "B").Value
                 If drugNameFromSheet2 = drugNameFromSheet3 Then
-                    '��^�C�v���擾
+                    '包タイプを取得
                     packageType = GetPackageType(inputValue)
                     
-                    '�f�[�^��]�L
+                    'データを転記
                     ws1.Cells(currentRow, "B").Value = ws2.Cells(j, "A").Value
                     ws1.Cells(currentRow, "C").Value = packageType
                     Exit For
@@ -145,7 +145,7 @@ Private Sub ProcessInputValue(ByVal inputValue As Variant, _
     Next k
 End Sub
 
-' ��v���v�Z�ɂ���i�������֐�
+' 一致率計算による医薬品処理関数
 Public Sub ProcessDrugNamesWithMatchRate()
     Dim ws1 As Worksheet, ws2 As Worksheet
     Set ws1 = ThisWorkbook.Worksheets(1)
@@ -153,7 +153,7 @@ Public Sub ProcessDrugNamesWithMatchRate()
     
     Dim i As Long, j As Long
     Dim lastRow1 As Long, lastRow2 As Long
-    Const MATCH_THRESHOLD As Double = 80 ' ��v���̂������l�i80%�j
+    Const MATCH_THRESHOLD As Double = 80 ' 一致率のしきい値（80%）
     
     lastRow1 = ws1.Cells(ws1.Rows.Count, "B").End(xlUp).Row
     lastRow2 = ws2.Cells(ws2.Rows.Count, "B").End(xlUp).Row
@@ -180,67 +180,69 @@ Public Sub ProcessDrugNamesWithMatchRate()
             End If
         Next j
         
-        ' �������l�ȏ�̈�v�����������ꍇ�̂ݓ]�L
+        ' しきい値以上の一致率があった場合のみ転記
         If maxMatchRate >= MATCH_THRESHOLD Then
             ws1.Cells(i, "C").Value = ws2.Cells(bestMatchIndex, "B").Value
             ws1.Cells(i, "D").Value = maxMatchRate & "%"
         End If
     Next i
     
-    MsgBox "�������������܂����B"
+    MsgBox "処理が完了しました。"
 End Sub
 
-' �ݒ�V�[�g�̕�`�Ԃ��l���������i����r�Ɠ]�L���s��
+' 設定シートの包形態を考慮して医薬品比較と転記を行う
 Public Sub CompareAndTransferDrugNamesByPackage()
     On Error GoTo ErrorHandler
     
     Application.ScreenUpdating = False
     
-    ' ���[�N�V�[�g�̐ݒ�
+    ' ワークシートの設定
     Dim wsSettings As Worksheet, wsTarget As Worksheet
-    Set wsSettings = ThisWorkbook.Worksheets(1) ' �ݒ�V�[�g
-    Set wsTarget = ThisWorkbook.Worksheets(2)   ' ��r�Ώۂ̃V�[�g
+    Set wsSettings = ThisWorkbook.Worksheets(1) ' 設定シート
+    Set wsTarget = ThisWorkbook.Worksheets(2)   ' 比較対象のシート
     
-    ' B4�Z�������`�Ԃ��擾
+    ' 包装形態を医薬品名から直接抽出するように変更
     Dim packageType As String
-    packageType = wsSettings.Range("B4").Value
     
-    ' �ŏI�s���擾
+    ' 最終行を取得
     Dim lastRowSettings As Long, lastRowTarget As Long
     lastRowSettings = wsSettings.Cells(wsSettings.Rows.Count, "B").End(xlUp).Row
     lastRowTarget = wsTarget.Cells(wsTarget.Rows.Count, "B").End(xlUp).Row
     
-    ' �����ΏۂƔ�r�Ώۂ̈��i����z��Ɋi�[
+    ' 検索対象と比較対象の医薬品名を配列に格納
     Dim searchDrugs() As String
     Dim targetDrugs() As String
     Dim i As Long, j As Long
     
-    ' �������i�p�̔z���������
-    ReDim searchDrugs(1 To lastRowSettings - 1) ' �w�b�_�[�s������
+    ' 検索医薬品用の配列を初期化
+    ReDim searchDrugs(1 To lastRowSettings - 1) ' ヘッダー行を除外
     For i = 2 To lastRowSettings
         searchDrugs(i - 1) = wsSettings.Cells(i, "B").Value
     Next i
     
-    ' ��r�Ώۗp�̔z���������
-    ReDim targetDrugs(1 To lastRowTarget - 1) ' �w�b�_�[�s������
+    ' 比較対象用の配列を初期化
+    ReDim targetDrugs(1 To lastRowTarget - 1) ' ヘッダー行を除外
     For i = 2 To lastRowTarget
         targetDrugs(i - 1) = wsTarget.Cells(i, "B").Value
     Next i
     
-    ' �e�������i�ɑ΂��Ĕ�r����
+    ' 各検索医薬品に対して比較処理
     For i = 2 To lastRowSettings
         Dim searchDrug As String
         searchDrug = wsSettings.Cells(i, "B").Value
         
         If Len(searchDrug) > 0 Then
+            ' 医薬品名から直接包装形態を抽出
+            packageType = PackageTypeExtractor.ExtractPackageTypeFromDrugName(searchDrug)
+            
             Dim bestMatch As String
             bestMatch = FindBestMatchWithPackage(searchDrug, targetDrugs, packageType)
             
             If Len(bestMatch) > 0 Then
-                ' ��v�������i����C��ɓ]�L
+                ' 一致した医薬品名をC列に転記
                 wsSettings.Cells(i, "C").Value = bestMatch
             Else
-                ' ��v���Ȃ������ꍇ�͋󗓂ɂ���
+                ' 一致しなかった場合は空欄にする
                 wsSettings.Cells(i, "C").Value = ""
             End If
         End If
@@ -248,15 +250,15 @@ Public Sub CompareAndTransferDrugNamesByPackage()
     
 CleanExit:
     Application.ScreenUpdating = True
-    MsgBox "�������������܂����B", vbInformation
+    MsgBox "処理が完了しました。", vbInformation
     Exit Sub
     
 ErrorHandler:
     Application.ScreenUpdating = True
-    MsgBox "�G���[���������܂���: " & Err.Description, vbCritical
+    MsgBox "エラーが発生しました: " & Err.Description, vbCritical
 End Sub
 
-' ���i���̐����A�K�i�A�P�ʂ̈�v�x���v�Z
+' 医薬品名の成分、規格、単位の一致度を計算
 Public Function CalculateMatchScore(ByRef searchParts As DrugNameParts, ByRef targetParts As DrugNameParts) As Double
     Dim score As Double
     Dim totalWeight As Double
@@ -264,25 +266,25 @@ Public Function CalculateMatchScore(ByRef searchParts As DrugNameParts, ByRef ta
     score = 0
     totalWeight = 0
     
-    ' �������̔�r�i�d��: 50%�j
+    ' 基本名の比較（重み: 50%）
     If StrComp(searchParts.BaseName, targetParts.BaseName, vbTextCompare) = 0 Then
         score = score + 50
     End If
     totalWeight = totalWeight + 50
     
-    ' �܌^�̔�r�i�d��: 20%�j
+    ' 剤形の比較（重み: 20%）
     If StrComp(searchParts.formType, targetParts.formType, vbTextCompare) = 0 Then
         score = score + 20
     End If
     totalWeight = totalWeight + 20
     
-    ' �K�i�̔�r�i�d��: 30%�j
+    ' 規格の比較（重み: 30%）
     If CompareStrength(searchParts.strength, targetParts.strength) Then
         score = score + 30
     End If
     totalWeight = totalWeight + 30
     
-    ' �X�R�A�̐��K���i�S�����j
+    ' スコアの正規化（百分率）
     If totalWeight > 0 Then
         CalculateMatchScore = (score / totalWeight) * 100
     Else
@@ -290,32 +292,32 @@ Public Function CalculateMatchScore(ByRef searchParts As DrugNameParts, ByRef ta
     End If
 End Function
 
-' ��`�Ԃ��l�������œK�Ȉ��i���̈�v����������
+' 包形態を考慮して最適な医薬品名の一致を見つける関数
 Private Function FindBestMatchWithPackage(ByVal searchDrug As String, ByRef targetDrugs() As String, ByVal requiredPackage As String) As String
     Dim i As Long
     Dim bestMatchScore As Double
     Dim bestMatchIndex As Long
     Dim searchParts As DrugNameParts
     
-    ' �����Ώۂ̈��i���𕪉�
+    ' 検索対象の医薬品名を分解
     searchParts = ParseDrugString(searchDrug)
     bestMatchScore = 0
     bestMatchIndex = -1
     
-    ' �e��r�Ώۂɑ΂��ăX�R�A���v�Z
+    ' 各比較対象に対してスコアを計算
     For i = LBound(targetDrugs) To UBound(targetDrugs)
         Dim targetParts As DrugNameParts
         Dim currentScore As Double
         Dim hasRequiredPackage As Boolean
         
-        ' ��r�Ώۂ̈��i���𕪉�
+        ' 比較対象の医薬品名を分解
         targetParts = ParseDrugString(targetDrugs(i))
         
-        ' ��`�Ԃ̊m�F
+        ' 包形態の確認
         hasRequiredPackage = (InStr(1, targetParts.Package, requiredPackage, vbTextCompare) > 0)
         
         If hasRequiredPackage Then
-            ' �������A�K�i�A�P�ʂ̈�v�x���v�Z
+            ' 基本名、規格、単位の一致度を計算
             currentScore = CalculateMatchScore(searchParts, targetParts)
             
             If currentScore > bestMatchScore Then
@@ -325,83 +327,67 @@ Private Function FindBestMatchWithPackage(ByVal searchDrug As String, ByRef targ
         End If
     Next i
     
-    ' ���ȏ�̃X�R�A������ꍇ�̂݌��ʂ�Ԃ�
-    If bestMatchScore >= 70 And bestMatchIndex >= 0 Then ' 70%�ȏ�̈�v��
+    ' 一定以上のスコアがある場合のみ結果を返す
+    If bestMatchScore >= 70 And bestMatchIndex >= 0 Then ' 70%以上の一致率
         FindBestMatchWithPackage = targetDrugs(bestMatchIndex)
     Else
         FindBestMatchWithPackage = ""
     End If
 End Function
 
-' 7�s�ڈȍ~�̈��i����r�Ɠ]�L���s���֐�
+' 7行目以降の医薬品名を比較と転記を行う関数
 Public Sub ProcessFromRow7()
     On Error GoTo ErrorHandler
     
-    ' �����ݒ�
+    ' 初期設定
     Application.ScreenUpdating = False
     
-    ' ���[�N�V�[�g�Q�Ƃ̎擾
+    ' ワークシート参照の取得
     Dim settingsSheet As Worksheet, targetSheet As Worksheet
-    Set settingsSheet = ThisWorkbook.Worksheets(1) ' �ݒ�V�[�g
-    Set targetSheet = ThisWorkbook.Worksheets(2)   ' ��r�Ώۂ̃V�[�g
+    Set settingsSheet = ThisWorkbook.Worksheets(1) ' 設定シート
+    Set targetSheet = ThisWorkbook.Worksheets(2)   ' 比較対象のシート
     
-    ' ��`�Ԃ̎擾�Ɗm�F
-    Dim packageType As String
-    packageType = settingsSheet.Range("B4").Value
+    ' 医薬品名から直接包装形態を抽出するように変更
+    ' PackageTypeExtractorモジュールを初期化
+    PackageTypeExtractor.InitializePackageMappings
     
-    ' �L���ȕ�`�Ԃ��`�F�b�N
-    Dim validPackageTypes As Variant
-    validPackageTypes = Array("(����`)", "���̑�(�Ȃ�)", "���", "���ܗp", "PTP", "����", "�o��", "SP", "PTP(���җp)")
-    
-    Dim isValidPackage As Boolean
-    Dim i As Long
-    isValidPackage = False
-    
-    For i = LBound(validPackageTypes) To UBound(validPackageTypes)
-        If packageType = validPackageTypes(i) Then
-            isValidPackage = True
-            Exit For
-        End If
-    Next i
-    
-    If Not isValidPackage Then
-        MsgBox "B4�Z���ɗL���ȕ�`�Ԃ�ݒ肵�Ă��������B" & vbCrLf & _
-               "�L���Ȓl: (����`), ���̑�(�Ȃ�), ���, ���ܗp, PTP, ����, �o��, SP, PTP(���җp)", vbExclamation
-        GoTo CleanExit
-    End If
-    
-    ' �ŏI�s�̎擾
+    ' 最終行の取得
     Dim lastRowSettings As Long, lastRowTarget As Long
     lastRowSettings = settingsSheet.Cells(settingsSheet.Rows.Count, "B").End(xlUp).Row
     lastRowTarget = targetSheet.Cells(targetSheet.Rows.Count, "B").End(xlUp).Row
     
-    ' ��r�Ώۖ�i����z��Ɋi�[
+    ' 比較対象医薬品を配列に格納
     Dim targetDrugs() As String
     ReDim targetDrugs(1 To lastRowTarget - 1)
     
+    Dim i As Long
     For i = 2 To lastRowTarget
         targetDrugs(i - 1) = targetSheet.Cells(i, "B").Value
     Next i
     
-    ' ���i���̔�r�Ɠ]�L�i7�s�ڂ���J�n�j
+    ' 医薬品名の比較と転記（7行目から開始）
     Dim searchDrug As String, bestMatch As String
     Dim processedCount As Long, skippedCount As Long
     processedCount = 0
     skippedCount = 0
     
-    For i = 7 To lastRowSettings ' ������7�s�ڈȍ~������
+    For i = 7 To lastRowSettings ' 処理を7行目以降から開始
         searchDrug = settingsSheet.Cells(i, "B").Value
         
         If Len(searchDrug) > 0 Then
-            ' �œK�Ȉ�v������
+            ' 医薬品名から直接包装形態を抽出
+            Dim packageType As String
+            packageType = PackageTypeExtractor.ExtractPackageTypeFromDrugName(searchDrug)
+            
+            ' 最適な一致を検索
             bestMatch = FindBestMatchingDrug(searchDrug, targetDrugs, packageType)
             
-            ' ��v���錋�ʂ�����Γ]�L�A�Ȃ���΃X�L�b�v
+            ' 一致する結果があれば転記、なければスキップ
             If Len(bestMatch) > 0 Then
                 settingsSheet.Cells(i, "C").Value = bestMatch
                 processedCount = processedCount + 1
             Else
-                ' ��v���Ȃ��ꍇ�͉������Ȃ��i�󕶎��ŏ㏑�����Ȃ��j
+                ' 一致しない場合は何もしない（空文字で上書きしない）
                 skippedCount = skippedCount + 1
             End If
         End If
@@ -409,18 +395,18 @@ Public Sub ProcessFromRow7()
     
 CleanExit:
     Application.ScreenUpdating = True
-    MsgBox "�������������܂����B" & vbCrLf & _
-           processedCount & "���̈��i������v���܂����B" & vbCrLf & _
-           skippedCount & "���̈��i���͈�v������̂�������܂���ł����B", vbInformation
+    MsgBox "処理が完了しました。" & vbCrLf & _
+           processedCount & "件の医薬品名が一致しました。" & vbCrLf & _
+           skippedCount & "件の医薬品名は一致するものが見つかりませんでした。", vbInformation
     Exit Sub
     
 ErrorHandler:
     Application.ScreenUpdating = True
-    MsgBox "�G���[���������܂���: " & Err.Description, vbCritical
+    MsgBox "エラーが発生しました: " & Err.Description, vbCritical
     Resume CleanExit
 End Sub
 
-' �ł���v������i������������֐�
+' 最適一致する医薬品名を見つける関数
 Private Function FindBestMatchingDrug(ByVal searchDrug As String, ByRef targetDrugs() As String, ByVal packageType As String) As String
     Dim i As Long
     Dim bestMatchIndex As Long, bestMatchScore As Long, currentScore As Long
@@ -428,33 +414,35 @@ Private Function FindBestMatchingDrug(ByVal searchDrug As String, ByRef targetDr
     bestMatchIndex = -1
     bestMatchScore = 0
     
-    ' �����Ώۂ��L�[���[�h�ɕ���
+    ' 検索対象をキーワードに分解
     Dim keywords As Variant
     keywords = ExtractKeywords(searchDrug)
     
-    ' ��`�Ԃ̓��ʏ���
+    ' 包形態の特殊処理
     Dim skipPackageCheck As Boolean
-    skipPackageCheck = (packageType = "(����`)" Or packageType = "���̑�(�Ȃ�)")
+    skipPackageCheck = (packageType = "/未定義/" Or packageType = "/その他(なし)/")
     
-    ' �e��r�Ώۂɑ΂��ď���
+    ' 各比較対象に対して処理
     For i = LBound(targetDrugs) To UBound(targetDrugs)
         If Len(targetDrugs(i)) > 0 Then
-            ' ��`�ԃ`�F�b�N
+            ' 包形態チェック
             Dim matchesPackage As Boolean
             
             If skipPackageCheck Then
-                ' ����`�܂��͂��̑��̏ꍇ�͕�`�ԃ`�F�b�N���X�L�b�v
+                ' 未定義またはその他の場合は包形態チェックをスキップ
                 matchesPackage = True
             Else
-                ' ��`�Ԃ���v���邩�m�F
-                matchesPackage = CheckPackage(targetDrugs(i), packageType)
+                ' 包形態が一致するか確認
+                Dim targetPackageType As String
+                targetPackageType = PackageTypeExtractor.ExtractPackageTypeFromDrugName(targetDrugs(i))
+                matchesPackage = (targetPackageType = packageType)
             End If
             
             If matchesPackage Then
-                ' �L�[���[�h��v�����v�Z
+                ' キーワード一致率を計算
                 currentScore = CalcMatchScore(keywords, targetDrugs(i))
                 
-                ' ��荂���X�R�A���L�^
+                ' より高いスコアを記録
                 If currentScore > bestMatchScore Then
                     bestMatchScore = currentScore
                     bestMatchIndex = i
@@ -463,7 +451,7 @@ Private Function FindBestMatchingDrug(ByVal searchDrug As String, ByRef targetDr
         End If
     Next i
     
-    ' ���ʂ�Ԃ��i臒l�ȏ�̃X�R�A�̏ꍇ�̂݁j
+    ' 結果を返す（閾値以上のスコアの場合のみ）
     If bestMatchScore >= 50 And bestMatchIndex >= 0 Then
         FindBestMatchingDrug = targetDrugs(bestMatchIndex)
     Else
@@ -471,12 +459,12 @@ Private Function FindBestMatchingDrug(ByVal searchDrug As String, ByRef targetDr
     End If
 End Function
 
-' ���i������L�[���[�h�𒊏o����֐�
+' 医薬品名からキーワードを抽出する関数
 Private Function ExtractKeywords(ByVal drugName As String) As Variant
-    ' �S�p�X�y�[�X�𔼊p�ɕϊ�
-    drugName = Replace(drugName, "�@", " ")
+    ' 全角スペースを半角に変換
+    drugName = Replace(drugName, "　", " ")
     
-    ' �X�y�[�X�ŕ������Ĕz��Ɋi�[
+    ' スペースで分割して配列に格納
     Dim words As Variant, result() As String
     Dim i As Long, validCount As Long
     
@@ -484,7 +472,7 @@ Private Function ExtractKeywords(ByVal drugName As String) As Variant
     ReDim result(UBound(words))
     validCount = 0
     
-    ' ��łȂ��v�f�̂ݎ擾
+    ' 空でない要素のみ取得
     For i = 0 To UBound(words)
         If Trim(words(i)) <> "" Then
             result(validCount) = LCase(Trim(words(i)))
@@ -492,7 +480,7 @@ Private Function ExtractKeywords(ByVal drugName As String) As Variant
         End If
     Next i
     
-    ' ���ʂ���̏ꍇ�̏���
+    ' 結果が空の場合の処理
     If validCount = 0 Then
         ReDim result(0)
         result(0) = LCase(Trim(drugName))
@@ -503,7 +491,7 @@ Private Function ExtractKeywords(ByVal drugName As String) As Variant
     ExtractKeywords = result
 End Function
 
-' �L�[���[�h�̈�v�����v�Z����֐�
+' キーワードの一致率を計算する関数
 Private Function CalcMatchScore(ByRef keywords As Variant, ByVal targetDrug As String) As Long
     Dim i As Long, matchCount As Long
     Dim lowerTargetDrug As String
@@ -511,14 +499,14 @@ Private Function CalcMatchScore(ByRef keywords As Variant, ByVal targetDrug As S
     lowerTargetDrug = LCase(targetDrug)
     matchCount = 0
     
-    ' �e�L�[���[�h���܂܂�Ă��邩�`�F�b�N
+    ' 各キーワードが含まれているかチェック
     For i = 0 To UBound(keywords)
         If InStr(1, lowerTargetDrug, keywords(i), vbTextCompare) > 0 Then
             matchCount = matchCount + 1
         End If
     Next i
     
-    ' ��v�����v�Z�i�S�����j
+    ' 一致率を計算（百分率）
     If UBound(keywords) >= 0 Then
         CalcMatchScore = (matchCount * 100) / (UBound(keywords) + 1)
     Else
@@ -526,60 +514,14 @@ Private Function CalcMatchScore(ByRef keywords As Variant, ByVal targetDrug As S
     End If
 End Function
 
-' ��`�Ԃ���v���邩�`�F�b�N����֐��iCreateObject���g��Ȃ��o�[�W�����j
+' 包形態が一致するかチェックする関数（CreateObjectを使わないバージョン）
 Private Function CheckPackage(ByVal drugName As String, ByVal packageType As String) As Boolean
-    ' ��`�Ԃ̃o���G�[�V�������`
-    Dim PTPVariations As Variant
-    Dim BulkVariations As Variant
-    Dim SPVariations As Variant
-    Dim DividedVariations As Variant
-    Dim SmallPackageVariations As Variant
-    Dim DispensingVariations As Variant
-    Dim PatientPTPVariations As Variant
+    ' PackageTypeExtractorモジュールを使用して包装形態を抽出
+    Dim extractedPackageType As String
+    extractedPackageType = PackageTypeExtractor.ExtractPackageTypeFromDrugName(drugName)
     
-    ' �e��`�Ԃٕ̈\�L��z��Œ�`
-    PTPVariations = Array("PTP", "�o�s�o", "P.T.P.", "P.T.P")
-    BulkVariations = Array("�o��", "���", "BARA", "�o����")
-    SPVariations = Array("SP", "�r�o", "S.P")
-    DividedVariations = Array("����", "�Ԃ�ۂ�", "����i")
-    SmallPackageVariations = Array("���", "���")
-    DispensingVariations = Array("���ܗp", "����", "���ܗp�")
-    PatientPTPVariations = Array("PTP(���җp)", "���җpPTP", "���җp")
-    
-    ' ��`�Ԃɉ������ϐ���I��
-    Dim variations As Variant
-    
-    Select Case packageType
-        Case "PTP"
-            variations = PTPVariations
-        Case "�o��"
-            variations = BulkVariations
-        Case "SP"
-            variations = SPVariations
-        Case "����"
-            variations = DividedVariations
-        Case "���"
-            variations = SmallPackageVariations
-        Case "���ܗp"
-            variations = DispensingVariations
-        Case "PTP(���җp)"
-            variations = PatientPTPVariations
-        Case Else
-            ' ��`����Ă��Ȃ��ꍇ�͕����񊮑S��v�Ŋm�F
-            CheckPackage = (InStr(1, drugName, packageType, vbTextCompare) > 0)
-            Exit Function
-    End Select
-    
-    ' �e�o���G�[�V�����Ŋm�F
-    Dim j As Long
-    For j = LBound(variations) To UBound(variations)
-        If InStr(1, drugName, variations(j), vbTextCompare) > 0 Then
-            CheckPackage = True
-            Exit Function
-        End If
-    Next j
-    
-    CheckPackage = False
+    ' 抽出した包装形態と指定された包装形態を比較
+    CheckPackage = (extractedPackageType = packageType)
 End Function
 
 ' GTIN-14コードから医薬品情報を処理するメイン関数
@@ -665,8 +607,3 @@ Private Function GetPackageIndicatorDescription(ByVal indicator As String) As St
             GetPackageIndicatorDescription = "不明"
     End Select
 End Function
-
-
-
-
-
