@@ -1,197 +1,227 @@
 Attribute VB_Name = "DrugNameConverter"
 Option Explicit
 
-' ƒ‰ƒbƒp[ƒ‚ƒWƒ…[ƒ‹ - Šî–{‹@”\
+' ï¿½ï¿½ï¿½bï¿½pï¿½[ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½[ï¿½ï¿½ - ï¿½ï¿½{ï¿½@ï¿½\
 
-' ƒƒCƒ“ˆ—‚ğŒÄ‚Ño‚·ƒ‰ƒbƒp[ŠÖ”i7s–ÚˆÈ~‚Ìˆã–ò•i–¼”äŠrj
+' ï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚Ñoï¿½ï¿½ï¿½ï¿½ï¿½bï¿½pï¿½[ï¿½Öï¿½ï¿½i7ï¿½sï¿½ÚˆÈ~ï¿½Ìˆï¿½ï¿½iï¿½ï¿½ï¿½ï¿½rï¿½j
 Public Sub RunDrugNameComparison()
-    ' MainModule‚ÌŠÖ”‚ğŒÄ‚Ño‚µ
+    ' MainModuleï¿½ÌŠÖï¿½ï¿½ï¿½ï¿½Ä‚Ñoï¿½ï¿½
     MainModule.ProcessFromRow7
 End Sub
 
-' B4ƒZƒ‹‚É•ï‘•Œ`‘Ô‚Ì‘I‘ğˆ‚ğƒhƒƒbƒvƒ_ƒEƒ“ƒŠƒXƒg‚Æ‚µ‚Äİ’è‚·‚éŠÖ”
+' B4ï¿½Zï¿½ï¿½ï¿½É•ï‘•ï¿½`ï¿½Ô‚Ì‘Iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½hï¿½ï¿½ï¿½bï¿½vï¿½_ï¿½Eï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½gï¿½Æ‚ï¿½ï¿½Äİ’è‚·ï¿½ï¿½Öï¿½
 Public Sub SetupPackageTypeDropdown()
     Dim settingsSheet As Worksheet
     Set settingsSheet = ThisWorkbook.Worksheets(1)
     
-    ' B4ƒZƒ‹‚Éƒhƒƒbƒvƒ_ƒEƒ“ƒŠƒXƒg‚ğİ’è
+    ' B4ï¿½Zï¿½ï¿½ï¿½Éƒhï¿½ï¿½ï¿½bï¿½vï¿½_ï¿½Eï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½İ’ï¿½
     With settingsSheet.Range("B4").Validation
-        .Delete ' Šù‘¶‚Ì“ü—Í‹K‘¥‚ğíœ
+        .Delete ' ï¿½ï¿½ï¿½ï¿½ï¿½Ì“ï¿½ï¿½Í‹Kï¿½ï¿½ï¿½ï¿½ï¿½íœ
         .Add Type:=xlValidateList, _
              AlertStyle:=xlValidAlertStop, _
              Operator:=xlBetween, _
-             Formula1:="(–¢’è‹`),‚»‚Ì‘¼(‚È‚µ),•ï‘•¬,’²Ü—p,PTP,•ª•ï,ƒoƒ‰,SP,PTP(Š³Ò—p)"
+             Formula1:="(ï¿½ï¿½ï¿½ï¿½`),ï¿½ï¿½ï¿½Ì‘ï¿½(ï¿½È‚ï¿½),ï¿½ï‘•ï¿½ï¿½,ï¿½ï¿½ï¿½Ü—p,PTP,ï¿½ï¿½ï¿½ï¿½,ï¿½oï¿½ï¿½,SP,PTP(ï¿½ï¿½ï¿½Ò—p)"
         .IgnoreBlank = True
         .InCellDropdown = True
-        .InputTitle = "•ï‘•Œ`‘Ô‚Ì‘I‘ğ"
-        .ErrorTitle = "–³Œø‚È‘I‘ğ"
-        .InputMessage = "ƒŠƒXƒg‚©‚ç•ï‘•Œ`‘Ô‚ğ‘I‘ğ‚µ‚Ä‚­‚¾‚³‚¢"
-        .ErrorMessage = "ƒŠƒXƒg‚©‚ç—LŒø‚È•ï‘•Œ`‘Ô‚ğ‘I‘ğ‚µ‚Ä‚­‚¾‚³‚¢"
+        .InputTitle = "ï¿½ï‘•ï¿½`ï¿½Ô‚Ì‘Iï¿½ï¿½"
+        .ErrorTitle = "ï¿½ï¿½ï¿½ï¿½ï¿½È‘Iï¿½ï¿½"
+        .InputMessage = "ï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½ï¿½ï‘•ï¿½`ï¿½Ô‚ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
+        .ErrorMessage = "ï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½ï¿½Lï¿½ï¿½ï¿½È•ï‘•ï¿½`ï¿½Ô‚ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
     End With
     
-    ' B4ƒZƒ‹‚Ì‘®İ’è
+    ' B4ï¿½Zï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½İ’ï¿½
     With settingsSheet.Range("B4")
-        .Value = "PTP" ' ƒfƒtƒHƒ‹ƒg’l‚ğİ’è
+        .Value = "PTP" ' ï¿½fï¿½tï¿½Hï¿½ï¿½ï¿½gï¿½lï¿½ï¿½İ’ï¿½
         .Font.Bold = True
-        .Interior.Color = RGB(217, 225, 242) ' ”–‚¢ÂF‚Ì”wŒi
+        .Interior.Color = RGB(217, 225, 242) ' ï¿½ï¿½ï¿½ï¿½ï¿½ÂFï¿½Ì”wï¿½i
     End With
     
-    ' A4ƒZƒ‹‚Éƒ‰ƒxƒ‹‚ğİ’è
+    ' A4ï¿½Zï¿½ï¿½ï¿½Éƒï¿½ï¿½xï¿½ï¿½ï¿½ï¿½İ’ï¿½
     With settingsSheet.Range("A4")
-        .Value = "•ï‘•Œ`‘Ô:"
+        .Value = "ï¿½ï‘•ï¿½`ï¿½ï¿½:"
         .Font.Bold = True
     End With
     
-    MsgBox "•ï‘•Œ`‘Ô‚Ìƒhƒƒbƒvƒ_ƒEƒ“ƒŠƒXƒg‚ğİ’è‚µ‚Ü‚µ‚½B", vbInformation
+    MsgBox "ï¿½ï‘•ï¿½`ï¿½Ô‚Ìƒhï¿½ï¿½ï¿½bï¿½vï¿½_ï¿½Eï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½İ’è‚µï¿½Ü‚ï¿½ï¿½ï¿½ï¿½B", vbInformation
 End Sub
 
-' ƒV[ƒg1‚ÉƒCƒ“ƒXƒgƒ‰ƒNƒVƒ‡ƒ“‚ğ’Ç‰Á‚·‚éŠÖ”
+' ï¿½Vï¿½[ï¿½g1ï¿½ÉƒCï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç‰ï¿½ï¿½ï¿½ï¿½ï¿½Öï¿½
 Public Sub AddInstructions()
     Dim ws As Worksheet
     Set ws = ThisWorkbook.Worksheets(1)
     
-    ' Šù‘¶‚Ìw¦‚ğíœ
+    ' ï¿½ï¿½ï¿½ï¿½ï¿½Ìwï¿½ï¿½ï¿½ï¿½ï¿½íœ
     ws.Range("A2:C3").ClearContents
     
-    ' w¦‚ğ’Ç‰Á
-    ws.Range("A2").Value = "yg‚¢•ûz"
-    ws.Range("A3").Value = "1. B4‚Ì•ï‘•Œ`‘Ô‚ğ‘I‘ğ‚µ‚Ä‰º‚³‚¢"
-    ws.Range("A4").Value = "•ï‘•Œ`‘Ô:"
+    ' ï¿½wï¿½ï¿½ï¿½ï¿½Ç‰ï¿½
+    ws.Range("A2").Value = "ï¿½yï¿½gï¿½ï¿½ï¿½ï¿½ï¿½z"
+    ws.Range("A3").Value = "1. B4ï¿½Ì•ï‘•ï¿½`ï¿½Ô‚ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½Ä‰ï¿½ï¿½ï¿½ï¿½ï¿½"
+    ws.Range("A4").Value = "ï¿½ï‘•ï¿½`ï¿½ï¿½:"
     ws.Range("B4").Font.Bold = True
     
-    ' ƒZƒ‹‚Ì‘®İ’è
+    ' ï¿½Zï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½İ’ï¿½
     ws.Range("A2").Font.Bold = True
     ws.Range("A2").Font.Size = 12
     
-    ' Às•û–@‚Ìw¦
-    ws.Range("A5").Value = "2. B7ˆÈ~‚ÉŒŸõ‚·‚éˆã–ò•i–¼‚ğ“ü—Í"
+    ' ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½@ï¿½Ìwï¿½ï¿½
+    ws.Range("A5").Value = "2. B7ï¿½È~ï¿½ÉŒï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
     ws.Range("A6").Value = "No."
-    ws.Range("B6").Value = "ŒŸõˆã–ò•i–¼"
-    ws.Range("C6").Value = "ˆê’vˆã–ò•i–¼"
+    ws.Range("B6").Value = "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½iï¿½ï¿½"
+    ws.Range("C6").Value = "ï¿½ï¿½vï¿½ï¿½ï¿½iï¿½ï¿½"
     
     With ws.Range("A6:C6")
         .Font.Bold = True
-        .Interior.Color = RGB(221, 235, 247) ' ”–‚¢ÂF‚Ì”wŒi
+        .Interior.Color = RGB(221, 235, 247) ' ï¿½ï¿½ï¿½ï¿½ï¿½ÂFï¿½Ì”wï¿½i
     End With
     
-    ' Às•û–@‚ÌˆÄ“à
+    ' ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½@ï¿½ÌˆÄ“ï¿½
     Dim note As String
-    note = "¦Às•û–@: ƒƒjƒ…[‚©‚çuƒc[ƒ‹v¨uƒ}ƒNƒv‚ğ‘I‘ğ‚µA" & vbCrLf & _
-           "uRunDrugNameComparisonv‚ğ‘I‚ñ‚ÅuÀsvƒ{ƒ^ƒ“‚ğƒNƒŠƒbƒN‚µ‚Ü‚·B"
+    note = "ï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½@: ï¿½ï¿½ï¿½jï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½uï¿½cï¿½[ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½uï¿½}ï¿½Nï¿½ï¿½ï¿½vï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½A" & vbCrLf & _
+           "ï¿½uRunDrugNameComparisonï¿½vï¿½ï¿½Iï¿½ï¿½Åuï¿½ï¿½ï¿½sï¿½vï¿½{ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½bï¿½Nï¿½ï¿½ï¿½Ü‚ï¿½ï¿½B"
     
     ws.Range("A" & (ws.Cells(ws.Rows.Count, "A").End(xlUp).Row + 2)).Value = note
     
-    MsgBox "g—p•û–@‚Ìw¦‚ğ’Ç‰Á‚µ‚Ü‚µ‚½Bƒƒjƒ…[‚©‚çuƒc[ƒ‹v¨uƒ}ƒNƒv‚ğ‘I‘ğ‚µA" & vbCrLf & _
-           "uRunDrugNameComparisonv‚ğ‘I‚ñ‚Åˆ—‚ğÀs‚µ‚Ä‚­‚¾‚³‚¢B", vbInformation
+    MsgBox "ï¿½gï¿½pï¿½ï¿½ï¿½@ï¿½Ìwï¿½ï¿½ï¿½ï¿½Ç‰ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½ï¿½Bï¿½ï¿½ï¿½jï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½uï¿½cï¿½[ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½uï¿½}ï¿½Nï¿½ï¿½ï¿½vï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½A" & vbCrLf & _
+           "ï¿½uRunDrugNameComparisonï¿½vï¿½ï¿½Iï¿½ï¿½Åï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B", vbInformation
 End Sub
 
-' ƒ[ƒNƒuƒbƒN‚Ì‰Šú‰»ŠÖ”
+' ï¿½ï¿½ï¿½[ï¿½Nï¿½uï¿½bï¿½Nï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öï¿½
 Public Sub InitWorkbook()
     On Error GoTo ErrorHandler
     
-    ' ƒ[ƒNƒV[ƒg‚ÌQÆ‚ğæ“¾
+    ' ï¿½ï¿½ï¿½[ï¿½Nï¿½Vï¿½[ï¿½gï¿½ÌQï¿½Æ‚ï¿½ï¿½æ“¾
     Dim settingsSheet As Worksheet
     Dim targetSheet As Worksheet
     
     Set settingsSheet = ThisWorkbook.Worksheets(1)
     Set targetSheet = ThisWorkbook.Worksheets(2)
     
-    ' ƒV[ƒg1‚Ìİ’è
+    ' ï¿½Vï¿½[ï¿½g1ï¿½Ìİ’ï¿½
     With settingsSheet
-        ' ƒ^ƒCƒgƒ‹İ’è
+        ' ï¿½^ï¿½Cï¿½gï¿½ï¿½ï¿½İ’ï¿½
         .Range("A1:C1").Merge
-        .Range("A1").Value = "ˆã–ò•i–¼”äŠrƒc[ƒ‹"
+        .Range("A1").Value = "ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½ï¿½rï¿½cï¿½[ï¿½ï¿½"
         .Range("A1").Font.Bold = True
         .Range("A1").Font.Size = 14
         .Range("A1").HorizontalAlignment = xlCenter
         .Range("A1").Interior.Color = RGB(180, 198, 231)
         
-        ' g‚¢•û
-        .Range("A2").Value = "yg‚¢•ûz"
+        ' ï¿½gï¿½ï¿½ï¿½ï¿½
+        .Range("A2").Value = "ï¿½yï¿½gï¿½ï¿½ï¿½ï¿½ï¿½z"
         .Range("A2").Font.Bold = True
-        .Range("A3").Value = "1. B4‚Ì•ï‘•Œ`‘Ô‚ğ‘I‘ğ"
-        .Range("A4").Value = "•ï‘•Œ`‘Ô:"
+        .Range("A3").Value = "1. B4ï¿½Ì•ï‘•ï¿½`ï¿½Ô‚ï¿½Iï¿½ï¿½"
+        .Range("A4").Value = "ï¿½ï‘•ï¿½`ï¿½ï¿½:"
         .Range("A4").Font.Bold = True
         
-        ' ƒhƒƒbƒvƒ_ƒEƒ“ƒŠƒXƒgİ’è
+        ' ï¿½hï¿½ï¿½ï¿½bï¿½vï¿½_ï¿½Eï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½gï¿½İ’ï¿½
         With .Range("B4").Validation
             .Delete
             .Add Type:=xlValidateList, _
                  AlertStyle:=xlValidAlertStop, _
                  Operator:=xlBetween, _
-                 Formula1:="(–¢’è‹`),‚»‚Ì‘¼(‚È‚µ),•ï‘•¬,’²Ü—p,PTP,•ª•ï,ƒoƒ‰,SP,PTP(Š³Ò—p)"
+                 Formula1:="(ï¿½ï¿½ï¿½ï¿½`),ï¿½ï¿½ï¿½Ì‘ï¿½(ï¿½È‚ï¿½),ï¿½ï‘•ï¿½ï¿½,ï¿½ï¿½ï¿½Ü—p,PTP,ï¿½ï¿½ï¿½ï¿½,ï¿½oï¿½ï¿½,SP,PTP(ï¿½ï¿½ï¿½Ò—p)"
             .IgnoreBlank = True
             .InCellDropdown = True
         End With
         
-        ' B4ƒZƒ‹İ’è
+        ' B4ï¿½Zï¿½ï¿½ï¿½İ’ï¿½
         .Range("B4").Value = "PTP"
         .Range("B4").Font.Bold = True
         .Range("B4").Interior.Color = RGB(217, 225, 242)
         
-        ' è‡
-        .Range("A5").Value = "2. B7ˆÈ~‚ÉŒŸõ‚·‚éˆã–ò•i–¼‚ğ“ü—Í"
+        ' ï¿½è‡
+        .Range("A5").Value = "2. B7ï¿½È~ï¿½ÉŒï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
         .Range("A5").Font.Bold = True
         
-        ' ƒwƒbƒ_[
+        ' ï¿½wï¿½bï¿½_ï¿½[
         .Range("A6").Value = "No."
-        .Range("B6").Value = "ŒŸõˆã–ò•i–¼"
-        .Range("C6").Value = "ˆê’vˆã–ò•i–¼"
+        .Range("B6").Value = "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½iï¿½ï¿½"
+        .Range("C6").Value = "ï¿½ï¿½vï¿½ï¿½ï¿½iï¿½ï¿½"
         .Range("A6:C6").Font.Bold = True
         .Range("A6:C6").Interior.Color = RGB(221, 235, 247)
         
-        ' —ñ•
+        ' ï¿½ï¿½
         .Columns("A").ColumnWidth = 5
         .Columns("B").ColumnWidth = 30
         .Columns("C").ColumnWidth = 40
         
-        ' s”Ô†
+        ' ï¿½sï¿½Ôï¿½
         Dim i As Long
         For i = 7 To 30
             .Cells(i, "A").Value = i - 6
         Next i
         
-        ' Às•û–@‚ÌˆÄ“à
-        .Range("A32").Value = "¦Às•û–@: ƒƒjƒ…[‚©‚çuƒc[ƒ‹v¨uƒ}ƒNƒv‚ğ‘I‘ğ‚µAuRunDrugNameComparisonv‚ğÀs"
+        ' ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½@ï¿½ÌˆÄ“ï¿½
+        .Range("A32").Value = "ï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½@: ï¿½ï¿½ï¿½jï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½uï¿½cï¿½[ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½uï¿½}ï¿½Nï¿½ï¿½ï¿½vï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½Aï¿½uRunDrugNameComparisonï¿½vï¿½ï¿½ï¿½ï¿½ï¿½s"
         .Range("A32").Font.Italic = True
+        
+        ' GS1ï¿½Rï¿½[ï¿½hï¿½ï¿½ï¿½ï¿½ï¿½ÉŠÖ‚áº´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        .Range("A34").Value = "ï¿½yGS1ï¿½Rï¿½[ï¿½hï¿½ï¿½ï¿½ï¿½ï¿½z"
+        .Range("A34").Font.Bold = True
+        .Range("A35").Value = "ï¿½ï¿½ï¿½jï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½uï¿½cï¿½[ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½uï¿½}ï¿½Nï¿½ï¿½ï¿½vï¿½ï¿½ï¿½uRunGS1CodeProcessingï¿½vï¿½ï¿½"
+        .Range("A36").Value = "GS1-128ï¿½Ì‚Pï¿½Sï¿½ï¿½ï¿½Rï¿½[ï¿½hï¿½ï¿½ï¿½ç—¤ï¿½iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İ’ï¿½Vï¿½[ï¿½gï¿½É“]ï¿½Lï¿½Å‚ï¿½ï¿½Ü‚ï¿½ï¿½B"
     End With
     
-    ' ƒV[ƒg2‚Ìİ’è
+    ' ï¿½Vï¿½[ï¿½g2ï¿½Ìİ’ï¿½
     With targetSheet
-        ' ƒ^ƒCƒgƒ‹
+        ' ï¿½^ï¿½Cï¿½gï¿½ï¿½
         .Range("A1:B1").Merge
-        .Range("A1").Value = "”äŠr‘ÎÛˆã–ò•iƒŠƒXƒg"
+        .Range("A1").Value = "ï¿½ï¿½rï¿½ÎÛˆï¿½ï¿½iï¿½ï¿½ï¿½Xï¿½g"
         .Range("A1").Font.Bold = True
         .Range("A1").Font.Size = 14
         .Range("A1").HorizontalAlignment = xlCenter
         .Range("A1").Interior.Color = RGB(180, 198, 231)
         
-        ' ƒwƒbƒ_[
+        ' ï¿½wï¿½bï¿½_ï¿½[
         .Range("A2").Value = "No."
-        .Range("B2").Value = "ˆã–ò•i–¼"
+        .Range("B2").Value = "ï¿½ï¿½ï¿½iï¿½ï¿½"
         .Range("A2:B2").Font.Bold = True
         .Range("A2:B2").Interior.Color = RGB(221, 235, 247)
         
-        ' —ñ•
+        ' ï¿½ï¿½
         .Columns("A").ColumnWidth = 5
         .Columns("B").ColumnWidth = 50
         
-        ' s”Ô†
+        ' ï¿½sï¿½Ôï¿½
         For i = 3 To 30
             .Cells(i, "A").Value = i - 2
         Next i
     End With
     
-    MsgBox "ƒ[ƒNƒuƒbƒN‚ğ‰Šú‰»‚µ‚Ü‚µ‚½B" & vbNewLine & _
-           "1. İ’èƒV[ƒg‚ÌB4ƒZƒ‹‚Å•ï‘•Œ`‘Ô‚ğ‘I‘ğ" & vbNewLine & _
-           "2. ƒV[ƒg2‚É”äŠr‘ÎÛ‚Ìˆã–ò•i–¼‚ğ“ü—Í" & vbNewLine & _
-           "3. İ’èƒV[ƒg‚ÌB7ˆÈ~‚ÉŒŸõ‚·‚éˆã–ò•i–¼‚ğ“ü—Í" & vbNewLine & _
-           "4. ƒƒjƒ…[‚Ìuƒc[ƒ‹v¨uƒ}ƒNƒv‚©‚çuRunDrugNameComparisonv‚ğÀs", vbInformation
+    MsgBox "ï¿½ï¿½ï¿½[ï¿½Nï¿½uï¿½bï¿½Nï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½ï¿½B" & vbNewLine & _
+           "1. ï¿½İ’ï¿½Vï¿½[ï¿½gï¿½ï¿½B4ï¿½Zï¿½ï¿½ï¿½Å•ï‘•ï¿½`ï¿½Ô‚ï¿½Iï¿½ï¿½" & vbNewLine & _
+           "2. ï¿½Vï¿½[ï¿½g2ï¿½É”ï¿½rï¿½ÎÛ‚Ìˆï¿½ï¿½iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" & vbNewLine & _
+           "3. ï¿½İ’ï¿½Vï¿½[ï¿½gï¿½ï¿½B7ï¿½È~ï¿½ÉŒï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" & vbNewLine & _
+           "4. ï¿½ï¿½ï¿½jï¿½ï¿½ï¿½[ï¿½Ìuï¿½cï¿½[ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½uï¿½}ï¿½Nï¿½ï¿½ï¿½vï¿½ï¿½ï¿½ï¿½uRunDrugNameComparisonï¿½vï¿½ï¿½ï¿½ï¿½ï¿½s", vbInformation
     
     Exit Sub
     
 ErrorHandler:
-    MsgBox "ƒGƒ‰[‚ª”­¶‚µ‚Ü‚µ‚½: " & Err.Description, vbCritical
+    MsgBox "ï¿½Gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½: " & Err.Description, vbCritical
+End Sub
+' GS1ã‚³ãƒ¼ãƒ‰å‡¦ç†æ©Ÿèƒ½ã‚’å®Ÿè¡Œã™ã‚‹ãƒ©ãƒƒãƒ‘ãƒ¼é–¢æ•°
+Public Sub RunGS1CodeProcessing()
+    ' MainModuleã®é–¢æ•°ã‚’å‘¼ã³å‡ºã—
+    MainModule.ProcessGS1DrugCode
+End Sub
+
+' ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã«GS1ã‚³ãƒ¼ãƒ‰å‡¦ç†æ©Ÿèƒ½ã‚’è¿½åŠ ã™ã‚‹
+Public Sub AddGS1ProcessingInstructions()
+    Dim ws As Worksheet
+    Set ws = ThisWorkbook.Worksheets(1)
+    
+    ' GS1å‡¦ç†ã«é–¢ã™ã‚‹èª¬æ˜ã‚’è¿½åŠ 
+    Dim lastRow As Long
+    lastRow = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row + 2
+    
+    ws.Cells(lastRow, "A").Value = "ã€GS1ã‚³ãƒ¼ãƒ‰å‡¦ç†æ©Ÿèƒ½ã€‘"
+    ws.Cells(lastRow, "A").Font.Bold = True
+    ws.Cells(lastRow, "A").Font.Size = 12
+    
+    ws.Cells(lastRow + 1, "A").Value = "ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‹ã‚‰ã€Œãƒ„ãƒ¼ãƒ«ã€â†’ã€Œãƒã‚¯ãƒ­ã€â†’ã€ŒRunGS1CodeProcessingã€ã‚’"
+    ws.Cells(lastRow + 2, "A").Value = "é¸æŠã™ã‚‹ã¨ã€GS1-128ã®14æ¡ã‚³ãƒ¼ãƒ‰ã‹ã‚‰åŒ»è–¬å“æƒ…å ±ã‚’å‡¦ç†ã§ãã¾ã™ã€‚"
+    
+    MsgBox "GS1ã‚³ãƒ¼ãƒ‰å‡¦ç†æ©Ÿèƒ½ã®èª¬æ˜ã‚’ã‚·ãƒ¼ãƒˆã«è¿½åŠ ã—ã¾ã—ãŸã€‚", vbInformation
 End Sub
 
 

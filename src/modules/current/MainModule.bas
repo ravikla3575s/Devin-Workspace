@@ -1,7 +1,7 @@
 Attribute VB_Name = "MainModule"
 Option Explicit
 
-' ƒƒCƒ“‚Ìˆ—ŠÖ”F–ò•i–¼‚Ìˆê’v—¦‚ÉŠî‚Ã‚¢‚Ä“]‹L
+' ï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½Öï¿½ï¿½Fï¿½ï¿½iï¿½ï¿½ï¿½Ìˆï¿½vï¿½ï¿½ï¿½ÉŠï¿½Ã‚ï¿½ï¿½Ä“]ï¿½L
 Public Sub MainProcess()
     On Error GoTo ErrorHandler
     
@@ -16,7 +16,7 @@ Public Sub MainProcess()
     lastRow1 = ws1.Cells(ws1.Rows.Count, "B").End(xlUp).Row
     lastRow2 = ws2.Cells(ws2.Rows.Count, "B").End(xlUp).Row
     
-    Const MATCH_THRESHOLD As Double = 80 ' ˆê’v—¦‚Ì‚µ‚«‚¢’li80%j
+    Const MATCH_THRESHOLD As Double = 80 ' ï¿½ï¿½vï¿½ï¿½ï¿½Ì‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½lï¿½i80%ï¿½j
     
     Dim i As Long, j As Long
     For i = 2 To lastRow1
@@ -42,48 +42,48 @@ Public Sub MainProcess()
                 End If
             Next j
             
-            ' Œ‹‰Ê‚Ìo—Í
+            ' ï¿½ï¿½ï¿½Ê‚Ìoï¿½ï¿½
             If maxMatchRate >= MATCH_THRESHOLD Then
                 ws1.Cells(i, "C").Value = ws2.Cells(bestMatchIndex, "B").Value
                 ws1.Cells(i, "D").Value = maxMatchRate & "%"
                 
-                ' ˆê’v‚µ‚½Še—v‘f‚ÌÚ×‚ğo—ÍiƒfƒoƒbƒO—pj
+                ' ï¿½ï¿½vï¿½ï¿½ï¿½ï¿½ï¿½eï¿½vï¿½fï¿½ÌÚ×‚ï¿½ï¿½oï¿½Íiï¿½fï¿½oï¿½bï¿½Oï¿½pï¿½j
                 Dim sourceParts As DrugNameParts
                 Dim targetParts As DrugNameParts
                 sourceParts = ParseDrugString(sourceStr)
                 targetParts = ParseDrugString(ws2.Cells(bestMatchIndex, "B").Value)
                 
-                ws1.Cells(i, "E").Value = "Šî–{–¼:" & sourceParts.BaseName & _
-                                         " ÜŒ^:" & sourceParts.formType & _
-                                         " ‹KŠi:" & sourceParts.strength & _
-                                         " ƒ[ƒJ[:" & sourceParts.maker
+                ws1.Cells(i, "E").Value = "ï¿½ï¿½{ï¿½ï¿½:" & sourceParts.BaseName & _
+                                         " ï¿½ÜŒ^:" & sourceParts.formType & _
+                                         " ï¿½Kï¿½i:" & sourceParts.strength & _
+                                         " ï¿½ï¿½ï¿½[ï¿½Jï¿½[:" & sourceParts.maker
             End If
         End If
     Next i
     
     Application.ScreenUpdating = True
-    MsgBox "ˆ—‚ªŠ®—¹‚µ‚Ü‚µ‚½B"
+    MsgBox "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½ï¿½B"
     Exit Sub
     
 ErrorHandler:
     Application.ScreenUpdating = True
-    MsgBox "ƒGƒ‰[‚ª”­¶‚µ‚Ü‚µ‚½: " & Err.Description
+    MsgBox "ï¿½Gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½: " & Err.Description
 End Sub
 
-' –ò•i–¼‚ÌŒŸõ‚Æ“]‹LŠÖ”
+' ï¿½ï¿½iï¿½ï¿½ï¿½ÌŒï¿½ï¿½ï¿½ï¿½Æ“]ï¿½Lï¿½Öï¿½
 Public Sub SearchAndTransferDrugData()
     On Error GoTo ErrorHandler
     
-    '‰æ–ÊXV‚ğˆê’â~‚µ‚ÄƒpƒtƒH[ƒ}ƒ“ƒXŒüã
+    'ï¿½ï¿½ÊXï¿½Vï¿½ï¿½ï¿½êï¿½ï¿½~ï¿½ï¿½ï¿½Äƒpï¿½tï¿½Hï¿½[ï¿½}ï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½
     Application.ScreenUpdating = False
     
-    'ƒ[ƒNƒV[ƒg‚Ìİ’è
+    'ï¿½ï¿½ï¿½[ï¿½Nï¿½Vï¿½[ï¿½gï¿½Ìİ’ï¿½
     Dim ws1 As Worksheet, ws2 As Worksheet, ws3 As Worksheet
     Set ws1 = ThisWorkbook.Worksheets(1)
     Set ws2 = ThisWorkbook.Worksheets(2)
     Set ws3 = ThisWorkbook.Worksheets(3)
     
-    'ÅIs‚Ìæ“¾
+    'ï¿½ÅIï¿½sï¿½Ìæ“¾
     Dim lastRow1 As Long, lastRow2 As Long, lastRow3 As Long
     lastRow1 = ws1.Cells(ws1.Rows.Count, "A").End(xlUp).Row
     lastRow2 = ws2.Cells(ws2.Rows.Count, "B").End(xlUp).Row
@@ -92,24 +92,24 @@ Public Sub SearchAndTransferDrugData()
     Dim i As Long
     Dim inputValue As Variant
     
-    'Šes‚ÌA—ñ‚Ì’l‚ğˆ—
-    For i = 2 To lastRow1  'ƒwƒbƒ_[‚ğƒXƒLƒbƒv
+    'ï¿½eï¿½sï¿½ï¿½Aï¿½ï¿½Ì’lï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    For i = 2 To lastRow1  'ï¿½wï¿½bï¿½_ï¿½[ï¿½ï¿½ï¿½Xï¿½Lï¿½bï¿½v
         inputValue = ws1.Cells(i, "A").Value
         
-        '“ü—Í’l‚ğˆ—‚·‚éŠÖ”‚ğŒÄ‚Ño‚µ
+        'ï¿½ï¿½ï¿½Í’lï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öï¿½ï¿½ï¿½ï¿½Ä‚Ñoï¿½ï¿½
         ProcessInputValue inputValue, ws1, ws2, ws3, i, lastRow2, lastRow3
     Next i
     
     Application.ScreenUpdating = True
-    MsgBox "ˆ—‚ªŠ®—¹‚µ‚Ü‚µ‚½B"
+    MsgBox "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½ï¿½B"
     Exit Sub
     
 ErrorHandler:
     Application.ScreenUpdating = True
-    MsgBox "ƒGƒ‰[‚ª”­¶‚µ‚Ü‚µ‚½: " & Err.Description
+    MsgBox "ï¿½Gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½: " & Err.Description
 End Sub
 
-' “ü—Í’l‚ğˆ—‚·‚éŠÖ”
+' ï¿½ï¿½ï¿½Í’lï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öï¿½
 Private Sub ProcessInputValue(ByVal inputValue As Variant, _
                             ByRef ws1 As Worksheet, _
                             ByRef ws2 As Worksheet, _
@@ -123,18 +123,18 @@ Private Sub ProcessInputValue(ByVal inputValue As Variant, _
     Dim packageType As String
     Dim j As Long, k As Long
     
-    'Sheet3‚©‚ç–òÜ–¼‚ğŒŸõ
+    'Sheet3ï¿½ï¿½ï¿½ï¿½ï¿½Ü–ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     For k = 2 To lastRow3
         drugNameFromSheet3 = ws3.Cells(k, "F").Value
         If InStr(1, inputValue, drugNameFromSheet3) > 0 Then
-            'Sheet2‚©‚ç‘Î‰‚·‚é–òÜ–¼‚ğŒŸõ
+            'Sheet2ï¿½ï¿½ï¿½ï¿½Î‰ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü–ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             For j = 2 To lastRow2
                 drugNameFromSheet2 = ws2.Cells(j, "B").Value
                 If drugNameFromSheet2 = drugNameFromSheet3 Then
-                    '•ï‘•ƒ^ƒCƒv‚ğæ“¾
+                    'ï¿½ï‘•ï¿½^ï¿½Cï¿½vï¿½ï¿½ï¿½æ“¾
                     packageType = GetPackageType(inputValue)
                     
-                    'ƒf[ƒ^‚ğ“]‹L
+                    'ï¿½fï¿½[ï¿½^ï¿½ï¿½]ï¿½L
                     ws1.Cells(currentRow, "B").Value = ws2.Cells(j, "A").Value
                     ws1.Cells(currentRow, "C").Value = packageType
                     Exit For
@@ -145,7 +145,7 @@ Private Sub ProcessInputValue(ByVal inputValue As Variant, _
     Next k
 End Sub
 
-' ˆê’v—¦ŒvZ‚É‚æ‚é–ò•i–¼ˆ—ŠÖ”
+' ï¿½ï¿½vï¿½ï¿½ï¿½vï¿½Zï¿½É‚ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öï¿½
 Public Sub ProcessDrugNamesWithMatchRate()
     Dim ws1 As Worksheet, ws2 As Worksheet
     Set ws1 = ThisWorkbook.Worksheets(1)
@@ -153,7 +153,7 @@ Public Sub ProcessDrugNamesWithMatchRate()
     
     Dim i As Long, j As Long
     Dim lastRow1 As Long, lastRow2 As Long
-    Const MATCH_THRESHOLD As Double = 80 ' ˆê’v—¦‚Ì‚µ‚«‚¢’li80%j
+    Const MATCH_THRESHOLD As Double = 80 ' ï¿½ï¿½vï¿½ï¿½ï¿½Ì‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½lï¿½i80%ï¿½j
     
     lastRow1 = ws1.Cells(ws1.Rows.Count, "B").End(xlUp).Row
     lastRow2 = ws2.Cells(ws2.Rows.Count, "B").End(xlUp).Row
@@ -180,54 +180,54 @@ Public Sub ProcessDrugNamesWithMatchRate()
             End If
         Next j
         
-        ' ‚µ‚«‚¢’lˆÈã‚Ìˆê’v—¦‚ª‚ ‚Á‚½ê‡‚Ì‚İ“]‹L
+        ' ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½lï¿½Èï¿½Ìˆï¿½vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‡ï¿½Ì‚İ“]ï¿½L
         If maxMatchRate >= MATCH_THRESHOLD Then
             ws1.Cells(i, "C").Value = ws2.Cells(bestMatchIndex, "B").Value
             ws1.Cells(i, "D").Value = maxMatchRate & "%"
         End If
     Next i
     
-    MsgBox "ˆ—‚ªŠ®—¹‚µ‚Ü‚µ‚½B"
+    MsgBox "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½ï¿½B"
 End Sub
 
-' İ’èƒV[ƒg‚Ì•ï‘•Œ`‘Ô‚ğl—¶‚µ‚½ˆã–ò•i–¼”äŠr‚Æ“]‹L‚ğs‚¤
+' ï¿½İ’ï¿½Vï¿½[ï¿½gï¿½Ì•ï‘•ï¿½`ï¿½Ô‚ï¿½ï¿½lï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½ï¿½rï¿½Æ“]ï¿½Lï¿½ï¿½ï¿½sï¿½ï¿½
 Public Sub CompareAndTransferDrugNamesByPackage()
     On Error GoTo ErrorHandler
     
     Application.ScreenUpdating = False
     
-    ' ƒ[ƒNƒV[ƒg‚Ìİ’è
+    ' ï¿½ï¿½ï¿½[ï¿½Nï¿½Vï¿½[ï¿½gï¿½Ìİ’ï¿½
     Dim wsSettings As Worksheet, wsTarget As Worksheet
-    Set wsSettings = ThisWorkbook.Worksheets(1) ' İ’èƒV[ƒg
-    Set wsTarget = ThisWorkbook.Worksheets(2)   ' ”äŠr‘ÎÛ‚ÌƒV[ƒg
+    Set wsSettings = ThisWorkbook.Worksheets(1) ' ï¿½İ’ï¿½Vï¿½[ï¿½g
+    Set wsTarget = ThisWorkbook.Worksheets(2)   ' ï¿½ï¿½rï¿½ÎÛ‚ÌƒVï¿½[ï¿½g
     
-    ' B4ƒZƒ‹‚©‚ç•ï‘•Œ`‘Ô‚ğæ“¾
+    ' B4ï¿½Zï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï‘•ï¿½`ï¿½Ô‚ï¿½ï¿½æ“¾
     Dim packageType As String
     packageType = wsSettings.Range("B4").Value
     
-    ' ÅIs‚ğæ“¾
+    ' ï¿½ÅIï¿½sï¿½ï¿½ï¿½æ“¾
     Dim lastRowSettings As Long, lastRowTarget As Long
     lastRowSettings = wsSettings.Cells(wsSettings.Rows.Count, "B").End(xlUp).Row
     lastRowTarget = wsTarget.Cells(wsTarget.Rows.Count, "B").End(xlUp).Row
     
-    ' ŒŸõ‘ÎÛ‚Æ”äŠr‘ÎÛ‚Ìˆã–ò•i–¼‚ğ”z—ñ‚ÉŠi”[
+    ' ï¿½ï¿½ï¿½ï¿½ï¿½ÎÛ‚Æ”ï¿½rï¿½ÎÛ‚Ìˆï¿½ï¿½iï¿½ï¿½ï¿½ï¿½zï¿½ï¿½ÉŠiï¿½[
     Dim searchDrugs() As String
     Dim targetDrugs() As String
     Dim i As Long, j As Long
     
-    ' ŒŸõˆã–ò•i—p‚Ì”z—ñ‚ğ‰Šú‰»
-    ReDim searchDrugs(1 To lastRowSettings - 1) ' ƒwƒbƒ_[s‚ğœ‚­
+    ' ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½iï¿½pï¿½Ì”zï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    ReDim searchDrugs(1 To lastRowSettings - 1) ' ï¿½wï¿½bï¿½_ï¿½[ï¿½sï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     For i = 2 To lastRowSettings
         searchDrugs(i - 1) = wsSettings.Cells(i, "B").Value
     Next i
     
-    ' ”äŠr‘ÎÛ—p‚Ì”z—ñ‚ğ‰Šú‰»
-    ReDim targetDrugs(1 To lastRowTarget - 1) ' ƒwƒbƒ_[s‚ğœ‚­
+    ' ï¿½ï¿½rï¿½ÎÛ—pï¿½Ì”zï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    ReDim targetDrugs(1 To lastRowTarget - 1) ' ï¿½wï¿½bï¿½_ï¿½[ï¿½sï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     For i = 2 To lastRowTarget
         targetDrugs(i - 1) = wsTarget.Cells(i, "B").Value
     Next i
     
-    ' ŠeŒŸõˆã–ò•i‚É‘Î‚µ‚Ä”äŠrˆ—
+    ' ï¿½eï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½iï¿½É‘Î‚ï¿½ï¿½Ä”ï¿½rï¿½ï¿½ï¿½ï¿½
     For i = 2 To lastRowSettings
         Dim searchDrug As String
         searchDrug = wsSettings.Cells(i, "B").Value
@@ -237,10 +237,10 @@ Public Sub CompareAndTransferDrugNamesByPackage()
             bestMatch = FindBestMatchWithPackage(searchDrug, targetDrugs, packageType)
             
             If Len(bestMatch) > 0 Then
-                ' ˆê’v‚µ‚½ˆã–ò•i–¼‚ğC—ñ‚É“]‹L
+                ' ï¿½ï¿½vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½ï¿½Cï¿½ï¿½É“]ï¿½L
                 wsSettings.Cells(i, "C").Value = bestMatch
             Else
-                ' ˆê’v‚µ‚È‚©‚Á‚½ê‡‚Í‹ó—“‚É‚·‚é
+                ' ï¿½ï¿½vï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‡ï¿½Í‹ó—“‚É‚ï¿½ï¿½ï¿½
                 wsSettings.Cells(i, "C").Value = ""
             End If
         End If
@@ -248,15 +248,15 @@ Public Sub CompareAndTransferDrugNamesByPackage()
     
 CleanExit:
     Application.ScreenUpdating = True
-    MsgBox "ˆ—‚ªŠ®—¹‚µ‚Ü‚µ‚½B", vbInformation
+    MsgBox "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½ï¿½B", vbInformation
     Exit Sub
     
 ErrorHandler:
     Application.ScreenUpdating = True
-    MsgBox "ƒGƒ‰[‚ª”­¶‚µ‚Ü‚µ‚½: " & Err.Description, vbCritical
+    MsgBox "ï¿½Gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½: " & Err.Description, vbCritical
 End Sub
 
-' ˆã–ò•i–¼‚Ì¬•ªA‹KŠiA’PˆÊ‚Ìˆê’v“x‚ğŒvZ
+' ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½Aï¿½Kï¿½iï¿½Aï¿½Pï¿½Ê‚Ìˆï¿½vï¿½xï¿½ï¿½ï¿½vï¿½Z
 Public Function CalculateMatchScore(ByRef searchParts As DrugNameParts, ByRef targetParts As DrugNameParts) As Double
     Dim score As Double
     Dim totalWeight As Double
@@ -264,25 +264,25 @@ Public Function CalculateMatchScore(ByRef searchParts As DrugNameParts, ByRef ta
     score = 0
     totalWeight = 0
     
-    ' ¬•ª–¼‚Ì”äŠrid‚İ: 50%j
+    ' ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì”ï¿½rï¿½iï¿½dï¿½ï¿½: 50%ï¿½j
     If StrComp(searchParts.BaseName, targetParts.BaseName, vbTextCompare) = 0 Then
         score = score + 50
     End If
     totalWeight = totalWeight + 50
     
-    ' ÜŒ^‚Ì”äŠrid‚İ: 20%j
+    ' ï¿½ÜŒ^ï¿½Ì”ï¿½rï¿½iï¿½dï¿½ï¿½: 20%ï¿½j
     If StrComp(searchParts.formType, targetParts.formType, vbTextCompare) = 0 Then
         score = score + 20
     End If
     totalWeight = totalWeight + 20
     
-    ' ‹KŠi‚Ì”äŠrid‚İ: 30%j
+    ' ï¿½Kï¿½iï¿½Ì”ï¿½rï¿½iï¿½dï¿½ï¿½: 30%ï¿½j
     If CompareStrength(searchParts.strength, targetParts.strength) Then
         score = score + 30
     End If
     totalWeight = totalWeight + 30
     
-    ' ƒXƒRƒA‚Ì³‹K‰»i•S•ª—¦j
+    ' ï¿½Xï¿½Rï¿½Aï¿½Ìï¿½ï¿½Kï¿½ï¿½ï¿½iï¿½Sï¿½ï¿½ï¿½ï¿½ï¿½j
     If totalWeight > 0 Then
         CalculateMatchScore = (score / totalWeight) * 100
     Else
@@ -290,32 +290,32 @@ Public Function CalculateMatchScore(ByRef searchParts As DrugNameParts, ByRef ta
     End If
 End Function
 
-' •ï‘•Œ`‘Ô‚ğl—¶‚µ‚½Å“K‚Èˆã–ò•i–¼‚Ìˆê’v‚ğŒŸõ‚·‚é
+' ï¿½ï‘•ï¿½`ï¿½Ô‚ï¿½ï¿½lï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å“Kï¿½Èˆï¿½ï¿½iï¿½ï¿½ï¿½Ìˆï¿½vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 Private Function FindBestMatchWithPackage(ByVal searchDrug As String, ByRef targetDrugs() As String, ByVal requiredPackage As String) As String
     Dim i As Long
     Dim bestMatchScore As Double
     Dim bestMatchIndex As Long
     Dim searchParts As DrugNameParts
     
-    ' ŒŸõ‘ÎÛ‚Ìˆã–ò•i–¼‚ğ•ª‰ğ
+    ' ï¿½ï¿½ï¿½ï¿½ï¿½ÎÛ‚Ìˆï¿½ï¿½iï¿½ï¿½ï¿½ğ•ª‰ï¿½
     searchParts = ParseDrugString(searchDrug)
     bestMatchScore = 0
     bestMatchIndex = -1
     
-    ' Še”äŠr‘ÎÛ‚É‘Î‚µ‚ÄƒXƒRƒA‚ğŒvZ
+    ' ï¿½eï¿½ï¿½rï¿½ÎÛ‚É‘Î‚ï¿½ï¿½ÄƒXï¿½Rï¿½Aï¿½ï¿½ï¿½vï¿½Z
     For i = LBound(targetDrugs) To UBound(targetDrugs)
         Dim targetParts As DrugNameParts
         Dim currentScore As Double
         Dim hasRequiredPackage As Boolean
         
-        ' ”äŠr‘ÎÛ‚Ìˆã–ò•i–¼‚ğ•ª‰ğ
+        ' ï¿½ï¿½rï¿½ÎÛ‚Ìˆï¿½ï¿½iï¿½ï¿½ï¿½ğ•ª‰ï¿½
         targetParts = ParseDrugString(targetDrugs(i))
         
-        ' •ï‘•Œ`‘Ô‚ÌŠm”F
+        ' ï¿½ï‘•ï¿½`ï¿½Ô‚ÌŠmï¿½F
         hasRequiredPackage = (InStr(1, targetParts.Package, requiredPackage, vbTextCompare) > 0)
         
         If hasRequiredPackage Then
-            ' ¬•ª–¼A‹KŠiA’PˆÊ‚Ìˆê’v“x‚ğŒvZ
+            ' ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Aï¿½Kï¿½iï¿½Aï¿½Pï¿½Ê‚Ìˆï¿½vï¿½xï¿½ï¿½ï¿½vï¿½Z
             currentScore = CalculateMatchScore(searchParts, targetParts)
             
             If currentScore > bestMatchScore Then
@@ -325,33 +325,33 @@ Private Function FindBestMatchWithPackage(ByVal searchDrug As String, ByRef targ
         End If
     Next i
     
-    ' ˆê’èˆÈã‚ÌƒXƒRƒA‚ª‚ ‚éê‡‚Ì‚İŒ‹‰Ê‚ğ•Ô‚·
-    If bestMatchScore >= 70 And bestMatchIndex >= 0 Then ' 70%ˆÈã‚Ìˆê’v—¦
+    ' ï¿½ï¿½ï¿½Èï¿½ÌƒXï¿½Rï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‡ï¿½Ì‚İŒï¿½ï¿½Ê‚ï¿½Ô‚ï¿½
+    If bestMatchScore >= 70 And bestMatchIndex >= 0 Then ' 70%ï¿½Èï¿½Ìˆï¿½vï¿½ï¿½
         FindBestMatchWithPackage = targetDrugs(bestMatchIndex)
     Else
         FindBestMatchWithPackage = ""
     End If
 End Function
 
-' 7s–ÚˆÈ~‚Ìˆã–ò•i–¼”äŠr‚Æ“]‹L‚ğs‚¤ŠÖ”
+' 7ï¿½sï¿½ÚˆÈ~ï¿½Ìˆï¿½ï¿½iï¿½ï¿½ï¿½ï¿½rï¿½Æ“]ï¿½Lï¿½ï¿½ï¿½sï¿½ï¿½ï¿½Öï¿½
 Public Sub ProcessFromRow7()
     On Error GoTo ErrorHandler
     
-    ' ‰Šúİ’è
+    ' ï¿½ï¿½ï¿½ï¿½ï¿½İ’ï¿½
     Application.ScreenUpdating = False
     
-    ' ƒ[ƒNƒV[ƒgQÆ‚Ìæ“¾
+    ' ï¿½ï¿½ï¿½[ï¿½Nï¿½Vï¿½[ï¿½gï¿½Qï¿½Æ‚Ìæ“¾
     Dim settingsSheet As Worksheet, targetSheet As Worksheet
-    Set settingsSheet = ThisWorkbook.Worksheets(1) ' İ’èƒV[ƒg
-    Set targetSheet = ThisWorkbook.Worksheets(2)   ' ”äŠr‘ÎÛ‚ÌƒV[ƒg
+    Set settingsSheet = ThisWorkbook.Worksheets(1) ' ï¿½İ’ï¿½Vï¿½[ï¿½g
+    Set targetSheet = ThisWorkbook.Worksheets(2)   ' ï¿½ï¿½rï¿½ÎÛ‚ÌƒVï¿½[ï¿½g
     
-    ' •ï‘•Œ`‘Ô‚Ìæ“¾‚ÆŠm”F
+    ' ï¿½ï‘•ï¿½`ï¿½Ô‚Ìæ“¾ï¿½ÆŠmï¿½F
     Dim packageType As String
     packageType = settingsSheet.Range("B4").Value
     
-    ' —LŒø‚È•ï‘•Œ`‘Ô‚©ƒ`ƒFƒbƒN
+    ' ï¿½Lï¿½ï¿½ï¿½È•ï‘•ï¿½`ï¿½Ô‚ï¿½ï¿½`ï¿½Fï¿½bï¿½N
     Dim validPackageTypes As Variant
-    validPackageTypes = Array("(–¢’è‹`)", "‚»‚Ì‘¼(‚È‚µ)", "•ï‘•¬", "’²Ü—p", "PTP", "•ª•ï", "ƒoƒ‰", "SP", "PTP(Š³Ò—p)")
+    validPackageTypes = Array("(ï¿½ï¿½ï¿½ï¿½`)", "ï¿½ï¿½ï¿½Ì‘ï¿½(ï¿½È‚ï¿½)", "ï¿½ï‘•ï¿½ï¿½", "ï¿½ï¿½ï¿½Ü—p", "PTP", "ï¿½ï¿½ï¿½ï¿½", "ï¿½oï¿½ï¿½", "SP", "PTP(ï¿½ï¿½ï¿½Ò—p)")
     
     Dim isValidPackage As Boolean
     Dim i As Long
@@ -365,17 +365,17 @@ Public Sub ProcessFromRow7()
     Next i
     
     If Not isValidPackage Then
-        MsgBox "B4ƒZƒ‹‚É—LŒø‚È•ï‘•Œ`‘Ô‚ğİ’è‚µ‚Ä‚­‚¾‚³‚¢B" & vbCrLf & _
-               "—LŒø‚È’l: (–¢’è‹`), ‚»‚Ì‘¼(‚È‚µ), •ï‘•¬, ’²Ü—p, PTP, •ª•ï, ƒoƒ‰, SP, PTP(Š³Ò—p)", vbExclamation
+        MsgBox "B4ï¿½Zï¿½ï¿½ï¿½É—Lï¿½ï¿½ï¿½È•ï‘•ï¿½`ï¿½Ô‚ï¿½İ’è‚µï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B" & vbCrLf & _
+               "ï¿½Lï¿½ï¿½ï¿½È’l: (ï¿½ï¿½ï¿½ï¿½`), ï¿½ï¿½ï¿½Ì‘ï¿½(ï¿½È‚ï¿½), ï¿½ï‘•ï¿½ï¿½, ï¿½ï¿½ï¿½Ü—p, PTP, ï¿½ï¿½ï¿½ï¿½, ï¿½oï¿½ï¿½, SP, PTP(ï¿½ï¿½ï¿½Ò—p)", vbExclamation
         GoTo CleanExit
     End If
     
-    ' ÅIs‚Ìæ“¾
+    ' ï¿½ÅIï¿½sï¿½Ìæ“¾
     Dim lastRowSettings As Long, lastRowTarget As Long
     lastRowSettings = settingsSheet.Cells(settingsSheet.Rows.Count, "B").End(xlUp).Row
     lastRowTarget = targetSheet.Cells(targetSheet.Rows.Count, "B").End(xlUp).Row
     
-    ' ”äŠr‘ÎÛ–ò•i–¼‚ğ”z—ñ‚ÉŠi”[
+    ' ï¿½ï¿½rï¿½ÎÛ–ï¿½iï¿½ï¿½ï¿½ï¿½zï¿½ï¿½ÉŠiï¿½[
     Dim targetDrugs() As String
     ReDim targetDrugs(1 To lastRowTarget - 1)
     
@@ -383,25 +383,25 @@ Public Sub ProcessFromRow7()
         targetDrugs(i - 1) = targetSheet.Cells(i, "B").Value
     Next i
     
-    ' ˆã–ò•i–¼‚Ì”äŠr‚Æ“]‹Li7s–Ú‚©‚çŠJnj
+    ' ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½Ì”ï¿½rï¿½Æ“]ï¿½Lï¿½i7ï¿½sï¿½Ú‚ï¿½ï¿½ï¿½Jï¿½nï¿½j
     Dim searchDrug As String, bestMatch As String
     Dim processedCount As Long, skippedCount As Long
     processedCount = 0
     skippedCount = 0
     
-    For i = 7 To lastRowSettings ' ‚±‚±‚Å7s–ÚˆÈ~‚ğˆ—
+    For i = 7 To lastRowSettings ' ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½7ï¿½sï¿½ÚˆÈ~ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         searchDrug = settingsSheet.Cells(i, "B").Value
         
         If Len(searchDrug) > 0 Then
-            ' Å“K‚Èˆê’v‚ğŒŸõ
+            ' ï¿½Å“Kï¿½Èˆï¿½vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             bestMatch = FindBestMatchingDrug(searchDrug, targetDrugs, packageType)
             
-            ' ˆê’v‚·‚éŒ‹‰Ê‚ª‚ ‚ê‚Î“]‹LA‚È‚¯‚ê‚ÎƒXƒLƒbƒv
+            ' ï¿½ï¿½vï¿½ï¿½ï¿½éŒ‹ï¿½Ê‚ï¿½ï¿½ï¿½ï¿½ï¿½Î“]ï¿½Lï¿½Aï¿½È‚ï¿½ï¿½ï¿½ÎƒXï¿½Lï¿½bï¿½v
             If Len(bestMatch) > 0 Then
                 settingsSheet.Cells(i, "C").Value = bestMatch
                 processedCount = processedCount + 1
             Else
-                ' ˆê’v‚µ‚È‚¢ê‡‚Í‰½‚à‚µ‚È‚¢i‹ó•¶š‚Åã‘‚«‚µ‚È‚¢j
+                ' ï¿½ï¿½vï¿½ï¿½ï¿½È‚ï¿½ï¿½ê‡ï¿½Í‰ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½iï¿½ó•¶ï¿½ï¿½Åã‘ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½j
                 skippedCount = skippedCount + 1
             End If
         End If
@@ -409,18 +409,18 @@ Public Sub ProcessFromRow7()
     
 CleanExit:
     Application.ScreenUpdating = True
-    MsgBox "ˆ—‚ªŠ®—¹‚µ‚Ü‚µ‚½B" & vbCrLf & _
-           processedCount & "Œ‚Ìˆã–ò•i–¼‚ªˆê’v‚µ‚Ü‚µ‚½B" & vbCrLf & _
-           skippedCount & "Œ‚Ìˆã–ò•i–¼‚Íˆê’v‚·‚é‚à‚Ì‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½B", vbInformation
+    MsgBox "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½ï¿½B" & vbCrLf & _
+           processedCount & "ï¿½ï¿½ï¿½Ìˆï¿½ï¿½iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½ï¿½B" & vbCrLf & _
+           skippedCount & "ï¿½ï¿½ï¿½Ìˆï¿½ï¿½iï¿½ï¿½ï¿½Íˆï¿½vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì‚ï¿½ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½Å‚ï¿½ï¿½ï¿½ï¿½B", vbInformation
     Exit Sub
     
 ErrorHandler:
     Application.ScreenUpdating = True
-    MsgBox "ƒGƒ‰[‚ª”­¶‚µ‚Ü‚µ‚½: " & Err.Description, vbCritical
+    MsgBox "ï¿½Gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½: " & Err.Description, vbCritical
     Resume CleanExit
 End Sub
 
-' Å‚àˆê’v‚·‚éˆã–ò•i–¼‚ğŒŸõ‚·‚éŠÖ”
+' ï¿½Å‚ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öï¿½
 Private Function FindBestMatchingDrug(ByVal searchDrug As String, ByRef targetDrugs() As String, ByVal packageType As String) As String
     Dim i As Long
     Dim bestMatchIndex As Long, bestMatchScore As Long, currentScore As Long
@@ -428,33 +428,33 @@ Private Function FindBestMatchingDrug(ByVal searchDrug As String, ByRef targetDr
     bestMatchIndex = -1
     bestMatchScore = 0
     
-    ' ŒŸõ‘ÎÛ‚ğƒL[ƒ[ƒh‚É•ª‰ğ
+    ' ï¿½ï¿½ï¿½ï¿½ï¿½ÎÛ‚ï¿½ï¿½Lï¿½[ï¿½ï¿½ï¿½[ï¿½hï¿½É•ï¿½ï¿½ï¿½
     Dim keywords As Variant
     keywords = ExtractKeywords(searchDrug)
     
-    ' •ï‘•Œ`‘Ô‚Ì“Á•Êˆ—
+    ' ï¿½ï‘•ï¿½`ï¿½Ô‚Ì“ï¿½ï¿½Êï¿½ï¿½ï¿½
     Dim skipPackageCheck As Boolean
-    skipPackageCheck = (packageType = "(–¢’è‹`)" Or packageType = "‚»‚Ì‘¼(‚È‚µ)")
+    skipPackageCheck = (packageType = "(ï¿½ï¿½ï¿½ï¿½`)" Or packageType = "ï¿½ï¿½ï¿½Ì‘ï¿½(ï¿½È‚ï¿½)")
     
-    ' Še”äŠr‘ÎÛ‚É‘Î‚µ‚Äˆ—
+    ' ï¿½eï¿½ï¿½rï¿½ÎÛ‚É‘Î‚ï¿½ï¿½Äï¿½ï¿½ï¿½
     For i = LBound(targetDrugs) To UBound(targetDrugs)
         If Len(targetDrugs(i)) > 0 Then
-            ' •ï‘•Œ`‘Ôƒ`ƒFƒbƒN
+            ' ï¿½ï‘•ï¿½`ï¿½Ôƒ`ï¿½Fï¿½bï¿½N
             Dim matchesPackage As Boolean
             
             If skipPackageCheck Then
-                ' –¢’è‹`‚Ü‚½‚Í‚»‚Ì‘¼‚Ìê‡‚Í•ï‘•Œ`‘Ôƒ`ƒFƒbƒN‚ğƒXƒLƒbƒv
+                ' ï¿½ï¿½ï¿½ï¿½`ï¿½Ü‚ï¿½ï¿½Í‚ï¿½ï¿½Ì‘ï¿½ï¿½Ìê‡ï¿½Í•ï‘•ï¿½`ï¿½Ôƒ`ï¿½Fï¿½bï¿½Nï¿½ï¿½ï¿½Xï¿½Lï¿½bï¿½v
                 matchesPackage = True
             Else
-                ' •ï‘•Œ`‘Ô‚ªˆê’v‚·‚é‚©Šm”F
+                ' ï¿½ï‘•ï¿½`ï¿½Ô‚ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½é‚©ï¿½mï¿½F
                 matchesPackage = CheckPackage(targetDrugs(i), packageType)
             End If
             
             If matchesPackage Then
-                ' ƒL[ƒ[ƒhˆê’v—¦‚ğŒvZ
+                ' ï¿½Lï¿½[ï¿½ï¿½ï¿½[ï¿½hï¿½ï¿½vï¿½ï¿½ï¿½ï¿½ï¿½vï¿½Z
                 currentScore = CalcMatchScore(keywords, targetDrugs(i))
                 
-                ' ‚æ‚è‚‚¢ƒXƒRƒA‚ğ‹L˜^
+                ' ï¿½ï¿½è‚ï¿½ï¿½ï¿½Xï¿½Rï¿½Aï¿½ï¿½ï¿½Lï¿½^
                 If currentScore > bestMatchScore Then
                     bestMatchScore = currentScore
                     bestMatchIndex = i
@@ -463,7 +463,7 @@ Private Function FindBestMatchingDrug(ByVal searchDrug As String, ByRef targetDr
         End If
     Next i
     
-    ' Œ‹‰Ê‚ğ•Ô‚·iè‡’lˆÈã‚ÌƒXƒRƒA‚Ìê‡‚Ì‚İj
+    ' ï¿½ï¿½ï¿½Ê‚ï¿½Ô‚ï¿½ï¿½iè‡’lï¿½Èï¿½ÌƒXï¿½Rï¿½Aï¿½Ìê‡ï¿½Ì‚İj
     If bestMatchScore >= 50 And bestMatchIndex >= 0 Then
         FindBestMatchingDrug = targetDrugs(bestMatchIndex)
     Else
@@ -471,12 +471,12 @@ Private Function FindBestMatchingDrug(ByVal searchDrug As String, ByRef targetDr
     End If
 End Function
 
-' ˆã–ò•i–¼‚©‚çƒL[ƒ[ƒh‚ğ’Šo‚·‚éŠÖ”
+' ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Lï¿½[ï¿½ï¿½ï¿½[ï¿½hï¿½ğ’Šoï¿½ï¿½ï¿½ï¿½Öï¿½
 Private Function ExtractKeywords(ByVal drugName As String) As Variant
-    ' ‘SŠpƒXƒy[ƒX‚ğ”¼Šp‚É•ÏŠ·
-    drugName = Replace(drugName, "@", " ")
+    ' ï¿½Sï¿½pï¿½Xï¿½yï¿½[ï¿½Xï¿½ğ”¼Špï¿½É•ÏŠï¿½
+    drugName = Replace(drugName, "ï¿½@", " ")
     
-    ' ƒXƒy[ƒX‚Å•ªŠ„‚µ‚Ä”z—ñ‚ÉŠi”[
+    ' ï¿½Xï¿½yï¿½[ï¿½Xï¿½Å•ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä”zï¿½ï¿½ÉŠiï¿½[
     Dim words As Variant, result() As String
     Dim i As Long, validCount As Long
     
@@ -484,7 +484,7 @@ Private Function ExtractKeywords(ByVal drugName As String) As Variant
     ReDim result(UBound(words))
     validCount = 0
     
-    ' ‹ó‚Å‚È‚¢—v‘f‚Ì‚İæ“¾
+    ' ï¿½ï¿½Å‚È‚ï¿½ï¿½vï¿½fï¿½Ì‚İæ“¾
     For i = 0 To UBound(words)
         If Trim(words(i)) <> "" Then
             result(validCount) = LCase(Trim(words(i)))
@@ -492,7 +492,7 @@ Private Function ExtractKeywords(ByVal drugName As String) As Variant
         End If
     Next i
     
-    ' Œ‹‰Ê‚ª‹ó‚Ìê‡‚Ìˆ—
+    ' ï¿½ï¿½ï¿½Ê‚ï¿½ï¿½ï¿½Ìê‡ï¿½Ìï¿½ï¿½ï¿½
     If validCount = 0 Then
         ReDim result(0)
         result(0) = LCase(Trim(drugName))
@@ -503,7 +503,7 @@ Private Function ExtractKeywords(ByVal drugName As String) As Variant
     ExtractKeywords = result
 End Function
 
-' ƒL[ƒ[ƒh‚Ìˆê’v—¦‚ğŒvZ‚·‚éŠÖ”
+' ï¿½Lï¿½[ï¿½ï¿½ï¿½[ï¿½hï¿½Ìˆï¿½vï¿½ï¿½ï¿½ï¿½ï¿½vï¿½Zï¿½ï¿½ï¿½ï¿½Öï¿½
 Private Function CalcMatchScore(ByRef keywords As Variant, ByVal targetDrug As String) As Long
     Dim i As Long, matchCount As Long
     Dim lowerTargetDrug As String
@@ -511,14 +511,14 @@ Private Function CalcMatchScore(ByRef keywords As Variant, ByVal targetDrug As S
     lowerTargetDrug = LCase(targetDrug)
     matchCount = 0
     
-    ' ŠeƒL[ƒ[ƒh‚ªŠÜ‚Ü‚ê‚Ä‚¢‚é‚©ƒ`ƒFƒbƒN
+    ' ï¿½eï¿½Lï¿½[ï¿½ï¿½ï¿½[ï¿½hï¿½ï¿½ï¿½Ü‚Ü‚ï¿½Ä‚ï¿½ï¿½é‚©ï¿½`ï¿½Fï¿½bï¿½N
     For i = 0 To UBound(keywords)
         If InStr(1, lowerTargetDrug, keywords(i), vbTextCompare) > 0 Then
             matchCount = matchCount + 1
         End If
     Next i
     
-    ' ˆê’v—¦‚ğŒvZi•S•ª—¦j
+    ' ï¿½ï¿½vï¿½ï¿½ï¿½ï¿½ï¿½vï¿½Zï¿½iï¿½Sï¿½ï¿½ï¿½ï¿½ï¿½j
     If UBound(keywords) >= 0 Then
         CalcMatchScore = (matchCount * 100) / (UBound(keywords) + 1)
     Else
@@ -526,9 +526,9 @@ Private Function CalcMatchScore(ByRef keywords As Variant, ByVal targetDrug As S
     End If
 End Function
 
-' •ï‘•Œ`‘Ô‚ªˆê’v‚·‚é‚©ƒ`ƒFƒbƒN‚·‚éŠÖ”iCreateObject‚ğg‚í‚È‚¢ƒo[ƒWƒ‡ƒ“j
+' ï¿½ï‘•ï¿½`ï¿½Ô‚ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½é‚©ï¿½`ï¿½Fï¿½bï¿½Nï¿½ï¿½ï¿½ï¿½Öï¿½ï¿½iCreateObjectï¿½ï¿½ï¿½gï¿½ï¿½È‚ï¿½ï¿½oï¿½[ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½j
 Private Function CheckPackage(ByVal drugName As String, ByVal packageType As String) As Boolean
-    ' •ï‘•Œ`‘Ô‚ÌƒoƒŠƒG[ƒVƒ‡ƒ“‚ğ’è‹`
+    ' ï¿½ï‘•ï¿½`ï¿½Ô‚Ìƒoï¿½ï¿½ï¿½Gï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½`
     Dim PTPVariations As Variant
     Dim BulkVariations As Variant
     Dim SPVariations As Variant
@@ -537,40 +537,40 @@ Private Function CheckPackage(ByVal drugName As String, ByVal packageType As Str
     Dim DispensingVariations As Variant
     Dim PatientPTPVariations As Variant
     
-    ' Še•ï‘•Œ`‘Ô‚ÌˆÙ•\‹L‚ğ”z—ñ‚Å’è‹`
-    PTPVariations = Array("PTP", "‚o‚s‚o", "P.T.P.", "P.T.P")
-    BulkVariations = Array("ƒoƒ‰", "ÊŞ×", "BARA", "ƒoƒ‰ù")
-    SPVariations = Array("SP", "‚r‚o", "S.P")
-    DividedVariations = Array("•ª•ï", "‚Ô‚ñ‚Û‚¤", "•ª•ï•i")
-    SmallPackageVariations = Array("•ï‘•¬", "¬•ï‘•")
-    DispensingVariations = Array("’²Ü—p", "’²Ü", "’²Ü—p•ï‘•")
-    PatientPTPVariations = Array("PTP(Š³Ò—p)", "Š³Ò—pPTP", "Š³Ò—p")
+    ' ï¿½eï¿½ï‘•ï¿½`ï¿½Ô‚ÌˆÙ•\ï¿½Lï¿½ï¿½zï¿½ï¿½Å’ï¿½`
+    PTPVariations = Array("PTP", "ï¿½oï¿½sï¿½o", "P.T.P.", "P.T.P")
+    BulkVariations = Array("ï¿½oï¿½ï¿½", "ï¿½ï¿½ï¿½", "BARA", "ï¿½oï¿½ï¿½ï¿½ï¿½")
+    SPVariations = Array("SP", "ï¿½rï¿½o", "S.P")
+    DividedVariations = Array("ï¿½ï¿½ï¿½ï¿½", "ï¿½Ô‚ï¿½Û‚ï¿½", "ï¿½ï¿½ï¿½ï¿½i")
+    SmallPackageVariations = Array("ï¿½ï‘•ï¿½ï¿½", "ï¿½ï¿½ï¿½ï‘•")
+    DispensingVariations = Array("ï¿½ï¿½ï¿½Ü—p", "ï¿½ï¿½ï¿½ï¿½", "ï¿½ï¿½ï¿½Ü—pï¿½ï‘•")
+    PatientPTPVariations = Array("PTP(ï¿½ï¿½ï¿½Ò—p)", "ï¿½ï¿½ï¿½Ò—pPTP", "ï¿½ï¿½ï¿½Ò—p")
     
-    ' •ï‘•Œ`‘Ô‚É‰‚¶‚½•Ï”‚ğ‘I‘ğ
+    ' ï¿½ï‘•ï¿½`ï¿½Ô‚É‰ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïï¿½ï¿½ï¿½Iï¿½ï¿½
     Dim variations As Variant
     
     Select Case packageType
         Case "PTP"
             variations = PTPVariations
-        Case "ƒoƒ‰"
+        Case "ï¿½oï¿½ï¿½"
             variations = BulkVariations
         Case "SP"
             variations = SPVariations
-        Case "•ª•ï"
+        Case "ï¿½ï¿½ï¿½ï¿½"
             variations = DividedVariations
-        Case "•ï‘•¬"
+        Case "ï¿½ï‘•ï¿½ï¿½"
             variations = SmallPackageVariations
-        Case "’²Ü—p"
+        Case "ï¿½ï¿½ï¿½Ü—p"
             variations = DispensingVariations
-        Case "PTP(Š³Ò—p)"
+        Case "PTP(ï¿½ï¿½ï¿½Ò—p)"
             variations = PatientPTPVariations
         Case Else
-            ' ’è‹`‚³‚ê‚Ä‚¢‚È‚¢ê‡‚Í•¶š—ñŠ®‘Sˆê’v‚ÅŠm”F
+            ' ï¿½ï¿½`ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½È‚ï¿½ï¿½ê‡ï¿½Í•ï¿½ï¿½ï¿½ï¿½ñŠ®‘Sï¿½ï¿½vï¿½ÅŠmï¿½F
             CheckPackage = (InStr(1, drugName, packageType, vbTextCompare) > 0)
             Exit Function
     End Select
     
-    ' ŠeƒoƒŠƒG[ƒVƒ‡ƒ“‚ÅŠm”F
+    ' ï¿½eï¿½oï¿½ï¿½ï¿½Gï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ÅŠmï¿½F
     Dim j As Long
     For j = LBound(variations) To UBound(variations)
         If InStr(1, drugName, variations(j), vbTextCompare) > 0 Then
@@ -581,6 +581,75 @@ Private Function CheckPackage(ByVal drugName As String, ByVal packageType As Str
     
     CheckPackage = False
 End Function
+
+' GS1-128ã‚³ãƒ¼ãƒ‰ã‹ã‚‰åŒ»è–¬å“æƒ…å ±ã‚’å‡¦ç†ã™ã‚‹ãƒ¡ã‚¤ãƒ³é–¢æ•°
+Public Sub ProcessGS1DrugCode()
+    On Error GoTo ErrorHandler
+    
+    ' GS1ã‚³ãƒ¼ãƒ‰ã®å…¥åŠ›ã‚’æ±‚ã‚ã‚‹
+    Dim gs1Code As String
+    gs1Code = InputBox("GS1-128ã®14æ¡ã‚³ãƒ¼ãƒ‰ã‚’å…¥åŠ›ã—ã¦ãã ã•ã„:", "åŒ»è–¬å“ã‚³ãƒ¼ãƒ‰å‡¦ç†")
+    
+    If Len(gs1Code) = 0 Then
+        Exit Sub
+    End If
+    
+    ' 14æ¡ã§ã‚ã‚‹ã“ã¨ã‚’ç¢ºèª
+    If Len(gs1Code) <> 14 Or Not IsNumeric(gs1Code) Then
+        MsgBox "GS1-128ã‚³ãƒ¼ãƒ‰ã¯14æ¡ã®æ•°å­—ã§ã‚ã‚‹å¿…è¦ãŒã‚ã‚Šã¾ã™ã€‚", vbExclamation
+        Exit Sub
+    End If
+    
+    ' GS1ã‚³ãƒ¼ãƒ‰ã‚’å‡¦ç†
+    GS1CodeProcessor.ProcessGS1CodeAndUpdateSettings gs1Code
+    
+    Exit Sub
+    
+ErrorHandler:
+    MsgBox "ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸ: " & Err.Description, vbCritical
+End Sub
+
+' GS1ã‚³ãƒ¼ãƒ‰ã‹ã‚‰åŒ»è–¬å“æƒ…å ±ã‚’é…åˆ—ã§å–å¾—ã—ã¦è¡¨ç¤ºã™ã‚‹ãƒ‡ãƒ¢é–¢æ•°
+Public Sub DemoDisplayDrugInfoFromGS1()
+    On Error GoTo ErrorHandler
+    
+    ' GS1ã‚³ãƒ¼ãƒ‰ã®å…¥åŠ›ã‚’æ±‚ã‚ã‚‹
+    Dim gs1Code As String
+    gs1Code = InputBox("GS1-128ã®14æ¡ã‚³ãƒ¼ãƒ‰ã‚’å…¥åŠ›ã—ã¦ãã ã•ã„:", "åŒ»è–¬å“æƒ…å ±è¡¨ç¤º")
+    
+    If Len(gs1Code) = 0 Then
+        Exit Sub
+    End If
+    
+    ' 14æ¡ã§ã‚ã‚‹ã“ã¨ã‚’ç¢ºèª
+    If Len(gs1Code) <> 14 Or Not IsNumeric(gs1Code) Then
+        MsgBox "GS1-128ã‚³ãƒ¼ãƒ‰ã¯14æ¡ã®æ•°å­—ã§ã‚ã‚‹å¿…è¦ãŒã‚ã‚Šã¾ã™ã€‚", vbExclamation
+        Exit Sub
+    End If
+    
+    ' åŒ»è–¬å“æƒ…å ±ã‚’é…åˆ—ã¨ã—ã¦å–å¾—
+    Dim drugInfoArray As Variant
+    drugInfoArray = GS1CodeProcessor.GetDrugInfoAsArray(gs1Code)
+    
+    ' çµæœã‚’è¡¨ç¤º
+    Dim resultMsg As String
+    resultMsg = "åŒ»è–¬å“æƒ…å ±:" & vbCrLf & _
+               "æˆåˆ†å: " & drugInfoArray(1) & vbCrLf & _
+               "å‰¤å½¢: " & drugInfoArray(2) & vbCrLf & _
+               "ç”¨é‡è¦æ ¼: " & drugInfoArray(3) & vbCrLf & _
+               "ãƒ¡ãƒ¼ã‚«ãƒ¼: " & drugInfoArray(4) & vbCrLf & _
+               "åŒ…è£…è¦æ ¼: " & drugInfoArray(5) & vbCrLf & _
+               "åŒ…è£…å½¢æ…‹: " & drugInfoArray(6) & vbCrLf & _
+               "è¿½åŠ æƒ…å ±: " & drugInfoArray(7) & vbCrLf & _
+               "åŒ»è–¬å“å: " & drugInfoArray(8)
+    
+    MsgBox resultMsg, vbInformation
+    
+    Exit Sub
+    
+ErrorHandler:
+    MsgBox "ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸ: " & Err.Description, vbCritical
+End Sub
 
 
 
