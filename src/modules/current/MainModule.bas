@@ -582,26 +582,26 @@ Private Function CheckPackage(ByVal drugName As String, ByVal packageType As Str
     CheckPackage = False
 End Function
 
-' GS1-128コードから医薬品情報を処理するメイン関数
+' GTIN-14コードから医薬品情報を処理するメイン関数
 Public Sub ProcessGS1DrugCode()
     On Error GoTo ErrorHandler
     
-    ' GS1コードの入力を求める
-    Dim gs1Code As String
-    gs1Code = InputBox("GS1-128の14桁コードを入力してください:", "医薬品コード処理")
+    ' GTIN-14コードの入力を求める
+    Dim gtin14Code As String
+    gtin14Code = InputBox("GTIN-14の14桁コードを入力してください:", "医薬品コード処理")
     
-    If Len(gs1Code) = 0 Then
+    If Len(gtin14Code) = 0 Then
         Exit Sub
     End If
     
     ' 14桁であることを確認
-    If Len(gs1Code) <> 14 Or Not IsNumeric(gs1Code) Then
-        MsgBox "GS1-128コードは14桁の数字である必要があります。", vbExclamation
+    If Len(gtin14Code) <> 14 Or Not IsNumeric(gtin14Code) Then
+        MsgBox "GTIN-14コードは14桁の数字である必要があります。", vbExclamation
         Exit Sub
     End If
     
-    ' GS1コードを処理
-    GS1CodeProcessor.ProcessGS1CodeAndUpdateSettings gs1Code
+    ' GTIN-14コードを処理
+    GS1CodeProcessor.ProcessGS1CodeAndUpdateSettings gtin14Code
     
     Exit Sub
     
@@ -609,27 +609,27 @@ ErrorHandler:
     MsgBox "エラーが発生しました: " & Err.Description, vbCritical
 End Sub
 
-' GS1コードから医薬品情報を配列で取得して表示するデモ関数
+' GTIN-14コードから医薬品情報を配列で取得して表示するデモ関数
 Public Sub DemoDisplayDrugInfoFromGS1()
     On Error GoTo ErrorHandler
     
-    ' GS1コードの入力を求める
-    Dim gs1Code As String
-    gs1Code = InputBox("GS1-128の14桁コードを入力してください:", "医薬品情報表示")
+    ' GTIN-14コードの入力を求める
+    Dim gtin14Code As String
+    gtin14Code = InputBox("GTIN-14の14桁コードを入力してください:", "医薬品情報表示")
     
-    If Len(gs1Code) = 0 Then
+    If Len(gtin14Code) = 0 Then
         Exit Sub
     End If
     
     ' 14桁であることを確認
-    If Len(gs1Code) <> 14 Or Not IsNumeric(gs1Code) Then
-        MsgBox "GS1-128コードは14桁の数字である必要があります。", vbExclamation
+    If Len(gtin14Code) <> 14 Or Not IsNumeric(gtin14Code) Then
+        MsgBox "GTIN-14コードは14桁の数字である必要があります。", vbExclamation
         Exit Sub
     End If
     
     ' 医薬品情報を配列として取得
     Dim drugInfoArray As Variant
-    drugInfoArray = GS1CodeProcessor.GetDrugInfoAsArray(gs1Code)
+    drugInfoArray = GS1CodeProcessor.GetDrugInfoAsArray(gtin14Code)
     
     ' 結果を表示
     Dim resultMsg As String
@@ -641,7 +641,8 @@ Public Sub DemoDisplayDrugInfoFromGS1()
                "包装規格: " & drugInfoArray(5) & vbCrLf & _
                "包装形態: " & drugInfoArray(6) & vbCrLf & _
                "追加情報: " & drugInfoArray(7) & vbCrLf & _
-               "医薬品名: " & drugInfoArray(8)
+               "医薬品名: " & drugInfoArray(8) & vbCrLf & _
+               "パッケージ・インジケーター: " & Left(gtin14Code, 1) & " (" & GetPackageIndicatorDescription(Left(gtin14Code, 1)) & ")"
     
     MsgBox resultMsg, vbInformation
     
@@ -650,6 +651,20 @@ Public Sub DemoDisplayDrugInfoFromGS1()
 ErrorHandler:
     MsgBox "エラーが発生しました: " & Err.Description, vbCritical
 End Sub
+
+' パッケージ・インジケーターの説明を取得する関数
+Private Function GetPackageIndicatorDescription(ByVal indicator As String) As String
+    Select Case indicator
+        Case "0"
+            GetPackageIndicatorDescription = "調剤包装単位"
+        Case "1"
+            GetPackageIndicatorDescription = "販売包装単位"
+        Case "2"
+            GetPackageIndicatorDescription = "元梱包装単位"
+        Case Else
+            GetPackageIndicatorDescription = "不明"
+    End Select
+End Function
 
 
 
