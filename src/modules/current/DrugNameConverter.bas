@@ -87,6 +87,13 @@ Public Sub InitWorkbook()
         ' 初期化時にPackageTypeExtractorを初期化
         PackageTypeExtractor.InitializePackageMappings
         
+        ' メニュー設定ボタンを追加
+        With settingsSheet.Buttons.Add(10, 30, 120, 30)
+            .OnAction = "ShowMainMenu"
+            .Caption = "メニュー表示"
+            .Name = "MenuButton"
+        End With
+        
         ' 手順
         .Range("A5").Value = "2. 下記の実行方法で処理を開始"
         .Range("A5").Font.Bold = True
@@ -181,3 +188,5 @@ Public Sub AddGS1ProcessingInstructions()
     
     MsgBox "GS1コード処理機能の説明をシートに追加しました。", vbInformation
 End Sub
+
+

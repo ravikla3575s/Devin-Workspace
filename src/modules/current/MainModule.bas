@@ -607,3 +607,59 @@ Private Function GetPackageIndicatorDescription(ByVal indicator As String) As St
             GetPackageIndicatorDescription = "不明"
     End Select
 End Function
+
+' メインメニューを表示する関数
+Public Sub ShowMainMenu()
+    Dim choice As VbMsgBoxResult
+    
+    choice = MsgBox("薬局在庫管理システム - 機能選択" & vbCrLf & vbCrLf & _
+                   "「はい」：医薬品名比較機能" & vbCrLf & _
+                   "「いいえ」：棚番一括更新機能" & vbCrLf & _
+                   "「キャンセル」：GTIN-14コード処理", _
+                   vbYesNoCancel + vbQuestion, "メイン機能選択")
+    
+    Select Case choice
+        Case vbYes
+            ' 医薬品名比較機能
+            RunDrugNameComparison
+            
+        Case vbNo
+            ' 棚番一括更新機能
+            ShelfManager_new.Main
+            
+        Case vbCancel
+            ' GTIN-14コード処理
+            ProcessGS1DrugCode
+            
+    End Select
+End Sub
+
+' アプリケーション起動時の初期化関数
+Public Sub InitializeApplication()
+    ' ユーザーフォームを初期化（必要な場合）
+    If Not IsFormLoaded("ShelfNameForm") Then
+        Load ShelfNameForm
+    End If
+    
+    ' その他の初期化処理
+    
+    ' メインメニューを表示
+    ShowMainMenu
+End Sub
+
+' フォームが既にロードされているか確認
+Private Function IsFormLoaded(formName As String) As Boolean
+    Dim i As Integer
+    For i = 0 To VBA.UserForms.Count - 1
+        If VBA.UserForms(i).Name = formName Then
+            IsFormLoaded = True
+            Exit Function
+        End If
+    Next i
+    IsFormLoaded = False
+End Function
+
+
+
+
+

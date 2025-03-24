@@ -89,3 +89,30 @@ GTIN-14コードは以下の構造を持ちます：
 - `MainModule.bas` - GTIN-14コード処理のメインインターフェース
 - `DrugNameConverter.bas` - UI関連の機能とラッパー
 - `DrugNameParser.bas` - 医薬品名の構文解析に使用
+
+## 棚番一括更新システム
+
+### 概要
+棚番一括更新システムは、CSVファイルから読み込んだGTIN-14コードを使って医薬品情報を取得し、tmp_tanaシートの棚番情報を一括で更新する機能です。この機能には以下の特徴があります：
+
+1. 最大3つのCSVファイルを一度に処理可能
+2. 各CSVファイルに対応する棚名を指定可能
+3. GTIN-14コードから医薬品名を自動検索
+4. tmp_tanaシート内の医薬品を部分一致で検索
+5. 棚名の一括更新および元に戻す機能
+6. 更新結果のCSVエクスポート
+
+### モジュール構成
+- `ShelfManager_new.bas` - 棚番一括更新システムの中核機能
+- `ShelfNameForm.frm` - 棚名入力用のユーザーフォーム
+- `GS1CodeProcessor.bas` - GTIN-14コード処理機能（連携）
+- `MainModule.bas` - メインメニューおよび連携機能
+
+### 主要機能
+- `Main()` - 棚番一括更新処理のエントリーポイント
+- `ImportCSVFiles(folderPath)` - CSVファイルからGTIN-14コードを取り込む
+- `ProcessItems()` - 取り込んだGTINコードを処理し棚番を更新
+- `GetDrugName(gtin)` - GTINコードから医薬品名を取得
+- `FindMedicineRowByName(drugName)` - 医薬品名からtmp_tanaの行を検索
+- `UndoShelfNames()` - 棚名を元に戻す
+- `ExportTemplateCSV()` - 更新後のtmp_tanaシートをCSVに出力
