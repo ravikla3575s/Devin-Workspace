@@ -41,7 +41,7 @@ Public Sub TestCSVImport()
     testFolderPath = CreateTestCSVFiles()
     
     ' CSVファイル取り込み
-    ShelfManager_new.ImportCSVFiles testFolderPath
+    ShelfManager.ImportCSVFiles testFolderPath
     
     ' 結果の検証 - 設定シートにデータが正しく取り込まれたか
     Dim settingsSheet As Worksheet
@@ -73,7 +73,7 @@ Public Sub TestDrugNameMatching()
     
     ' 医薬品名を取得
     Dim drugName As String
-    drugName = ShelfManager_new.GetDrugName(testGTIN)
+    drugName = ShelfManager.GetDrugName(testGTIN)
     
     Debug.Print "GTIN: " & testGTIN
     Debug.Print "取得された医薬品名: " & drugName
@@ -118,7 +118,7 @@ Public Sub TestShelfNameUpdate()
     Debug.Print "設定された棚名3: " & settingsSheet.Cells(3, 2).Value
     
     ' 棚名更新機能のテスト
-    ' ShelfManager_new.UpdateShelfNames testShelfNames
+    ' ShelfManager.UpdateShelfNames testShelfNames
     
     ' テスト完了メッセージ
     Debug.Print "棚名更新機能のテストが完了しました。"
@@ -147,7 +147,7 @@ Public Sub TestUndoFunctionality()
     Debug.Print "変更後の値: " & tmpTanaSheet.Cells(2, 1).Value
     
     ' 元に戻す機能を実行
-    ShelfManager_new.UndoChanges
+    ShelfManager.UndoShelfNames
     
     ' 結果を確認
     Debug.Print "元に戻した後の値: " & tmpTanaSheet.Cells(2, 1).Value

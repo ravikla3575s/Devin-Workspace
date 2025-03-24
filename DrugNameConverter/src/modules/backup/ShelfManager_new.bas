@@ -1,4 +1,4 @@
-Attribute VB_Name = "ShelfManager"
+Attribute VB_Name = "ShelfManager_new"
 Option Explicit
 
 ' グローバル変数 - 元の棚名データを保持（Undo用）
@@ -621,5 +621,3 @@ ErrorHandler:
     Application.DisplayAlerts = True
     MsgBox "CSVファイルの保存中にエラーが発生しました: " & Err.Description, vbCritical
 End Sub
-
-

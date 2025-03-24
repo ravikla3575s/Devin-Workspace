@@ -46,7 +46,7 @@
 
 ### 棚名を元に戻す
 1. Excel VBAでマクロを有効にします
-2. ツール > マクロメニューから「ShelfManager_new.UndoShelfNames」を選択して実行
+2. ツール > マクロメニューから「ShelfManager.UndoShelfNames」を選択して実行
 3. 最後の更新処理で変更された棚名が元に戻ります
 
 ### 注意事項

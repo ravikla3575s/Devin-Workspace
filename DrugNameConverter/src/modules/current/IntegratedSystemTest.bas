@@ -73,10 +73,10 @@ Public Sub TestGTIN14Integration()
     Debug.Print "GTIN: " & testGTIN
     Debug.Print "取得された医薬品名: " & drugName
     
-    ' ShelfManager_newモジュールでの医薬品名検索
+    ' ShelfManagerモジュールでの医薬品名検索
     If drugName <> "" Then
         Dim matchRow As Long
-        matchRow = ShelfManager_new.FindMedicineRowByName(drugName)
+        matchRow = ShelfManager.FindMedicineRowByName(drugName)
         
         Debug.Print "tmp_tanaでのマッチ行: " & matchRow
     End If
@@ -105,14 +105,14 @@ Public Sub TestShelfManagementIntegration()
         Debug.Print "エラー: ShelfNameFormが見つかりません"
     End If
     
-    ' ShelfManager_newモジュールの主要関数の存在確認
+    ' ShelfManagerモジュールの主要関数の存在確認
     Dim mainExists As Boolean
-    mainExists = FunctionExists("Main", "ShelfManager_new")
+    mainExists = FunctionExists("Main", "ShelfManager")
     
     If mainExists Then
-        Debug.Print "ShelfManager_new.Main関数が存在します"
+        Debug.Print "ShelfManager.Main関数が存在します"
     Else
-        Debug.Print "エラー: ShelfManager_new.Main関数が見つかりません"
+        Debug.Print "エラー: ShelfManager.Main関数が見つかりません"
     End If
     
     ' テスト完了メッセージ
