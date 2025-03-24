@@ -103,7 +103,7 @@ GTIN-14コードは以下の構造を持ちます：
 6. 更新結果のCSVエクスポート
 
 ### モジュール構成
-- `ShelfManager_new.bas` - 棚番一括更新システムの中核機能
+- `ShelfManager.bas` - 棚番一括更新システムの中核機能
 - `ShelfNameForm.frm` - 棚名入力用のユーザーフォーム
 - `GS1CodeProcessor.bas` - GTIN-14コード処理機能（連携）
 - `MainModule.bas` - メインメニューおよび連携機能

@@ -625,7 +625,7 @@ Public Sub ShowMainMenu()
             
         Case vbNo
             ' 棚番一括更新機能
-            ShelfManager_new.Main
+            ShelfManager.Main
             
         Case vbCancel
             ' GTIN-14コード処理
