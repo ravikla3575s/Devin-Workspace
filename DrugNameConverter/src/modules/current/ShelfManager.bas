@@ -9,6 +9,7 @@ Public Sub Main()
     On Error GoTo ErrorHandler
     
     Dim folderPath As String
+    Dim outputPath As String
     
     ' フォルダ選択ダイアログを表示
     folderPath = GetFolderPath()
@@ -37,8 +38,14 @@ Public Sub Main()
     ' tmp_tanaシートをCSV保存
     ExportTemplateCSV
     
+    ' 使用したファイルパスを取得
+    outputPath = GetTemplateOutputPath()
+    If outputPath = "" Then
+        outputPath = ThisWorkbook.Path & "\update_tmp_tana.csv"
+    End If
+    
     ' 完了メッセージ
-    MsgBox "処理が完了しました。update_tmp_tana.csvが作成されました。", vbInformation
+    MsgBox "処理が完了しました。" & vbCrLf & "ファイル: " & outputPath, vbInformation
     
     Exit Sub
     
@@ -580,18 +587,27 @@ Public Sub ExportTemplateCSV(Optional filePath As String = "")
     Dim tmpTanaSheet As Worksheet
     Dim defaultPath As String
     Dim timestamp As String
+    Dim savedPath As String
     
     ' tmp_tanaシートを取得
     Set tmpTanaSheet = ThisWorkbook.Sheets("tmp_tana")
     
-    ' ファイルパスが指定されていない場合はデフォルトパスを使用
+    ' ファイルパスが指定されていない場合
     If filePath = "" Then
-        ' タイムスタンプを生成（YYYYMMDD_HHMM形式）
-        timestamp = Format(Now, "YYYYMMDD_HHMM")
+        ' 設定シートのB4セルからパスを取得
+        savedPath = GetTemplateOutputPath()
         
-        ' デフォルトパスを設定
-        defaultPath = ThisWorkbook.Path & "\update_tmp_tana_" & timestamp & ".csv"
-        filePath = defaultPath
+        ' 保存されたパスが空または無効な場合はデフォルトパスを使用
+        If savedPath = "" Then
+            ' タイムスタンプを生成（YYYYMMDD_HHMM形式）
+            timestamp = Format(Now, "YYYYMMDD_HHMM")
+            
+            ' デフォルトパスを設定
+            defaultPath = ThisWorkbook.Path & "\update_tmp_tana_" & timestamp & ".csv"
+            filePath = defaultPath
+        Else
+            filePath = savedPath
+        End If
     End If
     
     ' 上書き確認を抑制
@@ -620,6 +636,72 @@ Public Sub ExportTemplateCSV(Optional filePath As String = "")
 ErrorHandler:
     Application.DisplayAlerts = True
     MsgBox "CSVファイルの保存中にエラーが発生しました: " & Err.Description, vbCritical
+End Sub
+
+' 設定シートのB4セルから出力先パスを取得する
+Private Function GetTemplateOutputPath() As String
+    On Error GoTo ErrorHandler
+    
+    Dim settingsSheet As Worksheet
+    Set settingsSheet = ThisWorkbook.Sheets("設定")
+    
+    ' B4セルからパスを取得（空の場合はデフォルトパスを使用）
+    GetTemplateOutputPath = Trim(settingsSheet.Range("B4").Value)
+    
+    Exit Function
+    
+ErrorHandler:
+    GetTemplateOutputPath = ""
+End Function
+
+' 設定シートのB4セルに出力先パスを保存する
+Public Sub SaveTemplateOutputPath(ByVal filePath As String)
+    On Error GoTo ErrorHandler
+    
+    Dim settingsSheet As Worksheet
+    Set settingsSheet = ThisWorkbook.Sheets("設定")
+    
+    ' B4セルにパスを保存
+    settingsSheet.Range("B4").Value = filePath
+    
+    Exit Sub
+    
+ErrorHandler:
+    MsgBox "出力先パスの保存中にエラーが発生しました: " & Err.Description, vbCritical
+End Sub
+
+' 出力ファイルパスを設定するダイアログを表示する
+Public Sub SetOutputFilePath()
+    On Error GoTo ErrorHandler
+    
+    Dim currentPath As String
+    Dim newPath As String
+    Dim fdDialog As FileDialog
+    
+    ' 現在の設定を取得
+    currentPath = GetTemplateOutputPath()
+    
+    ' ファイル選択ダイアログを表示
+    Set fdDialog = Application.FileDialog(msoFileDialogSaveAs)
+    
+    With fdDialog
+        .Title = "テンプレートファイルの出力先を選択してください"
+        .InitialFileName = IIf(currentPath <> "", currentPath, ThisWorkbook.Path & "\update_tmp_tana.csv")
+        .Filters.Clear
+        .Filters.Add "CSVファイル", "*.csv"
+        .FilterIndex = 1
+        
+        If .Show = -1 Then
+            newPath = .SelectedItems(1)
+            SaveTemplateOutputPath newPath
+            MsgBox "出力先を設定しました: " & newPath, vbInformation
+        End If
+    End With
+    
+    Exit Sub
+    
+ErrorHandler:
+    MsgBox "出力先の設定中にエラーが発生しました: " & Err.Description, vbCritical
 End Sub
 
 

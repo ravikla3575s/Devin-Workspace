@@ -115,4 +115,5 @@ GTIN-14コードは以下の構造を持ちます：
 - `GetDrugName(gtin)` - GTINコードから医薬品名を取得
 - `FindMedicineRowByName(drugName)` - 医薬品名からtmp_tanaの行を検索
 - `UndoShelfNames()` - 棚名を元に戻す
-- `ExportTemplateCSV()` - 更新後のtmp_tanaシートをCSVに出力
+- `ExportTemplateCSV()` - 更新後のtmp_tanaシートをCSVに出力（設定シートB4のパスを使用）
+- `SetOutputFilePath()` - テンプレートファイルの出力先パスを設定
