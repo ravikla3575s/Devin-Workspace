@@ -107,6 +107,7 @@ GTIN-14コードは以下の構造を持ちます：
 - `ShelfNameForm.frm` - 棚名入力用のユーザーフォーム
 - `GS1CodeProcessor.bas` - GTIN-14コード処理機能（連携）
 - `MainModule.bas` - メインメニューおよび連携機能
+- `ImportCSVToSheet2.bas` - 棚番テンプレートCSVファイルをシート2に転記する機能
 
 ### 主要機能
 - `Main()` - 棚番一括更新処理のエントリーポイント
@@ -117,3 +118,15 @@ GTIN-14コードは以下の構造を持ちます：
 - `UndoShelfNames()` - 棚名を元に戻す
 - `ExportTemplateCSV()` - 更新後のtmp_tanaシートをCSVに出力（設定シートB4のパスを使用）
 - `SetOutputFilePath()` - テンプレートファイルの出力先パスを設定
+
+### ImportCSVToSheet2モジュール
+棚番テンプレートCSVファイルをシート2（ターゲット）に転記する機能を提供します：
+- `ImportCSVToSheet2()` - CSVファイルを選択し、A〜I列のデータをシート2に転記
+- `GetCSVFilePath()` - CSVファイル選択ダイアログを表示
+- `GetFileName()` - ファイルパスからファイル名を取得
+
+特徴：
+- ファイル名が「tmp_tana.CSV」でない場合、ユーザーに確認ダイアログを表示
+- A〜I列（1行目から最終行まで）のデータを転記
+- 既存データをクリアしてから新しいデータを転記
+- 進捗状況をステータスバーに表示
