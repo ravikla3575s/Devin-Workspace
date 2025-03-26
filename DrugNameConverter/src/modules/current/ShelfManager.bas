@@ -687,9 +687,7 @@ Public Sub SetOutputFilePath()
     With fdDialog
         .Title = "テンプレートファイルの出力先を選択してください"
         .InitialFileName = IIf(currentPath <> "", currentPath, ThisWorkbook.Path & "\update_tmp_tana.csv")
-        .Filters.Clear
-        .Filters.Add "CSVファイル", "*.csv"
-        .FilterIndex = 1
+        ' Filtersプロパティは一部の環境でサポートされていないため削除
         
         If .Show = -1 Then
             newPath = .SelectedItems(1)
