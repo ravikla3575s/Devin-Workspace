@@ -95,22 +95,28 @@ GTIN-14コードは以下の構造を持ちます：
 ### 概要
 棚番一括更新システムは、CSVファイルから読み込んだGTIN-14コードを使って医薬品情報を取得し、tmp_tanaシートの棚番情報を一括で更新する機能です。この機能には以下の特徴があります：
 
-1. 最大3つのCSVファイルを一度に処理可能
-2. 各CSVファイルに対応する棚名を指定可能
-3. GTIN-14コードから医薬品名を自動検索
-4. tmp_tanaシート内の医薬品を部分一致で検索
-5. 棚名の一括更新および元に戻す機能
-6. 更新結果のCSVエクスポート
+1. フォルダ内のCSVファイル数を自動カウントし、動的にフォームを生成
+2. 最大10個のCSVファイルを一度に処理可能
+3. 各CSVファイルに対応する棚名を指定可能
+4. ファイル数が多い場合はスクロール可能なフォームで対応
+5. GTIN-14コードから医薬品名を自動検索
+6. tmp_tanaシート内の医薬品を部分一致で検索
+7. 棚名の一括更新および元に戻す機能
+8. 更新結果のCSVエクスポート
 
 ### モジュール構成
 - `ShelfManager.bas` - 棚番一括更新システムの中核機能
-- `ShelfNameForm.frm` - 棚名入力用のユーザーフォーム
+- `DynamicShelfNameForm.frm` - 動的棚名入力用のユーザーフォーム（スクロール機能付き）
+- `MouseOverControl.cls` - マウス操作検知用のクラス（スクロール機能用）
+- `MouseScroll.bas` - ユーザーフォームのマウスホイールスクロール機能を提供
 - `GS1CodeProcessor.bas` - GTIN-14コード処理機能（連携）
 - `MainModule.bas` - メインメニューおよび連携機能
 - `ImportCSVToSheet2.bas` - 棚番テンプレートCSVファイルをシート2に転記する機能
 
 ### 主要機能
 - `Main()` - 棚番一括更新処理のエントリーポイント
+- `CountCSVFiles(folderPath)` - フォルダ内のCSVファイル数をカウント
+- `GetCSVFileNames(folderPath, maxCount)` - フォルダ内のCSVファイル名を取得
 - `ImportCSVFiles(folderPath)` - CSVファイルからGTIN-14コードを取り込む
 - `ProcessItems()` - 取り込んだGTINコードを処理し棚番を更新
 - `GetDrugName(gtin)` - GTINコードから医薬品名を取得

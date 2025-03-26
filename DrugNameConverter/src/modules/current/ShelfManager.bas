@@ -4,12 +4,75 @@ Option Explicit
 ' グローバル変数 - 元の棚名データを保持（Undo用）
 Private originalShelfNames As Variant
 
+' フォルダ内のCSVファイル数をカウントする
+Public Function CountCSVFiles(folderPath As String) As Integer
+    On Error GoTo ErrorHandler
+    
+    Dim fileName As String
+    Dim count As Integer
+    
+    count = 0
+    
+    ' フォルダ内のCSVファイルを検索
+    fileName = Dir(folderPath & "\*.csv")
+    
+    ' CSVファイルがない場合は0を返す
+    If fileName = "" Then
+        CountCSVFiles = 0
+        Exit Function
+    End If
+    
+    ' 各CSVファイルをカウント
+    Do While fileName <> ""
+        count = count + 1
+        fileName = Dir
+    Loop
+    
+    CountCSVFiles = count
+    Exit Function
+    
+ErrorHandler:
+    MsgBox "CSVファイル数のカウント中にエラーが発生しました: " & Err.Description, vbCritical
+    CountCSVFiles = 0
+End Function
+
+' フォルダ内のCSVファイル名を取得する
+Private Function GetCSVFileNames(ByVal folderPath As String, ByVal maxCount As Integer) As Variant
+    On Error GoTo ErrorHandler
+    
+    Dim fileNames() As String
+    Dim fileName As String
+    Dim i As Integer
+    
+    ReDim fileNames(1 To maxCount)
+    i = 1
+    
+    ' フォルダ内のCSVファイルを検索
+    fileName = Dir(folderPath & "\*.csv")
+    
+    ' 各CSVファイル名を配列に格納
+    Do While fileName <> "" And i <= maxCount
+        fileNames(i) = fileName
+        i = i + 1
+        fileName = Dir
+    Loop
+    
+    GetCSVFileNames = fileNames
+    Exit Function
+    
+ErrorHandler:
+    MsgBox "CSVファイル名の取得中にエラーが発生しました: " & Err.Description, vbCritical
+    GetCSVFileNames = Array()
+End Function
+
 ' メインエントリポイント - 棚番一括更新マクロ
 Public Sub Main()
     On Error GoTo ErrorHandler
     
     Dim folderPath As String
     Dim outputPath As String
+    Dim fileCount As Integer
+    Dim fileNames As Variant
     
     ' フォルダ選択ダイアログを表示
     folderPath = GetFolderPath()
@@ -18,11 +81,24 @@ Public Sub Main()
         Exit Sub
     End If
     
-    ' ユーザーフォームを表示（棚名入力）
-    ShelfNameForm.Show
+    ' CSVファイル数をカウント
+    fileCount = CountCSVFiles(folderPath)
+    
+    ' ファイルがない場合は処理中止
+    If fileCount = 0 Then
+        MsgBox "指定フォルダにCSVファイルが見つかりません。", vbExclamation
+        Exit Sub
+    End If
+    
+    ' CSVファイル名を取得
+    fileNames = GetCSVFileNames(folderPath, fileCount)
+    
+    ' 動的ユーザーフォームを表示（棚名入力）
+    DynamicShelfNameForm.SetFileCount fileCount, fileNames
+    DynamicShelfNameForm.Show
     
     ' キャンセルされた場合は処理中止
-    If ShelfNameForm.IsCancelled Then
+    If DynamicShelfNameForm.IsCancelled Then
         Exit Sub
     End If
     
@@ -83,6 +159,7 @@ Public Sub ImportCSVFiles(folderPath As String)
     Dim colIndex As Long
     Dim csvCount As Integer
     Dim invalidCodes As New Collection
+    Dim maxFiles As Integer
     
     ' 設定シートを取得
     Dim settingsSheet As Worksheet
@@ -92,12 +169,16 @@ Public Sub ImportCSVFiles(folderPath As String)
     Dim lastRow As Long
     lastRow = settingsSheet.Cells(settingsSheet.Rows.Count, "A").End(xlUp).row
     If lastRow >= 7 Then
-        settingsSheet.Range("A7:F" & lastRow).ClearContents
+        ' 列数を拡張（最大10ファイル対応）
+        settingsSheet.Range("A7:M" & lastRow).ClearContents
     End If
     
     ' 開始行を設定
     row = 7
     csvCount = 0
+    
+    ' 最大ファイル数（設定シートの制限を考慮）
+    maxFiles = 10
     
     ' フォルダ内のCSVファイルを検索
     fileName = Dir(folderPath & "\*.csv")
@@ -113,15 +194,17 @@ Public Sub ImportCSVFiles(folderPath As String)
     
     ' 各CSVファイルを処理
     Do While fileName <> ""
-        ' CSVファイルのカウントを増やす（最大3まで）
+        ' CSVファイルのカウントを増やす
         csvCount = csvCount + 1
-        If csvCount > 3 Then
-            MsgBox "警告: 4つ以上のCSVファイルが見つかりました。最初の3つのみ処理します。", vbExclamation
+        
+        ' 最大ファイル数を超えた場合は処理を中止
+        If csvCount > maxFiles Then
+            MsgBox "警告: " & maxFiles + 1 & "つ以上のCSVファイルが見つかりました。最初の" & maxFiles & "つのみ処理します。", vbExclamation
             Exit Do
         End If
         
-        ' 対応する棚名列を決定（D=棚名1, E=棚名2, F=棚名3）
-        colIndex = 3 + csvCount  ' D=4, E=5, F=6
+        ' 対応する棚名列を決定（D=棚名1, E=棚名2, F=棚名3...）
+        colIndex = 3 + csvCount  ' D=4, E=5, F=6...
         
         ' CSVファイルのフルパス
         filePath = folderPath & "\" & fileName
@@ -141,8 +224,8 @@ Public Sub ImportCSVFiles(folderPath As String)
                     ' 設定シートにGTINコードを書き込む
                     settingsSheet.Cells(row, 1).Value = line
                     
-                    ' 対応する棚名を書き込む（設定シートB1〜B3から取得）
-                    settingsSheet.Cells(row, colIndex).Value = settingsSheet.Cells(1, 2).Offset(csvCount - 1, 0).Value
+                    ' 対応する棚名を書き込む（設定シートB1〜B10から取得）
+                    settingsSheet.Cells(row, colIndex).Value = settingsSheet.Cells(csvCount, 2).Value
                     
                     ' 次の行へ
                     row = row + 1
