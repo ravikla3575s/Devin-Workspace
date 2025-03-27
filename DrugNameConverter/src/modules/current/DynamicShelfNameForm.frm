@@ -50,11 +50,14 @@ Private Sub UserForm_Initialize()
     ' MouseScroll.EnableMouseScroll Me, True, True, True
 End Sub
 
+' ボタン変数
+Private okButton As MSForms.CommandButton
+Private cancelButton As MSForms.CommandButton
+
 ' デフォルトのボタンを作成する
 Private Sub CreateDefaultButtons()
     ' OKボタンを動的に作成
-    Set okButton = Me.Controls.Add("Forms.CommandButton.1", "OKButton", True)
-    With okButton
+    With Me.Controls.Add("Forms.CommandButton.1", "OKButton", True)
         .Caption = "OK"
         .Top = Me.Height - 30
         .Left = 10
@@ -63,8 +66,7 @@ Private Sub CreateDefaultButtons()
     End With
     
     ' キャンセルボタンを動的に作成
-    Set cancelButton = Me.Controls.Add("Forms.CommandButton.1", "CancelButton", True)
-    With cancelButton
+    With Me.Controls.Add("Forms.CommandButton.1", "CancelButton", True)
         .Caption = "キャンセル"
         .Top = Me.Height - 30
         .Left = 60
@@ -169,14 +171,14 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
     Next i
        
     ' OKボタンの位置を調整
-    OKButton.Top = Me.Height - 30
-    OKButton.Left = 10
-    OKButton.Width = 40
+    Me.Controls("OKButton").Top = Me.Height - 30
+    Me.Controls("OKButton").Left = 10
+    Me.Controls("OKButton").Width = 40
        
     ' キャンセルボタンの位置を調整
-    CancelButton.Top = Me.Height - 30
-    CancelButton.Left = 60
-    CancelButton.Width = 40
+    Me.Controls("CancelButton").Top = Me.Height - 30
+    Me.Controls("CancelButton").Left = 60
+    Me.Controls("CancelButton").Width = 40
        
     Exit Sub
        
