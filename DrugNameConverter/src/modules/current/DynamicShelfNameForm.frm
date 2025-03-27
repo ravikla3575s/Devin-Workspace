@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} DynamicShelfNameForm 
    Caption         =   "棚名入力"
-   ClientHeight    =   100
+   ClientHeight    =   200
    ClientLeft      =   120
    ClientTop       =   465
-   ClientWidth     =   140
+   ClientWidth     =   200
    OleObjectBlob   =   "DynamicShelfNameForm.frx":0000
    StartUpPosition =   1  'オーナー フォームの中央
 End
@@ -16,7 +16,7 @@ Attribute VB_Exposed = False
 Option Explicit
 
 ' 定数
-Private Const MAX_HEIGHT As Long = 100 ' 最大フォーム高さ（これを超えるとスクロール可能に）
+Private Const MAX_HEIGHT As Long = 200 ' 最大フォーム高さ（これを超えるとスクロール可能に）
 Private Const ROWS_PER_FILE As Long = 2 ' ファイルごとの行数
 Private Const ROW_HEIGHT As Long = 15   ' 1行の高さ
 Private Const CTRL_MARGIN As Long = 5  ' コントロール間のマージン
@@ -53,8 +53,8 @@ End Sub
 ' デフォルトのボタンを作成する
 Private Sub CreateDefaultButtons()
     ' OKボタンを動的に作成
-    Set okButton = Me.Controls.Add("Forms.CommandButton.1", "OKButton", True)
-    With okButton
+    Set OKButton = Me.Controls.Add("Forms.CommandButton.1", "OKButton", True)
+    With OKButton
         .Caption = "OK"
         .Top = Me.Height - 30
         .Left = 10
@@ -63,8 +63,8 @@ Private Sub CreateDefaultButtons()
     End With
     
     ' キャンセルボタンを動的に作成
-    Set cancelButton = Me.Controls.Add("Forms.CommandButton.1", "CancelButton", True)
-    With cancelButton
+    Set CancelButton = Me.Controls.Add("Forms.CommandButton.1", "CancelButton", True)
+    With CancelButton
         .Caption = "キャンセル"
         .Top = Me.Height - 30
         .Left = 60
@@ -183,6 +183,10 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
 ErrorHandler:
     MsgBox "フォームの初期化中にエラーが発生しました: " & Err.Description, vbCritical
 End Sub
+
+' ボタン変数の宣言
+Private WithEvents OKButton As MSForms.CommandButton
+Private WithEvents CancelButton As MSForms.CommandButton
 
 ' OKボタンクリック時の処理
 Private Sub OKButton_Click()
