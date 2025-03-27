@@ -42,9 +42,35 @@ Private scrollFrame As MSForms.Frame
 Private Sub UserForm_Initialize()
     ' キャンセルフラグを初期化
     mIsCancelled = False
+    
+    ' デフォルトのボタンを作成
+    CreateDefaultButtons
        
     ' MouseScrollを無効化（フリーズ問題対応）
     ' MouseScroll.EnableMouseScroll Me, True, True, True
+End Sub
+
+' デフォルトのボタンを作成する
+Private Sub CreateDefaultButtons()
+    ' OKボタンを動的に作成
+    Set okButton = Me.Controls.Add("Forms.CommandButton.1", "OKButton", True)
+    With okButton
+        .Caption = "OK"
+        .Top = Me.Height - 30
+        .Left = 10
+        .Width = 40
+        .Height = 20
+    End With
+    
+    ' キャンセルボタンを動的に作成
+    Set cancelButton = Me.Controls.Add("Forms.CommandButton.1", "CancelButton", True)
+    With cancelButton
+        .Caption = "キャンセル"
+        .Top = Me.Height - 30
+        .Left = 60
+        .Width = 40
+        .Height = 20
+    End With
 End Sub
 
 ' フォーム終了時
