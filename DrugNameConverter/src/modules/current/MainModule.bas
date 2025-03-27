@@ -635,6 +635,30 @@ Public Sub ShowMainMenu()
     End Select
 End Sub
 
+' アプリケーション起動時のメイン関数
+Public Sub Main()
+    Dim choice As VbMsgBoxResult
+    
+    choice = MsgBox("薬局在庫管理システム - 起動モード選択" & vbCrLf & vbCrLf & _
+                   "「はい」：一括処理モード（InitializeApplication）" & vbCrLf & _
+                   "「いいえ」：個別起動モード（ShowMainMenu）", _
+                   vbYesNoCancel + vbQuestion, "起動モード選択")
+    
+    Select Case choice
+        Case vbYes
+            ' 一括処理モード
+            InitializeApplication
+            
+        Case vbNo
+            ' 個別起動モード
+            ShowMainMenu
+            
+        Case vbCancel
+            ' キャンセル - 何もしない
+            Exit Sub
+    End Select
+End Sub
+
 ' アプリケーション起動時の初期化関数
 Public Sub InitializeApplication()
     ' ユーザーフォームを初期化（必要な場合）
