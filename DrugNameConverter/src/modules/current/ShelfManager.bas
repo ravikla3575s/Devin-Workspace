@@ -71,7 +71,7 @@ ErrorHandler:
     GetCSVFileNames = Array()
 End Function
 
-' メインエントリポイント - 棚番一括更新マクロ
+' メインエントリポイント - 棚番一括更新マクロ（最適化版）
 Public Sub Main()
     On Error GoTo ErrorHandler
     
@@ -80,10 +80,27 @@ Public Sub Main()
     Dim fileCount As Integer
     Dim fileShelfData() As FileShelfData
     Dim i As Integer
+    Dim batchSize As Integer
+    Dim currentBatch As Integer
+    Dim batchStart As Integer
+    Dim batchEnd As Integer
+    Dim isScreenUpdatingEnabled As Boolean
+    Dim isCalculationAutomatic As Boolean
+    
+    ' 画面更新と自動計算の現在の状態を保存
+    isScreenUpdatingEnabled = Application.ScreenUpdating
+    isCalculationAutomatic = Application.Calculation = xlCalculationAutomatic
+    
+    ' 画面更新と自動計算を一時的に無効化（パフォーマンス向上）
+    Application.ScreenUpdating = False
+    Application.Calculation = xlCalculationManual
     
     ' フォルダ選択ダイアログを表示
     folderPath = GetFolderPath()
     If folderPath = "" Then
+        ' 元の設定に戻す
+        Application.ScreenUpdating = isScreenUpdatingEnabled
+        Application.Calculation = IIf(isCalculationAutomatic, xlCalculationAutomatic, xlCalculationManual)
         MsgBox "フォルダが選択されていないため、処理を中止します。", vbExclamation
         Exit Sub
     End If
@@ -93,6 +110,9 @@ Public Sub Main()
     
     ' ファイルがない場合は処理中止
     If fileCount = 0 Then
+        ' 元の設定に戻す
+        Application.ScreenUpdating = isScreenUpdatingEnabled
+        Application.Calculation = IIf(isCalculationAutomatic, xlCalculationAutomatic, xlCalculationManual)
         MsgBox "指定フォルダにCSVファイルが見つかりません。", vbExclamation
         Exit Sub
     End If
@@ -100,12 +120,21 @@ Public Sub Main()
     ' 設定シートを準備（棚名入力用）
     PrepareSettingsSheet fileCount
     
+    ' 一時的に画面更新を有効にしてフォームを表示
+    Application.ScreenUpdating = True
+    
     ' 動的ユーザーフォームを表示（棚名入力）
     DynamicShelfNameForm.SetFileCount fileCount, GetCSVFileNames(folderPath, fileCount)
     DynamicShelfNameForm.Show
     
+    ' 画面更新を再度無効化
+    Application.ScreenUpdating = False
+    
     ' キャンセルされた場合は処理中止
     If DynamicShelfNameForm.IsCancelled Then
+        ' 元の設定に戻す
+        Application.ScreenUpdating = isScreenUpdatingEnabled
+        Application.Calculation = IIf(isCalculationAutomatic, xlCalculationAutomatic, xlCalculationManual)
         Exit Sub
     End If
     
@@ -115,20 +144,31 @@ Public Sub Main()
     ' 全ファイルと棚名データを配列に収集
     fileShelfData = CollectAllFileShelfData(folderPath, fileCount)
     
-    ' 各CSVファイルを個別に処理
-    For i = 1 To fileCount
-        ' 進捗状況表示
-        Application.StatusBar = "CSVファイルを処理中... (" & i & "/" & fileCount & ")"
-        
-        ' 現在のファイルのパスを作成
-        Dim filePath As String
-        filePath = folderPath & "\" & fileShelfData(i).FileName
-        
-        ' ファイルを処理 (ネストされた棚名配列を使用)
-        ProcessSingleCSVFileWithArray filePath, fileShelfData(i)
-        
-        DoEvents
-    Next i
+    ' バッチサイズを設定（メモリ使用量と処理速度のバランスをとる）
+    batchSize = 10
+    If fileCount <= batchSize Then
+        ' ファイル数が少ない場合は一括処理
+        ProcessFileBatch folderPath, fileShelfData, 1, fileCount
+    Else
+        ' ファイル数が多い場合はバッチ処理
+        currentBatch = 1
+        Do While (currentBatch - 1) * batchSize < fileCount
+            batchStart = (currentBatch - 1) * batchSize + 1
+            batchEnd = Application.WorksheetFunction.Min(currentBatch * batchSize, fileCount)
+            
+            ' バッチを処理
+            ProcessFileBatch folderPath, fileShelfData, batchStart, batchEnd
+            
+            ' 次のバッチへ
+            currentBatch = currentBatch + 1
+            
+            ' メモリ解放のためにガベージコレクションを促進
+            CollectGarbage
+        Loop
+    End If
+    
+    ' 不要になった配列を解放
+    Erase fileShelfData
     
     ' tmp_tanaシートをCSV保存
     ExportTemplateCSV
@@ -142,6 +182,10 @@ Public Sub Main()
     ' 進捗状況表示をクリア
     Application.StatusBar = False
     
+    ' 元の設定に戻す
+    Application.ScreenUpdating = isScreenUpdatingEnabled
+    Application.Calculation = IIf(isCalculationAutomatic, xlCalculationAutomatic, xlCalculationManual)
+    
     ' 完了メッセージ
     MsgBox "処理が完了しました。" & vbCrLf & "ファイル: " & outputPath, vbInformation
     
@@ -149,6 +193,8 @@ Public Sub Main()
     
 ErrorHandler:
     Application.StatusBar = False
+    Application.ScreenUpdating = isScreenUpdatingEnabled
+    Application.Calculation = IIf(isCalculationAutomatic, xlCalculationAutomatic, xlCalculationManual)
     MsgBox "エラーが発生しました: " & Err.Description, vbCritical
 End Sub
 
@@ -398,29 +444,40 @@ Private Function IsValidGTIN14(code As String) As Boolean
     IsValidGTIN14 = (Len(code) = 14) And IsNumeric(code)
 End Function
 
-' 全てのCSVファイルとその棚名を配列に格納する
+' 全てのCSVファイルとその棚名を配列に格納する（最適化版）
 Private Function CollectAllFileShelfData(ByVal folderPath As String, ByVal fileCount As Integer) As FileShelfData()
     On Error GoTo ErrorHandler
     
     Dim fileNames As Variant
     Dim fileShelfData() As FileShelfData
-    Dim i As Integer
+    Dim i As Integer, j As Integer
+    Dim hasContent As Boolean
     
-    ' 配列のサイズを設定
+    ' 配列のサイズを設定（最初から正確なサイズを確保）
     ReDim fileShelfData(1 To fileCount)
     
-    ' CSVファイル名を取得
+    ' CSVファイル名を一括取得
     fileNames = GetCSVFileNames(folderPath, fileCount)
     
-    ' 各ファイルのデータを設定
+    ' 各ファイルのデータを一括設定
     For i = 1 To fileCount
         ' ファイル名を設定
         fileShelfData(i).FileName = fileNames(i)
         
-        ' 棚名を設定（空でないもののみ）
-        fileShelfData(i).ShelfNames(1) = DynamicShelfNameForm.ShelfName(i)
-        fileShelfData(i).ShelfNames(2) = DynamicShelfNameForm.ShelfName2(i)
-        fileShelfData(i).ShelfNames(3) = DynamicShelfNameForm.ShelfName3(i)
+        ' 棚名を必要な分だけ設定（空チェック）
+        hasContent = False
+        For j = 1 To 3
+            Select Case j
+                Case 1: fileShelfData(i).ShelfNames(j) = DynamicShelfNameForm.ShelfName(i)
+                Case 2: fileShelfData(i).ShelfNames(j) = DynamicShelfNameForm.ShelfName2(i)
+                Case 3: fileShelfData(i).ShelfNames(j) = DynamicShelfNameForm.ShelfName3(i)
+            End Select
+            
+            ' 少なくとも1つのコンテンツがあるかチェック
+            If fileShelfData(i).ShelfNames(j) <> "" Then
+                hasContent = True
+            End If
+        Next j
     Next i
     
     CollectAllFileShelfData = fileShelfData
@@ -762,14 +819,28 @@ ErrorHandler:
 End Sub
 
 ' 元の棚名データに戻す（Undo）
+' 元の棚名データに戻す（Undo）- 最適化版
 Public Sub UndoShelfNames()
     On Error GoTo ErrorHandler
     
     Dim tmpTanaSheet As Worksheet
     Dim rowCount As Long
+    Dim isScreenUpdatingEnabled As Boolean
+    Dim isCalculationAutomatic As Boolean
+    
+    ' 画面更新と自動計算の現在の状態を保存
+    isScreenUpdatingEnabled = Application.ScreenUpdating
+    isCalculationAutomatic = Application.Calculation = xlCalculationAutomatic
+    
+    ' 画面更新と自動計算を一時的に無効化（パフォーマンス向上）
+    Application.ScreenUpdating = False
+    Application.Calculation = xlCalculationManual
     
     ' 保存データがない場合
     If Not IsArray(originalShelfNames) Then
+        ' 元の設定に戻す
+        Application.ScreenUpdating = isScreenUpdatingEnabled
+        Application.Calculation = IIf(isCalculationAutomatic, xlCalculationAutomatic, xlCalculationManual)
         MsgBox "元に戻すデータがありません。", vbExclamation
         Exit Sub
     End If
@@ -780,8 +851,15 @@ Public Sub UndoShelfNames()
     ' 行数を取得
     rowCount = UBound(originalShelfNames, 1)
     
-    ' 保存データを書き戻す
+    ' 保存データを書き戻す（一括操作）
     tmpTanaSheet.Range("G1").Resize(rowCount, 3).Value = originalShelfNames
+    
+    ' オブジェクト変数のクリーンアップ
+    Set tmpTanaSheet = Nothing
+    
+    ' 画面更新と自動計算を元に戻す
+    Application.ScreenUpdating = isScreenUpdatingEnabled
+    Application.Calculation = IIf(isCalculationAutomatic, xlCalculationAutomatic, xlCalculationManual)
     
     ' 完了メッセージ
     MsgBox "棚名を元の状態に戻しました。", vbInformation
@@ -789,9 +867,16 @@ Public Sub UndoShelfNames()
     ' 保存データをクリア
     Erase originalShelfNames
     
+    ' メモリ解放を促進
+    CollectGarbage
+    
     Exit Sub
     
 ErrorHandler:
+    ' クリーンアップ
+    Set tmpTanaSheet = Nothing
+    Application.ScreenUpdating = isScreenUpdatingEnabled
+    Application.Calculation = IIf(isCalculationAutomatic, xlCalculationAutomatic, xlCalculationManual)
     MsgBox "棚名の復元中にエラーが発生しました: " & Err.Description, vbCritical
 End Sub
 
