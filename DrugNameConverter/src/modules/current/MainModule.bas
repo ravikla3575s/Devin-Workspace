@@ -662,8 +662,8 @@ End Sub
 ' アプリケーション起動時の初期化関数
 Public Sub InitializeApplication()
     ' ユーザーフォームを初期化（必要な場合）
-    If Not IsFormLoaded("ShelfNameForm") Then
-        Load ShelfNameForm
+    If Not IsFormLoaded("DynamicShelfNameForm") Then
+        Load DynamicShelfNameForm
     End If
     
     ' その他の初期化処理
