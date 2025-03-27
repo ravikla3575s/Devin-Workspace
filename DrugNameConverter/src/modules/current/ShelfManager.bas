@@ -93,6 +93,9 @@ Public Sub Main()
     ' CSVファイル名を取得
     fileNames = GetCSVFileNames(folderPath, fileCount)
     
+    ' 設定シートを準備（棚名入力用）
+    PrepareSettingsSheet fileCount
+    
     ' 動的ユーザーフォームを表示（棚名入力）
     DynamicShelfNameForm.SetFileCount fileCount, fileNames
     DynamicShelfNameForm.Show
@@ -178,7 +181,7 @@ Public Sub ImportCSVFiles(folderPath As String)
     csvCount = 0
     
     ' 最大ファイル数（設定シートの制限を考慮）
-    maxFiles = 10
+    maxFiles = 100
     
     ' フォルダ内のCSVファイルを検索
     fileName = Dir(folderPath & "\*.csv")
@@ -764,6 +767,33 @@ Public Sub SetOutputFilePath()
     Exit Sub
     
 ErrorHandler:
+' 設定シートを棚名入力用に準備する
+Private Sub PrepareSettingsSheet(ByVal fileCount As Integer)
+    On Error GoTo ErrorHandler
+    
+    Dim settingsSheet As Worksheet
+    Dim i As Integer
+    Dim maxFilesToProcess As Integer
+    
+    ' 設定シートを取得
+    Set settingsSheet = ThisWorkbook.Sheets("設定")
+    
+    ' 最大ファイル数を取得（DynamicShelfNameFormの制限と一致させる）
+    maxFilesToProcess = WorksheetFunction.Min(fileCount, 100)
+    
+    ' 設定シートに棚名ラベルがなければ追加
+    For i = 1 To maxFilesToProcess
+        If settingsSheet.Cells(i, 1).Value = "" Then
+            settingsSheet.Cells(i, 1).Value = "棚名" & i
+        End If
+    Next i
+    
+    Exit Sub
+    
+ErrorHandler:
+    MsgBox "設定シートの準備中にエラーが発生しました: " & Err.Description, vbCritical
+End Sub
+
     MsgBox "出力先の設定中にエラーが発生しました: " & Err.Description, vbCritical
 End Sub
 

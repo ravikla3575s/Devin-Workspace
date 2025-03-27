@@ -44,6 +44,23 @@ Public Sub TestWithMultipleFiles()
            "3. フォームの表示と動作を確認", vbInformation
 End Sub
 
+' 多数のCSVファイルでのテスト（MAX_FILES以上）
+Public Sub TestWithManyFiles()
+    ' 現在の最大ファイル数を表示
+    MsgBox "現在の最大ファイル数設定: " & 100 & vbCrLf & _
+           "このテストでは100以上のCSVファイルを含むフォルダを選択してください。", vbInformation
+    
+    ' 棚番一括更新機能のメイン関数を実行
+    ShelfManager.Main
+    
+    ' テスト後の確認
+    MsgBox "テスト完了。以下を確認してください:" & vbCrLf & _
+           "1. 警告メッセージが表示されたか" & vbCrLf & _
+           "2. 最初の100ファイルのみ処理されたか" & vbCrLf & _
+           "3. スクロールが正しく機能したか" & vbCrLf & _
+           "4. 設定シートに棚名が正しく保存されたか", vbInformation
+End Sub
+
 ' ファイル名検証のテスト
 Public Sub TestFileNameValidation()
     ' このテストは手動で実行する必要があります
