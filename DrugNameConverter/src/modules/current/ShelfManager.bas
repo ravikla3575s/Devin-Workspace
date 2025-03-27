@@ -428,30 +428,12 @@ Private Function GetDrugName(gtin As String) As String
     On Error GoTo ErrorHandler
     
     ' GS1CodeProcessorを使用してGTIN-14コードから医薬品情報を取得
+    ' （これはすでにSheet3を使用するように修正されている）
     Dim drugInfo As DrugInfo
     drugInfo = GS1CodeProcessor.GetDrugInfoFromGS1Code(gtin)
     
-    ' 医薬品名が取得できた場合
-    If Len(drugInfo.DrugName) > 0 Then
-        GetDrugName = drugInfo.DrugName
-    Else
-        ' 既存の検索方法をバックアップとして使用
-        Dim drugCodeSheet As Worksheet
-        Dim findResult As Range
-        
-        ' 医薬品コードシートを取得
-        Set drugCodeSheet = ThisWorkbook.Sheets("医薬品コード")
-        
-        ' GTINコードをF列から検索
-        Set findResult = drugCodeSheet.Columns("F").Find(What:=gtin, LookIn:=xlValues, LookAt:=xlWhole)
-        
-        ' 見つかった場合、G列（医薬品名）の値を返す
-        If Not findResult Is Nothing Then
-            GetDrugName = findResult.Offset(0, 1).Value
-        Else
-            GetDrugName = ""
-        End If
-    End If
+    ' 結果を返す
+    GetDrugName = drugInfo.DrugName
     
     Exit Function
     
