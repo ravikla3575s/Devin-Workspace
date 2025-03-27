@@ -61,7 +61,7 @@ Public Function GetDrugInfoFromGS1Code(ByVal gs1Code As String) As DrugInfo
     validatedCode = ValidateGTIN14(gs1Code)
     
     ' 無効なコードの場合
-    If Len(validatedCode) = 0 Then
+    If Len(validatedCode) <> 14 Then
         MsgBox "入力されたコードは有効なGTIN-14形式ではありません。14桁の数字を入力してください。", vbExclamation
         Exit Function
     End If
@@ -87,7 +87,7 @@ Public Function GetDrugInfoFromGS1Code(ByVal gs1Code As String) As DrugInfo
         Dim dbCode As String
         dbCode = ValidateGTIN14(CStr(ws3.Cells(i, "F").Value))
         
-        If dbCode = validatedCode Then
+        If CStr(dbCode) = CStr(validatedCode) Then
             ' G列から医薬品名を取得
             drugName = ws3.Cells(i, "G").Value
             result.DrugName = drugName
@@ -117,7 +117,7 @@ Public Function GetDrugInfoFromGS1Code(ByVal gs1Code As String) As DrugInfo
     
     ' 見つからなかった場合のデフォルト値設定
     If Not found Then
-        result.DrugCode = validatedCode
+        result.GS1Code = CStr(validatedCode)
         result.DrugName = "/未登録/"
     End If
     
@@ -211,8 +211,8 @@ Public Sub ProcessGS1CodeAndUpdateSettings(ByVal gs1Code As String)
     drugInfo = GetDrugInfoFromGS1Code(gs1Code)
     
     ' 医薬品情報が取得できなかった場合
-    If Len(drugInfo.DrugName) = 0 Then
-        MsgBox "指定されたGS1コード: " & gs1Code & " に対応する医薬品が見つかりませんでした。", vbExclamation
+    If Len(CStr(drugInfo.DrugName)) = 0 Then
+        MsgBox "指定されたGS1コード: " & CStr(gs1Code) & " に対応する医薬品が見つかりませんでした。", vbExclamation
         GoTo CleanExit
     End If
     

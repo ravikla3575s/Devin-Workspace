@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} DynamicShelfNameForm 
    Caption         =   "棚名入力"
-   ClientHeight    =   400
+   ClientHeight    =   600
    ClientLeft      =   120
    ClientTop       =   465
-   ClientWidth     =   300
+   ClientWidth     =   520
    OleObjectBlob   =   "DynamicShelfNameForm.frx":0000
    StartUpPosition =   1  'オーナー フォームの中央
 End
@@ -16,8 +16,8 @@ Attribute VB_Exposed = False
 Option Explicit
 
 ' 定数
-Private Const MAX_HEIGHT As Long = 400 ' 最大フォーム高さ（これを超えるとスクロール可能に）
-Private Const ROWS_PER_FILE As Long = 4 ' ファイルごとの行数（ファイル名 + 3つの棚名入力欄）
+Private Const MAX_HEIGHT As Long = 600 ' 最大フォーム高さ（これを超えるとスクロール可能に）
+Private Const ROWS_PER_FILE As Long = 2 ' ファイルごとの行数（ファイル名 + 棚名入力欄の行）
 Private Const ROW_HEIGHT As Long = 20   ' 1行の高さ
 Private Const CTRL_MARGIN As Long = 5  ' コントロール間のマージン
 Private Const MAX_FILES As Long = 100   ' 最大ファイル数（600棚番号対応）
@@ -130,19 +130,22 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
         frameHeight = (mFileCount * ROWS_PER_FILE * ROW_HEIGHT) + 60
         .Height = frameHeight
            
-        ' ボタン用の余白を追加
-        formHeight = frameHeight + 60
+        ' ボタン用の余白を追加（十分なスペースを確保）
+        formHeight = frameHeight + 80
            
         ' フォームの高さを制限し、必要に応じてスクロール可能に
         If formHeight > MAX_HEIGHT Then
             Me.Height = MAX_HEIGHT
             .ScrollBars = fmScrollBarsVertical
-            .ScrollHeight = frameHeight  ' スクロール領域の高さを設定
+            .ScrollHeight = frameHeight + 20  ' スクロール領域の高さを設定（余裕を持たせる）
             .ScrollWidth = Me.Width - 30 ' スクロール領域の幅を設定
         Else
             Me.Height = formHeight
             .ScrollBars = fmScrollBarsNone
         End If
+        
+        ' フォームの幅を設定（すべての棚名入力欄が表示されるように）
+        Me.Width = 520
     End With
        
     ' テキストボックスとラベルを生成
@@ -172,21 +175,19 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
         With textBoxes(i)
             .Left = CTRL_MARGIN + 50
             .Top = CTRL_MARGIN + ((i - 1) * ROWS_PER_FILE * ROW_HEIGHT) + ROW_HEIGHT
-            .Width = 50
+            .Width = 60
             .Height = ROW_HEIGHT
             .MaxLength = 5
                
-            ' 設定シートから既存の棚名を取得して表示（B1〜BN）
-            If i <= MAX_FILES Then  ' 設定シートの制限を考慮
-                .Text = settingsSheet.Cells(i, 2).Value
-            End If
+            ' 初期値は空に設定
+            .Text = ""
         End With
         
         ' 棚名2ラベルを作成
         Set shelfLabels2(i) = scrollFrame.Controls.Add("Forms.Label.1", "ShelfLabel" & i & "_2", True)
         With shelfLabels2(i)
             .Caption = "棚名2:"
-            .Left = CTRL_MARGIN + 110
+            .Left = CTRL_MARGIN + 120
             .Top = CTRL_MARGIN + ((i - 1) * ROWS_PER_FILE * ROW_HEIGHT) + ROW_HEIGHT
             .Width = 40
             .Height = ROW_HEIGHT
@@ -195,24 +196,22 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
         ' 棚名2テキストボックスを作成
         Set textBoxes2(i) = scrollFrame.Controls.Add("Forms.TextBox.1", "TextBox" & i & "_2", True)
         With textBoxes2(i)
-            .Left = CTRL_MARGIN + 160
+            .Left = CTRL_MARGIN + 170
             .Top = CTRL_MARGIN + ((i - 1) * ROWS_PER_FILE * ROW_HEIGHT) + ROW_HEIGHT
-            .Width = 50
+            .Width = 60
             .Height = ROW_HEIGHT
             .MaxLength = 5
             
-            ' 設定シートから既存の棚名を取得して表示（C1〜CN）
-            If i <= MAX_FILES Then  ' 設定シートの制限を考慮
-                .Text = settingsSheet.Cells(i, 3).Value
-            End If
+            ' 初期値は空に設定
+            .Text = ""
         End With
         
         ' 棚名3ラベルを作成
         Set shelfLabels3(i) = scrollFrame.Controls.Add("Forms.Label.1", "ShelfLabel" & i & "_3", True)
         With shelfLabels3(i)
             .Caption = "棚名3:"
-            .Left = CTRL_MARGIN
-            .Top = CTRL_MARGIN + ((i - 1) * ROWS_PER_FILE * ROW_HEIGHT) + (ROW_HEIGHT * 2)
+            .Left = CTRL_MARGIN + 240
+            .Top = CTRL_MARGIN + ((i - 1) * ROWS_PER_FILE * ROW_HEIGHT) + ROW_HEIGHT
             .Width = 40
             .Height = ROW_HEIGHT
         End With
@@ -220,30 +219,33 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
         ' 棚名3テキストボックスを作成
         Set textBoxes3(i) = scrollFrame.Controls.Add("Forms.TextBox.1", "TextBox" & i & "_3", True)
         With textBoxes3(i)
-            .Left = CTRL_MARGIN + 50
-            .Top = CTRL_MARGIN + ((i - 1) * ROWS_PER_FILE * ROW_HEIGHT) + (ROW_HEIGHT * 2)
-            .Width = 50
+            .Left = CTRL_MARGIN + 290
+            .Top = CTRL_MARGIN + ((i - 1) * ROWS_PER_FILE * ROW_HEIGHT) + ROW_HEIGHT
+            .Width = 60
             .Height = ROW_HEIGHT
             .MaxLength = 5
             
-            ' 設定シートから既存の棚名を取得して表示（D1〜DN）
-            If i <= MAX_FILES Then  ' 設定シートの制限を考慮
-                .Text = settingsSheet.Cells(i, 4).Value
-            End If
+            ' 初期値は空に設定
+            .Text = ""
         End With
     Next i
        
     ' OKボタンの位置を調整
-    OKButton.Top = Me.Height - 30
+    OKButton.Top = Me.Height - 40
     OKButton.Left = 10
     OKButton.Width = 60
     OKButton.Height = 25
        
     ' キャンセルボタンの位置を調整
-    CancelButton.Top = Me.Height - 30
+    CancelButton.Top = Me.Height - 40
     CancelButton.Left = 80
     CancelButton.Width = 80
     CancelButton.Height = 25
+    
+    ' ボタンが確実に表示されるようにスクロール領域の下端に余白を追加
+    If .ScrollBars = fmScrollBarsVertical Then
+        .ScrollHeight = .ScrollHeight + 50
+    End If
        
     Exit Sub
        
