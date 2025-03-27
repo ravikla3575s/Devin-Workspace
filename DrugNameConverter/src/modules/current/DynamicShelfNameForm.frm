@@ -20,7 +20,7 @@ Private Const MAX_HEIGHT As Long = 5000 ' 最大フォーム高さ（これを�
 Private Const ROWS_PER_FILE As Long = 2 ' ファイルごとの行数
 Private Const ROW_HEIGHT As Long = 30   ' 1行の高さ
 Private Const CTRL_MARGIN As Long = 20  ' コントロール間のマージン
-Private Const MAX_FILES As Long = 10    ' 最大ファイル数
+Private Const MAX_FILES As Long = 100   ' 最大ファイル数（600棚番号対応）
 
 ' キャンセルフラグ
 Private mIsCancelled As Boolean
@@ -136,7 +136,7 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
             .MaxLength = 5
                
             ' 設定シートから既存の棚名を取得して表示（B1〜BN）
-            If i <= 10 Then  ' 設定シートの制限を考慮
+            If i <= MAX_FILES Then  ' 設定シートの制限を考慮
                 .Text = settingsSheet.Cells(i, 2).Value
             End If
         End With
@@ -166,7 +166,7 @@ Private Sub OKButton_Click()
     
     ' テキストボックスの値を設定シートに書き込む
     For i = 1 To mFileCount
-        If i <= 10 Then  ' 設定シートの制限を考慮
+        If i <= MAX_FILES Then  ' 設定シートの制限を考慮
             settingsSheet.Cells(i, 2).Value = textBoxes(i).Text
         End If
     Next i
