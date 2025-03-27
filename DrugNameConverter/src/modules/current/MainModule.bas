@@ -615,7 +615,8 @@ Public Sub ShowMainMenu()
     choice = MsgBox("薬局在庫管理システム - 機能選択" & vbCrLf & vbCrLf & _
                    "「はい」：医薬品名比較機能" & vbCrLf & _
                    "「いいえ」：棚番一括更新機能" & vbCrLf & _
-                   "「キャンセル」：GTIN-14コード処理", _
+                   "「キャンセル」：GTIN-14コード処理" & vbCrLf & vbCrLf & _
+                   "※CSVインポート機能はマクロ「ImportCSVToSheet2.ImportCSVToSheet2」を実行", _
                    vbYesNoCancel + vbQuestion, "メイン機能選択")
     
     Select Case choice
