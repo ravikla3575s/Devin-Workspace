@@ -1,6 +1,12 @@
 Attribute VB_Name = "ShelfManager"
 Option Explicit
 
+' ファイルごとの棚名データを格納する型
+Private Type FileShelfData
+    FileName As String
+    ShelfNames(1 To 3) As String ' 棚名1, 棚名2, 棚名3
+End Type
+
 ' グローバル変数 - 元の棚名データを保持（Undo用）
 Private originalShelfNames As Variant
 
@@ -72,7 +78,7 @@ Public Sub Main()
     Dim folderPath As String
     Dim outputPath As String
     Dim fileCount As Integer
-    Dim fileNames As Variant
+    Dim fileShelfData() As FileShelfData
     Dim i As Integer
     
     ' フォルダ選択ダイアログを表示
@@ -91,14 +97,11 @@ Public Sub Main()
         Exit Sub
     End If
     
-    ' CSVファイル名を取得
-    fileNames = GetCSVFileNames(folderPath, fileCount)
-    
     ' 設定シートを準備（棚名入力用）
     PrepareSettingsSheet fileCount
     
     ' 動的ユーザーフォームを表示（棚名入力）
-    DynamicShelfNameForm.SetFileCount fileCount, fileNames
+    DynamicShelfNameForm.SetFileCount fileCount, GetCSVFileNames(folderPath, fileCount)
     DynamicShelfNameForm.Show
     
     ' キャンセルされた場合は処理中止
@@ -109,6 +112,9 @@ Public Sub Main()
     ' 元の棚名データを保存（Undo用）
     SaveOriginalShelfNames
     
+    ' 全ファイルと棚名データを配列に収集
+    fileShelfData = CollectAllFileShelfData(folderPath, fileCount)
+    
     ' 各CSVファイルを個別に処理
     For i = 1 To fileCount
         ' 進捗状況表示
@@ -116,10 +122,10 @@ Public Sub Main()
         
         ' 現在のファイルのパスを作成
         Dim filePath As String
-        filePath = folderPath & "\" & fileNames(i)
+        filePath = folderPath & "\" & fileShelfData(i).FileName
         
-        ' ファイルを処理
-        ProcessSingleCSVFile filePath, i
+        ' ファイルを処理 (ネストされた棚名配列を使用)
+        ProcessSingleCSVFileWithArray filePath, fileShelfData(i)
         
         DoEvents
     Next i
@@ -390,6 +396,40 @@ End Sub
 Private Function IsValidGTIN14(code As String) As Boolean
     ' 14桁の数字かどうかをチェック
     IsValidGTIN14 = (Len(code) = 14) And IsNumeric(code)
+End Function
+
+' 全てのCSVファイルとその棚名を配列に格納する
+Private Function CollectAllFileShelfData(ByVal folderPath As String, ByVal fileCount As Integer) As FileShelfData()
+    On Error GoTo ErrorHandler
+    
+    Dim fileNames As Variant
+    Dim fileShelfData() As FileShelfData
+    Dim i As Integer
+    
+    ' 配列のサイズを設定
+    ReDim fileShelfData(1 To fileCount)
+    
+    ' CSVファイル名を取得
+    fileNames = GetCSVFileNames(folderPath, fileCount)
+    
+    ' 各ファイルのデータを設定
+    For i = 1 To fileCount
+        ' ファイル名を設定
+        fileShelfData(i).FileName = fileNames(i)
+        
+        ' 棚名を設定（空でないもののみ）
+        fileShelfData(i).ShelfNames(1) = DynamicShelfNameForm.ShelfName(i)
+        fileShelfData(i).ShelfNames(2) = DynamicShelfNameForm.ShelfName2(i)
+        fileShelfData(i).ShelfNames(3) = DynamicShelfNameForm.ShelfName3(i)
+    Next i
+    
+    CollectAllFileShelfData = fileShelfData
+    Exit Function
+    
+ErrorHandler:
+    MsgBox "ファイルデータの収集中にエラーが発生しました: " & Err.Description, vbCritical
+    ReDim fileShelfData(1 To 1)
+    CollectAllFileShelfData = fileShelfData
 End Function
 
 ' 設定シート上のGTIN一覧を処理し、tmp_tanaシートを更新する
