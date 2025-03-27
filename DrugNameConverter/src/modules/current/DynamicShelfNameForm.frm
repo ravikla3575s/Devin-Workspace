@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} DynamicShelfNameForm 
    Caption         =   "棚名入力"
-   ClientHeight    =   200
+   ClientHeight    =   400
    ClientLeft      =   120
    ClientTop       =   465
-   ClientWidth     =   200
+   ClientWidth     =   300
    OleObjectBlob   =   "DynamicShelfNameForm.frx":0000
    StartUpPosition =   1  'オーナー フォームの中央
 End
@@ -16,21 +16,26 @@ Attribute VB_Exposed = False
 Option Explicit
 
 ' 定数
-Private Const MAX_HEIGHT As Long = 200 ' 最大フォーム高さ（これを超えるとスクロール可能に）
-Private Const ROWS_PER_FILE As Long = 2 ' ファイルごとの行数
-Private Const ROW_HEIGHT As Long = 15   ' 1行の高さ
+Private Const MAX_HEIGHT As Long = 400 ' 最大フォーム高さ（これを超えるとスクロール可能に）
+Private Const ROWS_PER_FILE As Long = 4 ' ファイルごとの行数（ファイル名 + 3つの棚名入力欄）
+Private Const ROW_HEIGHT As Long = 20   ' 1行の高さ
 Private Const CTRL_MARGIN As Long = 5  ' コントロール間のマージン
 Private Const MAX_FILES As Long = 100   ' 最大ファイル数（600棚番号対応）
+Private Const SHELF_INPUTS_PER_FILE As Long = 3 ' 各ファイルに対する棚名入力欄の数
 
 ' キャンセルフラグ
 Private mIsCancelled As Boolean
 
 ' テキストボックスの配列
 Private textBoxes() As MSForms.TextBox
+Private textBoxes2() As MSForms.TextBox
+Private textBoxes3() As MSForms.TextBox
 
 ' ラベルの配列（ファイル名とラベル）
 Private fileLabels() As MSForms.Label
 Private shelfLabels() As MSForms.Label
+Private shelfLabels2() As MSForms.Label
+Private shelfLabels3() As MSForms.Label
 
 ' CSVファイル数
 Private mFileCount As Integer
@@ -58,8 +63,8 @@ Private Sub CreateDefaultButtons()
         .Caption = "OK"
         .Top = Me.Height - 30
         .Left = 10
-        .Width = 40
-        .Height = 20
+        .Width = 60
+        .Height = 25
     End With
     
     ' キャンセルボタンを動的に作成
@@ -67,9 +72,9 @@ Private Sub CreateDefaultButtons()
     With CancelButton
         .Caption = "キャンセル"
         .Top = Me.Height - 30
-        .Left = 60
-        .Width = 40
-        .Height = 20
+        .Left = 80
+        .Width = 80
+        .Height = 25
     End With
 End Sub
 
@@ -99,8 +104,12 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
        
     ' 配列を初期化
     ReDim textBoxes(1 To mFileCount)
+    ReDim textBoxes2(1 To mFileCount)
+    ReDim textBoxes3(1 To mFileCount)
     ReDim fileLabels(1 To mFileCount)
     ReDim shelfLabels(1 To mFileCount)
+    ReDim shelfLabels2(1 To mFileCount)
+    ReDim shelfLabels3(1 To mFileCount)
        
     ' 設定シートを取得
     Set settingsSheet = ThisWorkbook.Sheets("設定")
@@ -124,6 +133,8 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
         If formHeight > MAX_HEIGHT Then
             Me.Height = MAX_HEIGHT
             .ScrollBars = fmScrollBarsVertical
+            .ScrollHeight = frameHeight  ' スクロール領域の高さを設定
+            .ScrollWidth = Me.Width - 30 ' スクロール領域の幅を設定
         Else
             Me.Height = formHeight
             .ScrollBars = fmScrollBarsNone
@@ -142,23 +153,23 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
             .Height = ROW_HEIGHT
         End With
            
-        ' 棚名ラベルを作成
-        Set shelfLabels(i) = scrollFrame.Controls.Add("Forms.Label.1", "ShelfLabel" & i, True)
+        ' 棚名1ラベルを作成
+        Set shelfLabels(i) = scrollFrame.Controls.Add("Forms.Label.1", "ShelfLabel" & i & "_1", True)
         With shelfLabels(i)
-            .Caption = "棚名 " & i & ":"
+            .Caption = "棚名1:"
             .Left = CTRL_MARGIN
             .Top = CTRL_MARGIN + ((i - 1) * ROWS_PER_FILE * ROW_HEIGHT) + ROW_HEIGHT
-            .Width = 30
+            .Width = 40
             .Height = ROW_HEIGHT
         End With
            
-        ' テキストボックスを作成
-        Set textBoxes(i) = scrollFrame.Controls.Add("Forms.TextBox.1", "TextBox" & i, True)
+        ' 棚名1テキストボックスを作成
+        Set textBoxes(i) = scrollFrame.Controls.Add("Forms.TextBox.1", "TextBox" & i & "_1", True)
         With textBoxes(i)
-            .Left = CTRL_MARGIN + 10
+            .Left = CTRL_MARGIN + 50
             .Top = CTRL_MARGIN + ((i - 1) * ROWS_PER_FILE * ROW_HEIGHT) + ROW_HEIGHT
-            .Width = 25
-            .Height = ROW_HEIGHT - 5
+            .Width = 50
+            .Height = ROW_HEIGHT
             .MaxLength = 5
                
             ' 設定シートから既存の棚名を取得して表示（B1〜BN）
@@ -166,17 +177,69 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
                 .Text = settingsSheet.Cells(i, 2).Value
             End If
         End With
+        
+        ' 棚名2ラベルを作成
+        Set shelfLabels2(i) = scrollFrame.Controls.Add("Forms.Label.1", "ShelfLabel" & i & "_2", True)
+        With shelfLabels2(i)
+            .Caption = "棚名2:"
+            .Left = CTRL_MARGIN + 110
+            .Top = CTRL_MARGIN + ((i - 1) * ROWS_PER_FILE * ROW_HEIGHT) + ROW_HEIGHT
+            .Width = 40
+            .Height = ROW_HEIGHT
+        End With
+        
+        ' 棚名2テキストボックスを作成
+        Set textBoxes2(i) = scrollFrame.Controls.Add("Forms.TextBox.1", "TextBox" & i & "_2", True)
+        With textBoxes2(i)
+            .Left = CTRL_MARGIN + 160
+            .Top = CTRL_MARGIN + ((i - 1) * ROWS_PER_FILE * ROW_HEIGHT) + ROW_HEIGHT
+            .Width = 50
+            .Height = ROW_HEIGHT
+            .MaxLength = 5
+            
+            ' 設定シートから既存の棚名を取得して表示（C1〜CN）
+            If i <= MAX_FILES Then  ' 設定シートの制限を考慮
+                .Text = settingsSheet.Cells(i, 3).Value
+            End If
+        End With
+        
+        ' 棚名3ラベルを作成
+        Set shelfLabels3(i) = scrollFrame.Controls.Add("Forms.Label.1", "ShelfLabel" & i & "_3", True)
+        With shelfLabels3(i)
+            .Caption = "棚名3:"
+            .Left = CTRL_MARGIN
+            .Top = CTRL_MARGIN + ((i - 1) * ROWS_PER_FILE * ROW_HEIGHT) + (ROW_HEIGHT * 2)
+            .Width = 40
+            .Height = ROW_HEIGHT
+        End With
+        
+        ' 棚名3テキストボックスを作成
+        Set textBoxes3(i) = scrollFrame.Controls.Add("Forms.TextBox.1", "TextBox" & i & "_3", True)
+        With textBoxes3(i)
+            .Left = CTRL_MARGIN + 50
+            .Top = CTRL_MARGIN + ((i - 1) * ROWS_PER_FILE * ROW_HEIGHT) + (ROW_HEIGHT * 2)
+            .Width = 50
+            .Height = ROW_HEIGHT
+            .MaxLength = 5
+            
+            ' 設定シートから既存の棚名を取得して表示（D1〜DN）
+            If i <= MAX_FILES Then  ' 設定シートの制限を考慮
+                .Text = settingsSheet.Cells(i, 4).Value
+            End If
+        End With
     Next i
        
     ' OKボタンの位置を調整
     OKButton.Top = Me.Height - 30
     OKButton.Left = 10
-    OKButton.Width = 40
+    OKButton.Width = 60
+    OKButton.Height = 25
        
     ' キャンセルボタンの位置を調整
     CancelButton.Top = Me.Height - 30
-    CancelButton.Left = 60
-    CancelButton.Width = 40
+    CancelButton.Left = 80
+    CancelButton.Width = 80
+    CancelButton.Height = 25
        
     Exit Sub
        
@@ -201,7 +264,10 @@ Private Sub OKButton_Click()
     ' テキストボックスの値を設定シートに書き込む
     For i = 1 To mFileCount
         If i <= MAX_FILES Then  ' 設定シートの制限を考慮
-            settingsSheet.Cells(i, 2).Value = textBoxes(i).Text
+            ' 3つの棚名を設定シートの異なる列に保存
+            settingsSheet.Cells(i, 2).Value = textBoxes(i).Text   ' 棚名1
+            settingsSheet.Cells(i, 3).Value = textBoxes2(i).Text  ' 棚名2
+            settingsSheet.Cells(i, 4).Value = textBoxes3(i).Text  ' 棚名3
         End If
     Next i
     
@@ -233,11 +299,29 @@ Public Property Get FileCount() As Integer
     FileCount = mFileCount
 End Property
 
-' 棚名を取得するプロパティ
+' 棚名を取得するプロパティ（棚名1）
 Public Property Get ShelfName(ByVal index As Integer) As String
     If index >= 1 And index <= mFileCount Then
         ShelfName = textBoxes(index).Text
     Else
         ShelfName = ""
+    End If
+End Property
+
+' 棚名2を取得するプロパティ
+Public Property Get ShelfName2(ByVal index As Integer) As String
+    If index >= 1 And index <= mFileCount Then
+        ShelfName2 = textBoxes2(index).Text
+    Else
+        ShelfName2 = ""
+    End If
+End Property
+
+' 棚名3を取得するプロパティ
+Public Property Get ShelfName3(ByVal index As Integer) As String
+    If index >= 1 And index <= mFileCount Then
+        ShelfName3 = textBoxes3(index).Text
+    Else
+        ShelfName3 = ""
     End If
 End Property
