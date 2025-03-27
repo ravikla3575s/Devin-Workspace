@@ -73,6 +73,7 @@ Public Sub Main()
     Dim outputPath As String
     Dim fileCount As Integer
     Dim fileNames As Variant
+    Dim i As Integer
     
     ' フォルダ選択ダイアログを表示
     folderPath = GetFolderPath()
@@ -108,11 +109,20 @@ Public Sub Main()
     ' 元の棚名データを保存（Undo用）
     SaveOriginalShelfNames
     
-    ' CSVファイルを取り込み
-    ImportCSVFiles folderPath
-    
-    ' 設定シート上のGTIN一覧を処理
-    ProcessItems
+    ' 各CSVファイルを個別に処理
+    For i = 1 To fileCount
+        ' 進捗状況表示
+        Application.StatusBar = "CSVファイルを処理中... (" & i & "/" & fileCount & ")"
+        
+        ' 現在のファイルのパスを作成
+        Dim filePath As String
+        filePath = folderPath & "\" & fileNames(i)
+        
+        ' ファイルを処理
+        ProcessSingleCSVFile filePath, i
+        
+        DoEvents
+    Next i
     
     ' tmp_tanaシートをCSV保存
     ExportTemplateCSV
@@ -123,12 +133,16 @@ Public Sub Main()
         outputPath = ThisWorkbook.Path & "\update_tmp_tana.csv"
     End If
     
+    ' 進捗状況表示をクリア
+    Application.StatusBar = False
+    
     ' 完了メッセージ
     MsgBox "処理が完了しました。" & vbCrLf & "ファイル: " & outputPath, vbInformation
     
     Exit Sub
     
 ErrorHandler:
+    Application.StatusBar = False
     MsgBox "エラーが発生しました: " & Err.Description, vbCritical
 End Sub
 
@@ -277,7 +291,101 @@ ErrorHandler:
     Application.StatusBar = False
     MsgBox "CSVファイルの読み込み中にエラーが発生しました: " & Err.Description, vbCritical
 End Sub
-
+' 単一のCSVファイルを処理する関数
+Public Sub ProcessSingleCSVFile(ByVal filePath As String, ByVal fileIndex As Integer)
+    On Error GoTo ErrorHandler
+    
+    Dim fileNum As Integer
+    Dim line As String
+    Dim row As Long
+    Dim settingsSheet As Worksheet
+    Dim invalidCodes As New Collection
+    
+    ' 設定シートを取得
+    Set settingsSheet = ThisWorkbook.Sheets("設定")
+    
+    ' 設定シートの既存データをクリア（A7以降）
+    Dim lastRow As Long
+    lastRow = settingsSheet.Cells(settingsSheet.Rows.Count, "A").End(xlUp).row
+    If lastRow >= 7 Then
+        settingsSheet.Range("A7:B" & lastRow).ClearContents
+    End If
+    
+    ' 開始行を設定
+    row = 7
+    
+    ' CSVファイルに対応する棚名を設定シートのB1-B3に設定
+    ' 注意: 入力されていない棚名は更新しない（そのままにする）
+    If DynamicShelfNameForm.ShelfName(fileIndex) <> "" Then
+        settingsSheet.Cells(1, 2).Value = DynamicShelfNameForm.ShelfName(fileIndex)
+    End If
+    
+    If DynamicShelfNameForm.ShelfName2(fileIndex) <> "" Then
+        settingsSheet.Cells(2, 2).Value = DynamicShelfNameForm.ShelfName2(fileIndex)
+    End If
+    
+    If DynamicShelfNameForm.ShelfName3(fileIndex) <> "" Then
+        settingsSheet.Cells(3, 2).Value = DynamicShelfNameForm.ShelfName3(fileIndex)
+    End If
+    
+    ' CSVファイルを開く
+    fileNum = FreeFile
+    Open filePath For Input As #fileNum
+    
+    ' ファイルの各行を読み込む
+    Do While Not EOF(fileNum)
+        Line Input #fileNum, line
+        
+        ' 空行をスキップ
+        If Trim(line) <> "" Then
+            ' GTINコードのバリデーション（14桁の数字かチェック）
+            If IsValidGTIN14(line) Then
+                ' 設定シートにGTINコードを書き込む (A列)
+                settingsSheet.Cells(row, 1).Value = line
+                
+                ' 次の行へ
+                row = row + 1
+            Else
+                ' 無効なGTINコードを記録
+                On Error Resume Next
+                invalidCodes.Add line
+                On Error GoTo ErrorHandler
+            End If
+        End If
+    Loop
+    
+    ' ファイルを閉じる
+    Close #fileNum
+    
+    ' 医薬品コードに対応する医薬品名を取得して処理
+    ProcessItems
+    
+    ' 無効なGTINコードがあれば報告
+    If invalidCodes.Count > 0 Then
+        Dim message As String
+        Dim i As Integer
+        
+        message = "以下の" & invalidCodes.Count & "件のコードは14桁の数字ではないため、処理対象外としました:" & vbCrLf & vbCrLf
+        
+        For i = 1 To invalidCodes.Count
+            If i <= 10 Then
+                message = message & invalidCodes(i) & vbCrLf
+            Else
+                message = message & "... 他 " & (invalidCodes.Count - 10) & " 件"
+                Exit For
+            End If
+        Next i
+        
+        MsgBox message, vbExclamation
+    End If
+    
+    Exit Sub
+    
+ErrorHandler:
+    On Error Resume Next
+    Close #fileNum
+    MsgBox "CSVファイルの処理中にエラーが発生しました: " & Err.Description, vbCritical
+End Sub
 ' GTIN14コードが有効かチェック（14桁の数字であること）
 Private Function IsValidGTIN14(code As String) As Boolean
     ' 14桁の数字かどうかをチェック
@@ -308,7 +416,7 @@ Public Sub ProcessItems()
     
     ' 処理対象がない場合
     If lastRow < 7 Then
-        MsgBox "処理対象のGTINコードがありません。", vbExclamation
+        ' 静かに終了（エラーメッセージなし）
         Exit Sub
     End If
     
@@ -318,25 +426,29 @@ Public Sub ProcessItems()
     ' 画面更新を停止（パフォーマンス向上）
     Application.ScreenUpdating = False
     
+    ' 棚名を取得（設定シートB1〜B3）- 現在処理中のCSVファイルの棚名
+    shelf1 = settingsSheet.Cells(1, 2).Value
+    shelf2 = settingsSheet.Cells(2, 2).Value
+    shelf3 = settingsSheet.Cells(3, 2).Value
+    
     ' 設定シートA7から最終行までループ処理
     For row = 7 To lastRow
-        ' GTINコードを取得
-        gtin = settingsSheet.Cells(row, 1).Value
+        ' GTINコードを取得（String型として処理）
+        gtin = CStr(settingsSheet.Cells(row, 1).Value)
         
         ' GTINコードが空なら次の行へ
         If gtin = "" Then
             GoTo NextRow
         End If
         
-        ' 医薬品名を取得
+        ' 医薬品名を取得（GS1CodeProcessorを使用）
         drugName = GetDrugName(gtin)
         
         ' 医薬品名を設定シートB列に書き込む
         settingsSheet.Cells(row, 2).Value = drugName
         
         ' 医薬品名が取得できなかった場合は次の行へ
-        If drugName = "" Then
-            settingsSheet.Cells(row, 2).Value = "未登録"
+        If drugName = "" Or drugName = "未登録" Then
             GoTo NextRow
         End If
         
@@ -358,11 +470,6 @@ Public Sub ProcessItems()
             On Error GoTo ErrorHandler
             GoTo NextRow
         End If
-        
-        ' 棚名を取得（設定シートB1〜B3）
-        shelf1 = settingsSheet.Cells(1, 2).Value
-        shelf2 = settingsSheet.Cells(2, 2).Value
-        shelf3 = settingsSheet.Cells(3, 2).Value
         
         ' 棚名を更新
         OverwriteShelfNames matchRow, shelf1, shelf2, shelf3
