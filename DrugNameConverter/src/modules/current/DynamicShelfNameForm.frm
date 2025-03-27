@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} DynamicShelfNameForm 
    Caption         =   "棚名入力"
-   ClientHeight    =   300
+   ClientHeight    =   100
    ClientLeft      =   120
    ClientTop       =   465
-   ClientWidth     =   260
+   ClientWidth     =   140
    OleObjectBlob   =   "DynamicShelfNameForm.frx":0000
    StartUpPosition =   1  'オーナー フォームの中央
 End
@@ -16,10 +16,10 @@ Attribute VB_Exposed = False
 Option Explicit
 
 ' 定数
-Private Const MAX_HEIGHT As Long = 500 ' 最大フォーム高さ（これを超えるとスクロール可能に）
+Private Const MAX_HEIGHT As Long = 100 ' 最大フォーム高さ（これを超えるとスクロール可能に）
 Private Const ROWS_PER_FILE As Long = 2 ' ファイルごとの行数
-Private Const ROW_HEIGHT As Long = 30   ' 1行の高さ
-Private Const CTRL_MARGIN As Long = 20  ' コントロール間のマージン
+Private Const ROW_HEIGHT As Long = 15   ' 1行の高さ
+Private Const CTRL_MARGIN As Long = 5  ' コントロール間のマージン
 Private Const MAX_FILES As Long = 100   ' 最大ファイル数（600棚番号対応）
 
 ' キャンセルフラグ
@@ -43,14 +43,14 @@ Private Sub UserForm_Initialize()
     ' キャンセルフラグを初期化
     mIsCancelled = False
        
-    ' MouseScrollを有効化
-    MouseScroll.EnableMouseScroll Me, True, True, True
+    ' MouseScrollを無効化（フリーズ問題対応）
+    ' MouseScroll.EnableMouseScroll Me, True, True, True
 End Sub
 
 ' フォーム終了時
 Private Sub UserForm_Terminate()
-    ' 明示的にスクロールを無効化（推奨）
-    MouseScroll.DisableMouseScroll Me
+    ' 明示的にスクロールを無効化（フリーズ問題対応のため無効化）
+    ' MouseScroll.DisableMouseScroll Me
 End Sub
 
 ' CSVファイル数を設定し、動的にコントロールを生成する
@@ -83,9 +83,9 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
     Set scrollFrame = Me.Controls.Add("Forms.Frame.1", "ScrollFrame", True)
     With scrollFrame
         .Caption = ""
-        .Left = 10
-        .Top = 10
-        .Width = Me.Width - 30
+        .Left = 5
+        .Top = 5
+        .Width = Me.Width - 20
            
         ' フレームの高さを計算（ファイル数に基づく）
         frameHeight = (mFileCount * ROWS_PER_FILE * ROW_HEIGHT) + 60
@@ -122,16 +122,16 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
             .Caption = "棚名 " & i & ":"
             .Left = CTRL_MARGIN
             .Top = CTRL_MARGIN + ((i - 1) * ROWS_PER_FILE * ROW_HEIGHT) + ROW_HEIGHT
-            .Width = 50
+            .Width = 30
             .Height = ROW_HEIGHT
         End With
            
         ' テキストボックスを作成
         Set textBoxes(i) = scrollFrame.Controls.Add("Forms.TextBox.1", "TextBox" & i, True)
         With textBoxes(i)
-            .Left = CTRL_MARGIN + 20
+            .Left = CTRL_MARGIN + 10
             .Top = CTRL_MARGIN + ((i - 1) * ROWS_PER_FILE * ROW_HEIGHT) + ROW_HEIGHT
-            .Width = 40
+            .Width = 25
             .Height = ROW_HEIGHT - 5
             .MaxLength = 5
                
@@ -143,12 +143,14 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
     Next i
        
     ' OKボタンの位置を調整
-    OKButton.Top = Me.Height - 40
-    OKButton.Left = 20
+    OKButton.Top = Me.Height - 30
+    OKButton.Left = 10
+    OKButton.Width = 40
        
     ' キャンセルボタンの位置を調整
-    CancelButton.Top = Me.Height - 40
-    CancelButton.Left = 100
+    CancelButton.Top = Me.Height - 30
+    CancelButton.Left = 60
+    CancelButton.Width = 40
        
     Exit Sub
        
