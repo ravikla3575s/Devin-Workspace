@@ -28,12 +28,37 @@ Private Function ValidateGTIN14(ByVal gtinCode As String) As String
         End If
     Next i
     
-    ' 14桁であることを確認
-    If Len(result) <> 14 Then
+    ' 14桁ではない場合でも許容する
+    ' 数字が含まれる場合は処理対象とする
+    If Len(result) = 0 Then
         result = ""
     End If
     
     ValidateGTIN14 = result
+' GTIN-14コードが有効かどうかをチェックする関数
+Public Function IsValidGTIN14(ByVal gtinCode As String) As Boolean
+    ' 空文字チェック
+    If Trim(gtinCode) = "" Then
+        IsValidGTIN14 = False
+        Exit Function
+    End If
+    
+    ' 少なくとも1つの数字が含まれているかチェック
+    Dim i As Long
+    Dim hasNumeric As Boolean
+    
+    hasNumeric = False
+    For i = 1 To Len(gtinCode)
+        If IsNumeric(Mid(gtinCode, i, 1)) Then
+            hasNumeric = True
+            Exit For
+        End If
+    Next i
+    
+    ' 少なくとも1つの数字が含まれている場合は有効とする
+    IsValidGTIN14 = hasNumeric
+End Function
+
 End Function
 
 ' GTIN-14コードからパッケージ・インジケーターを取得する関数
