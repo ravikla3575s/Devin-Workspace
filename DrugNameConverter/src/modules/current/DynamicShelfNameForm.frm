@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} DynamicShelfNameForm 
    Caption         =   "棚名入力"
-   ClientHeight    =   3600
+   ClientHeight    =   300
    ClientLeft      =   120
    ClientTop       =   465
-   ClientWidth     =   4800
+   ClientWidth     =   260
    OleObjectBlob   =   "DynamicShelfNameForm.frx":0000
    StartUpPosition =   1  'オーナー フォームの中央
 End
@@ -16,7 +16,7 @@ Attribute VB_Exposed = False
 Option Explicit
 
 ' 定数
-Private Const MAX_HEIGHT As Long = 5000 ' 最大フォーム高さ（これを超えるとスクロール可能に）
+Private Const MAX_HEIGHT As Long = 500 ' 最大フォーム高さ（これを超えるとスクロール可能に）
 Private Const ROWS_PER_FILE As Long = 2 ' ファイルごとの行数
 Private Const ROW_HEIGHT As Long = 30   ' 1行の高さ
 Private Const CTRL_MARGIN As Long = 20  ' コントロール間のマージン
@@ -85,7 +85,7 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
         .Caption = ""
         .Left = 10
         .Top = 10
-        .Width = Me.Width - 40
+        .Width = Me.Width - 30
            
         ' フレームの高さを計算（ファイル数に基づく）
         frameHeight = (mFileCount * ROWS_PER_FILE * ROW_HEIGHT) + 60
@@ -112,7 +112,7 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
             .Caption = IIf(Not IsEmpty(fileNames) And i <= UBound(fileNames), "ファイル: " & fileNames(i), "ファイル " & i)
             .Left = CTRL_MARGIN
             .Top = CTRL_MARGIN + ((i - 1) * ROWS_PER_FILE * ROW_HEIGHT)
-            .Width = scrollFrame.Width - 40
+            .Width = scrollFrame.Width - 20
             .Height = ROW_HEIGHT
         End With
            
@@ -129,9 +129,9 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
         ' テキストボックスを作成
         Set textBoxes(i) = scrollFrame.Controls.Add("Forms.TextBox.1", "TextBox" & i, True)
         With textBoxes(i)
-            .Left = CTRL_MARGIN + 60
+            .Left = CTRL_MARGIN + 20
             .Top = CTRL_MARGIN + ((i - 1) * ROWS_PER_FILE * ROW_HEIGHT) + ROW_HEIGHT
-            .Width = 120
+            .Width = 40
             .Height = ROW_HEIGHT - 5
             .MaxLength = 5
                
@@ -144,9 +144,11 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
        
     ' OKボタンの位置を調整
     OKButton.Top = Me.Height - 40
+    OKButton.Left = 20
        
     ' キャンセルボタンの位置を調整
     CancelButton.Top = Me.Height - 40
+    CancelButton.Left = 100
        
     Exit Sub
        
