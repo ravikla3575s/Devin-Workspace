@@ -243,9 +243,11 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
     CancelButton.Height = 25
     
     ' ボタンが確実に表示されるようにスクロール領域の下端に余白を追加
-    If .ScrollBars = fmScrollBarsVertical Then
-        .ScrollHeight = .ScrollHeight + 50
-    End If
+    With scrollFrame
+        If .ScrollBars = fmScrollBarsVertical Then
+            .ScrollHeight = .ScrollHeight + 50
+        End If
+    End With
        
     Exit Sub
        
