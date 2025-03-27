@@ -32,6 +32,10 @@ Private textBoxes() As MSForms.TextBox
 Private fileLabels() As MSForms.Label
 Private shelfLabels() As MSForms.Label
 
+' ボタン
+Private okButton As MSForms.CommandButton
+Private cancelButton As MSForms.CommandButton
+
 ' CSVファイル数
 Private mFileCount As Integer
    
@@ -141,16 +145,26 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
             End If
         End With
     Next i
-       
-    ' OKボタンの位置を調整
-    OKButton.Top = Me.Height - 30
-    OKButton.Left = 10
-    OKButton.Width = 40
-       
-    ' キャンセルボタンの位置を調整
-    CancelButton.Top = Me.Height - 30
-    CancelButton.Left = 60
-    CancelButton.Width = 40
+    
+    ' OKボタンを動的に作成
+    Set okButton = Me.Controls.Add("Forms.CommandButton.1", "OKButton", True)
+    With okButton
+        .Caption = "OK"
+        .Top = Me.Height - 30
+        .Left = 10
+        .Width = 40
+        .Height = 20
+    End With
+    
+    ' キャンセルボタンを動的に作成
+    Set cancelButton = Me.Controls.Add("Forms.CommandButton.1", "CancelButton", True)
+    With cancelButton
+        .Caption = "キャンセル"
+        .Top = Me.Height - 30
+        .Left = 60
+        .Width = 40
+        .Height = 20
+    End With
        
     Exit Sub
        
@@ -159,7 +173,7 @@ ErrorHandler:
 End Sub
 
 ' OKボタンクリック時の処理
-Private Sub OKButton_Click()
+Public Sub OKButton_Click()
     On Error GoTo ErrorHandler
     
     Dim i As Integer
@@ -185,7 +199,7 @@ ErrorHandler:
 End Sub
 
 ' キャンセルボタンクリック時の処理
-Private Sub CancelButton_Click()
+Public Sub CancelButton_Click()
     ' キャンセルフラグを設定
     mIsCancelled = True
     
