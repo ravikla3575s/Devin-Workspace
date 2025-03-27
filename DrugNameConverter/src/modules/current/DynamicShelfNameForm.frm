@@ -43,6 +43,10 @@ Private mFileCount As Integer
 ' スクロール用のフレーム
 Private scrollFrame As MSForms.Frame
 
+' ボタン変数の宣言
+Private WithEvents OKButton As MSForms.CommandButton
+Private WithEvents CancelButton As MSForms.CommandButton
+
 ' フォーム初期化
 Private Sub UserForm_Initialize()
     ' キャンセルフラグを初期化
@@ -246,10 +250,6 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
 ErrorHandler:
     MsgBox "フォームの初期化中にエラーが発生しました: " & Err.Description, vbCritical
 End Sub
-
-' ボタン変数の宣言
-Private WithEvents OKButton As MSForms.CommandButton
-Private WithEvents CancelButton As MSForms.CommandButton
 
 ' OKボタンクリック時の処理
 Private Sub OKButton_Click()
