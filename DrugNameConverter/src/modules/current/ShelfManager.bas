@@ -4,11 +4,75 @@ Option Explicit
 ' グローバル変数 - 元の棚名データを保持（Undo用）
 Private originalShelfNames As Variant
 
+' フォルダ内のCSVファイル数をカウントする
+Public Function CountCSVFiles(folderPath As String) As Integer
+    On Error GoTo ErrorHandler
+    
+    Dim fileName As String
+    Dim count As Integer
+    
+    count = 0
+    
+    ' フォルダ内のCSVファイルを検索
+    fileName = Dir(folderPath & "\*.csv")
+    
+    ' CSVファイルがない場合は0を返す
+    If fileName = "" Then
+        CountCSVFiles = 0
+        Exit Function
+    End If
+    
+    ' 各CSVファイルをカウント
+    Do While fileName <> ""
+        count = count + 1
+        fileName = Dir
+    Loop
+    
+    CountCSVFiles = count
+    Exit Function
+    
+ErrorHandler:
+    MsgBox "CSVファイル数のカウント中にエラーが発生しました: " & Err.Description, vbCritical
+    CountCSVFiles = 0
+End Function
+
+' フォルダ内のCSVファイル名を取得する
+Private Function GetCSVFileNames(ByVal folderPath As String, ByVal maxCount As Integer) As Variant
+    On Error GoTo ErrorHandler
+    
+    Dim fileNames() As String
+    Dim fileName As String
+    Dim i As Integer
+    
+    ReDim fileNames(1 To maxCount)
+    i = 1
+    
+    ' フォルダ内のCSVファイルを検索
+    fileName = Dir(folderPath & "\*.csv")
+    
+    ' 各CSVファイル名を配列に格納
+    Do While fileName <> "" And i <= maxCount
+        fileNames(i) = fileName
+        i = i + 1
+        fileName = Dir
+    Loop
+    
+    GetCSVFileNames = fileNames
+    Exit Function
+    
+ErrorHandler:
+    MsgBox "CSVファイル名の取得中にエラーが発生しました: " & Err.Description, vbCritical
+    GetCSVFileNames = Array()
+End Function
+
 ' メインエントリポイント - 棚番一括更新マクロ
 Public Sub Main()
     On Error GoTo ErrorHandler
     
     Dim folderPath As String
+    Dim outputPath As String
+    Dim fileCount As Integer
+    Dim fileNames As Variant
     
     ' フォルダ選択ダイアログを表示
     folderPath = GetFolderPath()
@@ -17,11 +81,27 @@ Public Sub Main()
         Exit Sub
     End If
     
-    ' ユーザーフォームを表示（棚名入力）
-    ShelfNameForm.Show
+    ' CSVファイル数をカウント
+    fileCount = CountCSVFiles(folderPath)
+    
+    ' ファイルがない場合は処理中止
+    If fileCount = 0 Then
+        MsgBox "指定フォルダにCSVファイルが見つかりません。", vbExclamation
+        Exit Sub
+    End If
+    
+    ' CSVファイル名を取得
+    fileNames = GetCSVFileNames(folderPath, fileCount)
+    
+    ' 設定シートを準備（棚名入力用）
+    PrepareSettingsSheet fileCount
+    
+    ' 動的ユーザーフォームを表示（棚名入力）
+    DynamicShelfNameForm.SetFileCount fileCount, fileNames
+    DynamicShelfNameForm.Show
     
     ' キャンセルされた場合は処理中止
-    If ShelfNameForm.IsCancelled Then
+    If DynamicShelfNameForm.IsCancelled Then
         Exit Sub
     End If
     
@@ -37,8 +117,14 @@ Public Sub Main()
     ' tmp_tanaシートをCSV保存
     ExportTemplateCSV
     
+    ' 使用したファイルパスを取得
+    outputPath = GetTemplateOutputPath()
+    If outputPath = "" Then
+        outputPath = ThisWorkbook.Path & "\update_tmp_tana.csv"
+    End If
+    
     ' 完了メッセージ
-    MsgBox "処理が完了しました。update_tmp_tana.csvが作成されました。", vbInformation
+    MsgBox "処理が完了しました。" & vbCrLf & "ファイル: " & outputPath, vbInformation
     
     Exit Sub
     
@@ -76,6 +162,7 @@ Public Sub ImportCSVFiles(folderPath As String)
     Dim colIndex As Long
     Dim csvCount As Integer
     Dim invalidCodes As New Collection
+    Dim maxFiles As Integer
     
     ' 設定シートを取得
     Dim settingsSheet As Worksheet
@@ -85,12 +172,16 @@ Public Sub ImportCSVFiles(folderPath As String)
     Dim lastRow As Long
     lastRow = settingsSheet.Cells(settingsSheet.Rows.Count, "A").End(xlUp).row
     If lastRow >= 7 Then
-        settingsSheet.Range("A7:F" & lastRow).ClearContents
+        ' 列数を拡張（最大10ファイル対応）
+        settingsSheet.Range("A7:M" & lastRow).ClearContents
     End If
     
     ' 開始行を設定
     row = 7
     csvCount = 0
+    
+    ' 最大ファイル数（設定シートの制限を考慮）
+    maxFiles = 100
     
     ' フォルダ内のCSVファイルを検索
     fileName = Dir(folderPath & "\*.csv")
@@ -106,15 +197,17 @@ Public Sub ImportCSVFiles(folderPath As String)
     
     ' 各CSVファイルを処理
     Do While fileName <> ""
-        ' CSVファイルのカウントを増やす（最大3まで）
+        ' CSVファイルのカウントを増やす
         csvCount = csvCount + 1
-        If csvCount > 3 Then
-            MsgBox "警告: 4つ以上のCSVファイルが見つかりました。最初の3つのみ処理します。", vbExclamation
+        
+        ' 最大ファイル数を超えた場合は処理を中止
+        If csvCount > maxFiles Then
+            MsgBox "警告: " & maxFiles + 1 & "つ以上のCSVファイルが見つかりました。最初の" & maxFiles & "つのみ処理します。", vbExclamation
             Exit Do
         End If
         
-        ' 対応する棚名列を決定（D=棚名1, E=棚名2, F=棚名3）
-        colIndex = 3 + csvCount  ' D=4, E=5, F=6
+        ' 対応する棚名列を決定（D=棚名1, E=棚名2, F=棚名3...）
+        colIndex = 3 + csvCount  ' D=4, E=5, F=6...
         
         ' CSVファイルのフルパス
         filePath = folderPath & "\" & fileName
@@ -134,8 +227,8 @@ Public Sub ImportCSVFiles(folderPath As String)
                     ' 設定シートにGTINコードを書き込む
                     settingsSheet.Cells(row, 1).Value = line
                     
-                    ' 対応する棚名を書き込む（設定シートB1〜B3から取得）
-                    settingsSheet.Cells(row, colIndex).Value = settingsSheet.Cells(1, 2).Offset(csvCount - 1, 0).Value
+                    ' 対応する棚名を書き込む（設定シートB1〜B10から取得）
+                    settingsSheet.Cells(row, colIndex).Value = settingsSheet.Cells(csvCount, 2).Value
                     
                     ' 次の行へ
                     row = row + 1
@@ -338,30 +431,12 @@ Private Function GetDrugName(gtin As String) As String
     On Error GoTo ErrorHandler
     
     ' GS1CodeProcessorを使用してGTIN-14コードから医薬品情報を取得
+    ' （これはすでにSheet3を使用するように修正されている）
     Dim drugInfo As DrugInfo
     drugInfo = GS1CodeProcessor.GetDrugInfoFromGS1Code(gtin)
     
-    ' 医薬品名が取得できた場合
-    If Len(drugInfo.DrugName) > 0 Then
-        GetDrugName = drugInfo.DrugName
-    Else
-        ' 既存の検索方法をバックアップとして使用
-        Dim drugCodeSheet As Worksheet
-        Dim findResult As Range
-        
-        ' 医薬品コードシートを取得
-        Set drugCodeSheet = ThisWorkbook.Sheets("医薬品コード")
-        
-        ' GTINコードをF列から検索
-        Set findResult = drugCodeSheet.Columns("F").Find(What:=gtin, LookIn:=xlValues, LookAt:=xlWhole)
-        
-        ' 見つかった場合、G列（医薬品名）の値を返す
-        If Not findResult Is Nothing Then
-            GetDrugName = findResult.Offset(0, 1).Value
-        Else
-            GetDrugName = ""
-        End If
-    End If
+    ' 結果を返す
+    GetDrugName = drugInfo.DrugName
     
     Exit Function
     
@@ -580,18 +655,27 @@ Public Sub ExportTemplateCSV(Optional filePath As String = "")
     Dim tmpTanaSheet As Worksheet
     Dim defaultPath As String
     Dim timestamp As String
+    Dim savedPath As String
     
     ' tmp_tanaシートを取得
     Set tmpTanaSheet = ThisWorkbook.Sheets("tmp_tana")
     
-    ' ファイルパスが指定されていない場合はデフォルトパスを使用
+    ' ファイルパスが指定されていない場合
     If filePath = "" Then
-        ' タイムスタンプを生成（YYYYMMDD_HHMM形式）
-        timestamp = Format(Now, "YYYYMMDD_HHMM")
+        ' 設定シートのB4セルからパスを取得
+        savedPath = GetTemplateOutputPath()
         
-        ' デフォルトパスを設定
-        defaultPath = ThisWorkbook.Path & "\update_tmp_tana_" & timestamp & ".csv"
-        filePath = defaultPath
+        ' 保存されたパスが空または無効な場合はデフォルトパスを使用
+        If savedPath = "" Then
+            ' タイムスタンプを生成（YYYYMMDD_HHMM形式）
+            timestamp = Format(Now, "YYYYMMDD_HHMM")
+            
+            ' デフォルトパスを設定
+            defaultPath = ThisWorkbook.Path & "\update_tmp_tana_" & timestamp & ".csv"
+            filePath = defaultPath
+        Else
+            filePath = savedPath
+        End If
     End If
     
     ' 上書き確認を抑制
@@ -620,6 +704,97 @@ Public Sub ExportTemplateCSV(Optional filePath As String = "")
 ErrorHandler:
     Application.DisplayAlerts = True
     MsgBox "CSVファイルの保存中にエラーが発生しました: " & Err.Description, vbCritical
+End Sub
+
+' 設定シートのB4セルから出力先パスを取得する
+Private Function GetTemplateOutputPath() As String
+    On Error GoTo ErrorHandler
+    
+    Dim settingsSheet As Worksheet
+    Set settingsSheet = ThisWorkbook.Sheets("設定")
+    
+    ' B4セルからパスを取得（空の場合はデフォルトパスを使用）
+    GetTemplateOutputPath = Trim(settingsSheet.Range("B4").Value)
+    
+    Exit Function
+    
+ErrorHandler:
+    GetTemplateOutputPath = ""
+End Function
+
+' 設定シートのB4セルに出力先パスを保存する
+Public Sub SaveTemplateOutputPath(ByVal filePath As String)
+    On Error GoTo ErrorHandler
+    
+    Dim settingsSheet As Worksheet
+    Set settingsSheet = ThisWorkbook.Sheets("設定")
+    
+    ' B4セルにパスを保存
+    settingsSheet.Range("B4").Value = filePath
+    
+    Exit Sub
+    
+ErrorHandler:
+    MsgBox "出力先パスの保存中にエラーが発生しました: " & Err.Description, vbCritical
+End Sub
+
+' 出力ファイルパスを設定するダイアログを表示する
+Public Sub SetOutputFilePath()
+    On Error GoTo ErrorHandler
+    
+    Dim currentPath As String
+    Dim newPath As String
+    Dim fdDialog As FileDialog
+    
+    ' 現在の設定を取得
+    currentPath = GetTemplateOutputPath()
+    
+    ' ファイル選択ダイアログを表示
+    Set fdDialog = Application.FileDialog(msoFileDialogSaveAs)
+    
+    With fdDialog
+        .Title = "テンプレートファイルの出力先を選択してください"
+        .InitialFileName = IIf(currentPath <> "", currentPath, ThisWorkbook.Path & "\update_tmp_tana.csv")
+        ' Filtersプロパティは一部の環境でサポートされていないため削除
+        
+        If .Show = -1 Then
+            newPath = .SelectedItems(1)
+            SaveTemplateOutputPath newPath
+            MsgBox "出力先を設定しました: " & newPath, vbInformation
+        End If
+    End With
+    
+    Exit Sub
+    
+ErrorHandler:
+' 設定シートを棚名入力用に準備する
+Private Sub PrepareSettingsSheet(ByVal fileCount As Integer)
+    On Error GoTo ErrorHandler
+    
+    Dim settingsSheet As Worksheet
+    Dim i As Integer
+    Dim maxFilesToProcess As Integer
+    
+    ' 設定シートを取得
+    Set settingsSheet = ThisWorkbook.Sheets("設定")
+    
+    ' 最大ファイル数を取得（DynamicShelfNameFormの制限と一致させる）
+    maxFilesToProcess = WorksheetFunction.Min(fileCount, 100)
+    
+    ' 設定シートに棚名ラベルがなければ追加
+    For i = 1 To maxFilesToProcess
+        If settingsSheet.Cells(i, 1).Value = "" Then
+            settingsSheet.Cells(i, 1).Value = "棚名" & i
+        End If
+    Next i
+    
+    Exit Sub
+    
+ErrorHandler:
+    MsgBox "設定シートの準備中にエラーが発生しました: " & Err.Description, vbCritical
+End Sub
+
+    MsgBox "出力先の設定中にエラーが発生しました: " & Err.Description, vbCritical
 End Sub
 
 

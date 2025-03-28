@@ -50,25 +50,24 @@ Public Function GetDrugInfoFromGS1Code(ByVal gs1Code As String) As DrugInfo
     On Error GoTo ErrorHandler
     
     Dim result As DrugInfo
-    Dim wbDrugCode As Workbook
-    Dim wsDrugCode As Worksheet
+    Dim ws3 As Worksheet
     Dim lastRow As Long
     Dim i As Long
     Dim drugName As String
     Dim validatedCode As String
+    Dim found As Boolean
     
     ' GTIN-14コードを検証
     validatedCode = ValidateGTIN14(gs1Code)
     
     ' 無効なコードの場合
-    If Len(validatedCode) = 0 Then
+    If Len(validatedCode) <> 14 Then
         MsgBox "入力されたコードは有効なGTIN-14形式ではありません。14桁の数字を入力してください。", vbExclamation
         Exit Function
     End If
     
-    ' 医薬品コードシートを開く
-    Set wbDrugCode = Workbooks.Open(Application.ThisWorkbook.Path & Application.PathSeparator & "医薬品コード.xlsx")
-    Set wsDrugCode = wbDrugCode.Sheets(1)
+    ' 医薬品コードシート（Sheet3）を取得
+    Set ws3 = ThisWorkbook.Worksheets(3) ' 医薬品コードシート
     
     ' GS1コードを結果に格納
     result.GS1Code = validatedCode
@@ -77,17 +76,20 @@ Public Function GetDrugInfoFromGS1Code(ByVal gs1Code As String) As DrugInfo
     result.PackageIndicator = GetPackageIndicator(validatedCode)
     
     ' 最終行を取得
-    lastRow = wsDrugCode.Cells(wsDrugCode.Rows.Count, 1).End(xlUp).Row
+    lastRow = ws3.Cells(ws3.Rows.Count, "F").End(xlUp).Row
     
-    ' GS1コードに一致する医薬品を検索
+    ' 検索フラグを初期化
+    found = False
+    
+    ' Sheet3でGTINコードに一致する医薬品を検索
     For i = 2 To lastRow ' ヘッダー行をスキップ
         ' データベース内のコードも検証して比較
         Dim dbCode As String
-        dbCode = ValidateGTIN14(CStr(wsDrugCode.Cells(i, 1).Value))
+        dbCode = ValidateGTIN14(CStr(ws3.Cells(i, "F").Value))
         
-        If dbCode = validatedCode Then
-            ' G列（調剤包装単位名称）から医薬品名を取得
-            drugName = wsDrugCode.Cells(i, 7).Value
+        If CStr(dbCode) = CStr(validatedCode) Then
+            ' G列から医薬品名を取得
+            drugName = ws3.Cells(i, "G").Value
             result.DrugName = drugName
             
             ' 医薬品名を各要素に分解
@@ -108,22 +110,24 @@ Public Function GetDrugInfoFromGS1Code(ByVal gs1Code As String) As DrugInfo
             result.PackageSpec = ExtractPackageSpecFromDrugName(drugName)
             result.PackageAddInfo = ExtractPackageAddInfoFromDrugName(drugName)
             
+            found = True
             Exit For
         End If
     Next i
     
-    ' 医薬品コードシートを閉じる
-    wbDrugCode.Close SaveChanges:=False
+    ' 見つからなかった場合のデフォルト値設定
+    If Not found Then
+        result.GS1Code = CStr(validatedCode)
+        result.DrugName = "/未登録/"
+    End If
     
     GetDrugInfoFromGS1Code = result
     Exit Function
     
 ErrorHandler:
-    If Not wbDrugCode Is Nothing Then
-        wbDrugCode.Close SaveChanges:=False
-    End If
-    MsgBox "GTIN-14コード処理中にエラーが発生しました: " & Err.Description, vbCritical
-    ' 空の結果を返す
+    ' エラーハンドリング
+    result.GS1Code = validatedCode
+    result.DrugName = "/エラー: " & Err.Description & "/"
     GetDrugInfoFromGS1Code = result
 End Function
 
@@ -207,8 +211,8 @@ Public Sub ProcessGS1CodeAndUpdateSettings(ByVal gs1Code As String)
     drugInfo = GetDrugInfoFromGS1Code(gs1Code)
     
     ' 医薬品情報が取得できなかった場合
-    If Len(drugInfo.DrugName) = 0 Then
-        MsgBox "指定されたGS1コード: " & gs1Code & " に対応する医薬品が見つかりませんでした。", vbExclamation
+    If Len(CStr(drugInfo.DrugName)) = 0 Then
+        MsgBox "指定されたGS1コード: " & CStr(gs1Code) & " に対応する医薬品が見つかりませんでした。", vbExclamation
         GoTo CleanExit
     End If
     

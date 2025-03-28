@@ -615,7 +615,8 @@ Public Sub ShowMainMenu()
     choice = MsgBox("薬局在庫管理システム - 機能選択" & vbCrLf & vbCrLf & _
                    "「はい」：医薬品名比較機能" & vbCrLf & _
                    "「いいえ」：棚番一括更新機能" & vbCrLf & _
-                   "「キャンセル」：GTIN-14コード処理", _
+                   "「キャンセル」：GTIN-14コード処理" & vbCrLf & vbCrLf & _
+                   "※CSVインポート機能はマクロ「ImportCSVToSheet2.ImportCSVToSheet2」を実行", _
                    vbYesNoCancel + vbQuestion, "メイン機能選択")
     
     Select Case choice
@@ -634,11 +635,35 @@ Public Sub ShowMainMenu()
     End Select
 End Sub
 
+' アプリケーション起動時のメイン関数
+Public Sub Main()
+    Dim choice As VbMsgBoxResult
+    
+    choice = MsgBox("薬局在庫管理システム - 起動モード選択" & vbCrLf & vbCrLf & _
+                   "「はい」：一括処理モード（InitializeApplication）" & vbCrLf & _
+                   "「いいえ」：個別起動モード（ShowMainMenu）", _
+                   vbYesNoCancel + vbQuestion, "起動モード選択")
+    
+    Select Case choice
+        Case vbYes
+            ' 一括処理モード
+            InitializeApplication
+            
+        Case vbNo
+            ' 個別起動モード
+            ShowMainMenu
+            
+        Case vbCancel
+            ' キャンセル - 何もしない
+            Exit Sub
+    End Select
+End Sub
+
 ' アプリケーション起動時の初期化関数
 Public Sub InitializeApplication()
     ' ユーザーフォームを初期化（必要な場合）
-    If Not IsFormLoaded("ShelfNameForm") Then
-        Load ShelfNameForm
+    If Not IsFormLoaded("DynamicShelfNameForm") Then
+        Load DynamicShelfNameForm
     End If
     
     ' その他の初期化処理
