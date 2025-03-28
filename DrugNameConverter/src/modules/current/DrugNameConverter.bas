@@ -5,8 +5,8 @@ Option Explicit
 
 ' メイン処理を呼び出すラッパー関数（7行目以降の医薬品名比較）
 Public Sub RunDrugNameComparison()
-    ' MainModuleの関数を呼び出し
-    MainModule.ProcessFromRow7
+    ' 処理モード選択ダイアログを表示して処理を実行
+    MainModule.Main
 End Sub
 
 ' 医薬品名から直接包装形態を抽出する機能に変更
