@@ -58,6 +58,41 @@ Public Sub CreateCustomMenu()
     ' セパレーター
     menu_item.Controls.Add Type:=msoControlSeparator, Temporary:=True
     
+    ' データベース機能メニュー
+    Set sub_menu = menu_item.Controls.Add(Type:=msoControlPopup, Temporary:=True)
+    sub_menu.Caption = "データベース機能"
+    
+    ' データベース作成・更新サブメニュー
+    With sub_menu.Controls.Add(Type:=msoControlButton, Temporary:=True)
+        .Caption = "データベース作成・更新"
+        .OnAction = "DatabaseMenuModule.CreateOrUpdateDatabase"
+        .FaceId = 37
+    End With
+    
+    ' データベース検索サブメニュー
+    With sub_menu.Controls.Add(Type:=msoControlButton, Temporary:=True)
+        .Caption = "データベース検索・フィルタリング"
+        .OnAction = "DatabaseMenuModule.ShowDatabaseSearchForm"
+        .FaceId = 52
+    End With
+    
+    ' データベースCSV出力サブメニュー
+    With sub_menu.Controls.Add(Type:=msoControlButton, Temporary:=True)
+        .Caption = "データベースCSV出力"
+        .OnAction = "DatabaseMenuModule.ExportDatabaseToCsv"
+        .FaceId = 17
+    End With
+    
+    ' データベース集計レポート作成サブメニュー
+    With sub_menu.Controls.Add(Type:=msoControlButton, Temporary:=True)
+        .Caption = "データベース集計レポート作成"
+        .OnAction = "DatabaseMenuModule.CreateDatabaseSummaryReport"
+        .FaceId = 184
+    End With
+    
+    ' セパレーター
+    menu_item.Controls.Add Type:=msoControlSeparator, Temporary:=True
+    
     ' ヘルプメニュー
     With menu_item.Controls.Add(Type:=msoControlButton, Temporary:=True)
         .Caption = "ヘルプ"
@@ -78,7 +113,12 @@ Public Sub ShowHelp()
            "【半期売掛金繰越額計算】" & vbCrLf & _
            "半期ごとの売掛金繰越額を計算します。" & vbCrLf & vbCrLf & _
            "【請求誤差追求報告書作成】" & vbCrLf & _
-           "減点・査定データから請求誤差追求報告書を作成します。", _
+           "減点・査定データから請求誤差追求報告書を作成します。" & vbCrLf & vbCrLf & _
+           "【データベース機能】" & vbCrLf & _
+           "・データベース作成・更新：データベースシートを作成または更新します。" & vbCrLf & _
+           "・データベース検索・フィルタリング：データベースを検索・フィルタリングします。" & vbCrLf & _
+           "・データベースCSV出力：データベースをCSVファイルに出力します。" & vbCrLf & _
+           "・データベース集計レポート作成：データベースの集計レポートを作成します。", _
            vbInformation, "ヘルプ"
 End Sub
 
