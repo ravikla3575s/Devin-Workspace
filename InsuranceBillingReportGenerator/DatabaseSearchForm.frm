@@ -70,6 +70,10 @@ Private Sub UserForm_Initialize()
     Me.txtPublicRebillingFrom.Value = ""
     Me.txtPublicRebillingTo.Value = ""
     
+    ' 機関フィールドの初期化
+    Me.txtBillingInstitution.Value = ""
+    Me.txtRebillingInstitution.Value = ""
+    
     ' 検索テキストの初期化
     Me.txtSearchText.Value = ""
     
@@ -119,6 +123,10 @@ Private Sub btnClear_Click()
     Me.txtPrimaryRebillingTo.Value = ""
     Me.txtPublicRebillingFrom.Value = ""
     Me.txtPublicRebillingTo.Value = ""
+    
+    ' 機関フィールドのリセット
+    Me.txtBillingInstitution.Value = ""
+    Me.txtRebillingInstitution.Value = ""
 End Sub
 
 ' キャンセルされたかどうかのプロパティ
@@ -247,4 +255,14 @@ End Property
 ' 公費再請求額範囲（終了）を取得
 Public Property Get PublicRebillingTo() As String
     PublicRebillingTo = Me.txtPublicRebillingTo.Value
+End Property
+
+' 請求先機関を取得
+Public Property Get BillingInstitution() As String
+    BillingInstitution = Me.txtBillingInstitution.Value
+End Property
+
+' 再請求先機関を取得
+Public Property Get RebillingInstitution() As String
+    RebillingInstitution = Me.txtRebillingInstitution.Value
 End Property

@@ -44,6 +44,9 @@ Public Sub SearchDatabase()
     Dim primary_rebilling_from As String, primary_rebilling_to As String
     Dim public_rebilling_from As String, public_rebilling_to As String
     
+    ' 機関フィールド用の変数
+    Dim billing_institution As String, rebilling_institution As String
+    
     billing_destination = search_form.SelectedBillingDestination
     category = search_form.SelectedCategory
     date_from = search_form.DateFrom
@@ -72,12 +75,16 @@ Public Sub SearchDatabase()
     public_rebilling_from = search_form.PublicRebillingFrom
     public_rebilling_to = search_form.PublicRebillingTo
     
+    ' 機関フィールドの値を取得
+    billing_institution = search_form.BillingInstitution
+    rebilling_institution = search_form.RebillingInstitution
+    
     ' フィルターをクリア
     ws_database.AutoFilterMode = False
     
     ' フィルター条件の配列を作成
-    Dim criteria(1 To 15) As Variant
-    For i = 1 To 15
+    Dim criteria(1 To 17) As Variant
+    For i = 1 To 17
         criteria(i) = ""
     Next i
     
@@ -200,16 +207,27 @@ Public Sub SearchDatabase()
         End If
     End If
     
+    ' 請求先機関の処理
+    If billing_institution <> "" Then
+        criteria(16) = "*" & billing_institution & "*"
+    End If
+    
+    ' 再請求先機関の処理
+    If rebilling_institution <> "" Then
+        criteria(17) = "*" & rebilling_institution & "*"
+    End If
+    
     ' テキスト検索の処理
     If search_text <> "" Then
-        ' 複数列で検索（患者名、医療機関）
-        ws_database.Range("A1:O1").AutoFilter Field:=4, Criteria1:="*" & search_text & "*", Operator:=xlOr, Criteria2:="*" & search_text & "*"
+        ' 複数列で検索（患者名、医療機関、請求先機関、再請求先機関）
+        ws_database.Range("A1:Q1").AutoFilter Field:=4, Criteria1:="*" & search_text & "*", Operator:=xlOr, _
+            Criteria2:=Array("*" & search_text & "*", "*" & search_text & "*", "*" & search_text & "*")
     End If
     
     ' 各列にフィルターを適用
-    For i = 1 To 15
+    For i = 1 To 17
         If criteria(i) <> "" Then
-            ws_database.Range("A1:O1").AutoFilter Field:=i, Criteria1:=criteria(i)
+            ws_database.Range("A1:Q1").AutoFilter Field:=i, Criteria1:=criteria(i)
         End If
     Next i
     
@@ -273,7 +291,7 @@ Public Sub ExportDatabaseToCsv()
     Set temp_ws = temp_wb.Sheets(1)
     
     ' データをコピー（フィルターされた表示データのみ）
-    ws_database.Range("A1:O" & last_row).SpecialCells(xlCellTypeVisible).Copy
+    ws_database.Range("A1:Q" & last_row).SpecialCells(xlCellTypeVisible).Copy
     temp_ws.Range("A1").PasteSpecial xlPasteValues
     
     ' CSV形式で保存
@@ -349,6 +367,8 @@ Public Sub CreateDatabaseSummaryReport()
         .Range("E4").Value = "公費請求額合計"
         .Range("F4").Value = "主保険再請求額合計"
         .Range("G4").Value = "公費再請求額合計"
+        .Range("H4").Value = "請求先機関"
+        .Range("I4").Value = "再請求先機関"
         
         .Range("A8").Value = "【区分別集計】"
         .Range("A8").Font.Bold = True
@@ -359,6 +379,8 @@ Public Sub CreateDatabaseSummaryReport()
         .Range("E9").Value = "公費請求額合計"
         .Range("F9").Value = "主保険再請求額合計"
         .Range("G9").Value = "公費再請求額合計"
+        .Range("H9").Value = "請求先機関"
+        .Range("I9").Value = "再請求先機関"
         
         .Range("A14").Value = "【月別集計】"
         .Range("A14").Font.Bold = True
@@ -369,6 +391,8 @@ Public Sub CreateDatabaseSummaryReport()
         .Range("E15").Value = "公費請求額合計"
         .Range("F15").Value = "主保険再請求額合計"
         .Range("G15").Value = "公費再請求額合計"
+        .Range("H15").Value = "請求先機関"
+        .Range("I15").Value = "再請求先機関"
     End With
     
     ' データベースシートからデータを集計

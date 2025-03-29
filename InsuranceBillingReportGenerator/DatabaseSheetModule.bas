@@ -28,22 +28,24 @@ Public Function CreateDatabaseSheet(ByVal wb As Workbook) As Boolean
             .Range("H1").Value = "処理日"
             .Range("I1").Value = "返戻日"
             .Range("J1").Value = "再請求日"
-            .Range("K1").Value = "主保険請求額"
-            .Range("L1").Value = "公費請求額"
-            .Range("M1").Value = "主保険再請求額"
-            .Range("N1").Value = "公費再請求額"
-            .Range("O1").Value = "備考"
+            .Range("K1").Value = "請求先機関"
+            .Range("L1").Value = "再請求先機関"
+            .Range("M1").Value = "主保険請求額"
+            .Range("N1").Value = "公費請求額"
+            .Range("O1").Value = "主保険再請求額"
+            .Range("P1").Value = "公費再請求額"
+            .Range("Q1").Value = "備考"
             
             ' ヘッダー行の書式設定
-            .Range("A1:O1").Font.Bold = True
-            .Range("A1:O1").Interior.ColorIndex = 15
-            .Range("A1:O1").Borders.LineStyle = xlContinuous
+            .Range("A1:Q1").Font.Bold = True
+            .Range("A1:Q1").Interior.ColorIndex = 15
+            .Range("A1:Q1").Borders.LineStyle = xlContinuous
             
             ' 列幅の自動調整
-            .Columns("A:O").AutoFit
+            .Columns("A:Q").AutoFit
             
             ' フィルターの追加
-            .Range("A1:O1").AutoFilter
+            .Range("A1:Q1").AutoFilter
         End With
     End If
     
@@ -83,7 +85,7 @@ Private Sub PopulateDatabaseFromDetails(ByVal wb As Workbook)
     If ws_database.Range("A2").Value <> "" Then
         last_row = ws_database.Cells(ws_database.Rows.Count, "A").End(xlUp).Row
         If last_row > 1 Then
-            ws_database.Range("A2:O" & last_row).Clear
+            ws_database.Range("A2:Q" & last_row).Clear
         End If
     End If
     
@@ -103,7 +105,7 @@ Private Sub PopulateDatabaseFromDetails(ByVal wb As Workbook)
     Next sheet_index
     
     ' 列幅の自動調整
-    ws_database.Columns("A:H").AutoFit
+    ws_database.Columns("A:Q").AutoFit
     
     Exit Sub
     
@@ -234,6 +236,23 @@ Private Function CollectDataFromSheet(ByVal ws As Worksheet, ByVal ws_database A
                     End If
                 Next j
                 
+                ' 請求先機関と再請求先機関
+                ' 請求先機関 - 区分に応じて推定
+                If category = "未請求" Or category = "返戻" Or category = "減点" Then
+                    ws_database.Cells(current_row, 11).Value = "社会保険診療報酬支払基金"  ' 仮の請求先機関
+                ElseIf category = "再請求" Then
+                    ws_database.Cells(current_row, 11).Value = ""  ' 再請求の場合は空白
+                Else
+                    ws_database.Cells(current_row, 11).Value = "国民健康保険団体連合会"  ' 仮の請求先機関
+                End If
+                
+                ' 再請求先機関 - 区分に応じて推定
+                If category = "再請求" Then
+                    ws_database.Cells(current_row, 12).Value = "社会保険診療報酬支払基金"  ' 仮の再請求先機関
+                Else
+                    ws_database.Cells(current_row, 12).Value = ""  ' 再請求以外は空白
+                End If
+                
                 ' 金額フィールド
                 Dim total_amount As Double
                 If IsNumeric(ws.Cells(i, 10).Value) Then
@@ -244,24 +263,24 @@ Private Function CollectDataFromSheet(ByVal ws As Worksheet, ByVal ws_database A
                 
                 ' 主保険請求額と公費請求額を分割（仮の比率：7:3）
                 If category <> "再請求" Then
-                    ws_database.Cells(current_row, 11).Value = Int(total_amount * 0.7)  ' 主保険請求額
-                    ws_database.Cells(current_row, 12).Value = total_amount - Int(total_amount * 0.7)  ' 公費請求額
-                    ws_database.Cells(current_row, 13).Value = 0  ' 主保険再請求額
-                    ws_database.Cells(current_row, 14).Value = 0  ' 公費再請求額
+                    ws_database.Cells(current_row, 13).Value = Int(total_amount * 0.7)  ' 主保険請求額
+                    ws_database.Cells(current_row, 14).Value = total_amount - Int(total_amount * 0.7)  ' 公費請求額
+                    ws_database.Cells(current_row, 15).Value = 0  ' 主保険再請求額
+                    ws_database.Cells(current_row, 16).Value = 0  ' 公費再請求額
                 Else
-                    ws_database.Cells(current_row, 11).Value = 0  ' 主保険請求額
-                    ws_database.Cells(current_row, 12).Value = 0  ' 公費請求額
-                    ws_database.Cells(current_row, 13).Value = Int(total_amount * 0.7)  ' 主保険再請求額
-                    ws_database.Cells(current_row, 14).Value = total_amount - Int(total_amount * 0.7)  ' 公費再請求額
+                    ws_database.Cells(current_row, 13).Value = 0  ' 主保険請求額
+                    ws_database.Cells(current_row, 14).Value = 0  ' 公費請求額
+                    ws_database.Cells(current_row, 15).Value = Int(total_amount * 0.7)  ' 主保険再請求額
+                    ws_database.Cells(current_row, 16).Value = total_amount - Int(total_amount * 0.7)  ' 公費再請求額
                 End If
                 
                 ' 金額フィールドの書式設定
-                For j = 11 To 14
+                For j = 13 To 16
                     ws_database.Cells(current_row, j).NumberFormat = "#,##0"
                 Next j
                 
                 ' 備考
-                ws_database.Cells(current_row, 15).Value = ""  ' 備考欄は空白として開始
+                ws_database.Cells(current_row, 17).Value = ""  ' 備考欄は空白として開始
                 
                 current_row = current_row + 1
             End If
