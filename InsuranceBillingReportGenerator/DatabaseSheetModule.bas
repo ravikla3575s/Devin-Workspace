@@ -24,21 +24,28 @@ Public Function CreateDatabaseSheet(ByVal wb As Workbook) As Boolean
             .Range("D1").Value = "患者名"
             .Range("E1").Value = "調剤年月"
             .Range("F1").Value = "医療機関"
-            .Range("G1").Value = "請求日"
-            .Range("H1").Value = "処理日"
-            .Range("I1").Value = "返戻日"
-            .Range("J1").Value = "再請求日"
-            .Range("K1").Value = "請求先機関"
-            .Range("L1").Value = "再請求先機関"
-            .Range("M1").Value = "主保険請求額"
-            .Range("N1").Value = "公費請求額"
-            .Range("O1").Value = "主保険再請求額"
-            .Range("P1").Value = "公費再請求額"
+            
+            ' 請求情報
+            .Range("G1").Value = "【請求】請求日"
+            .Range("H1").Value = "【請求】処理日"
+            .Range("I1").Value = "【請求】返戻日"
+            .Range("J1").Value = "【請求】請求先機関"
+            .Range("K1").Value = "【請求】主保険請求額"
+            .Range("L1").Value = "【請求】公費請求額"
+            
+            ' 再請求情報
+            .Range("M1").Value = "【再請求】再請求日"
+            .Range("N1").Value = "【再請求】再請求先機関"
+            .Range("O1").Value = "【再請求】主保険再請求額"
+            .Range("P1").Value = "【再請求】公費再請求額"
             .Range("Q1").Value = "備考"
             
             ' ヘッダー行の書式設定
             .Range("A1:Q1").Font.Bold = True
-            .Range("A1:Q1").Interior.ColorIndex = 15
+            .Range("A1:F1").Interior.ColorIndex = 15
+            .Range("G1:L1").Interior.ColorIndex = 36  ' 請求情報の列に色を設定
+            .Range("M1:P1").Interior.ColorIndex = 40  ' 再請求情報の列に別の色を設定
+            .Range("Q1").Interior.ColorIndex = 15
             .Range("A1:Q1").Borders.LineStyle = xlContinuous
             
             ' 列幅の自動調整
@@ -200,6 +207,7 @@ Private Function CollectDataFromSheet(ByVal ws As Worksheet, ByVal ws_database A
                 ws_database.Cells(current_row, 6).Value = ws.Cells(i, 6).Value
                 
                 ' 日付フィールド
+                ' 請求情報
                 ' 請求日 - 区分に応じて推定
                 If category = "未請求" Then
                     ws_database.Cells(current_row, 7).Value = ""  ' 未請求の場合は空白
@@ -221,36 +229,13 @@ Private Function CollectDataFromSheet(ByVal ws As Worksheet, ByVal ws_database A
                     ws_database.Cells(current_row, 9).Value = ""
                 End If
                 
-                ' 再請求日 - 区分に応じて推定
-                If category = "再請求" Then
-                    ws_database.Cells(current_row, 10).Value = DateAdd("d", -2, Now())  ' 仮の日付（現在から2日前）
-                Else
-                    ws_database.Cells(current_row, 10).Value = ""
-                End If
-                
-                ' 日付フィールドの書式設定
-                Dim j As Long
-                For j = 7 To 10
-                    If ws_database.Cells(current_row, j).Value <> "" Then
-                        ws_database.Cells(current_row, j).NumberFormat = "yyyy/mm/dd"
-                    End If
-                Next j
-                
-                ' 請求先機関と再請求先機関
                 ' 請求先機関 - 区分に応じて推定
                 If category = "未請求" Or category = "返戻" Or category = "減点" Then
-                    ws_database.Cells(current_row, 11).Value = "社会保険診療報酬支払基金"  ' 仮の請求先機関
+                    ws_database.Cells(current_row, 10).Value = "社会保険診療報酬支払基金"  ' 仮の請求先機関
                 ElseIf category = "再請求" Then
-                    ws_database.Cells(current_row, 11).Value = ""  ' 再請求の場合は空白
+                    ws_database.Cells(current_row, 10).Value = ""  ' 再請求の場合は空白
                 Else
-                    ws_database.Cells(current_row, 11).Value = "国民健康保険団体連合会"  ' 仮の請求先機関
-                End If
-                
-                ' 再請求先機関 - 区分に応じて推定
-                If category = "再請求" Then
-                    ws_database.Cells(current_row, 12).Value = "社会保険診療報酬支払基金"  ' 仮の再請求先機関
-                Else
-                    ws_database.Cells(current_row, 12).Value = ""  ' 再請求以外は空白
+                    ws_database.Cells(current_row, 10).Value = "国民健康保険団体連合会"  ' 仮の請求先機関
                 End If
                 
                 ' 金額フィールド
@@ -263,19 +248,54 @@ Private Function CollectDataFromSheet(ByVal ws As Worksheet, ByVal ws_database A
                 
                 ' 主保険請求額と公費請求額を分割（仮の比率：7:3）
                 If category <> "再請求" Then
-                    ws_database.Cells(current_row, 13).Value = Int(total_amount * 0.7)  ' 主保険請求額
-                    ws_database.Cells(current_row, 14).Value = total_amount - Int(total_amount * 0.7)  ' 公費請求額
-                    ws_database.Cells(current_row, 15).Value = 0  ' 主保険再請求額
-                    ws_database.Cells(current_row, 16).Value = 0  ' 公費再請求額
+                    ws_database.Cells(current_row, 11).Value = Int(total_amount * 0.7)  ' 主保険請求額
+                    ws_database.Cells(current_row, 12).Value = total_amount - Int(total_amount * 0.7)  ' 公費請求額
                 Else
-                    ws_database.Cells(current_row, 13).Value = 0  ' 主保険請求額
-                    ws_database.Cells(current_row, 14).Value = 0  ' 公費請求額
+                    ws_database.Cells(current_row, 11).Value = 0  ' 主保険請求額
+                    ws_database.Cells(current_row, 12).Value = 0  ' 公費請求額
+                End If
+                
+                ' 再請求情報
+                ' 再請求日 - 区分に応じて推定
+                If category = "再請求" Then
+                    ws_database.Cells(current_row, 13).Value = DateAdd("d", -2, Now())  ' 仮の日付（現在から2日前）
+                Else
+                    ws_database.Cells(current_row, 13).Value = ""
+                End If
+                
+                ' 再請求先機関 - 区分に応じて推定
+                If category = "再請求" Then
+                    ws_database.Cells(current_row, 14).Value = "社会保険診療報酬支払基金"  ' 仮の再請求先機関
+                Else
+                    ws_database.Cells(current_row, 14).Value = ""  ' 再請求以外は空白
+                End If
+                
+                ' 主保険再請求額と公費再請求額
+                If category = "再請求" Then
                     ws_database.Cells(current_row, 15).Value = Int(total_amount * 0.7)  ' 主保険再請求額
                     ws_database.Cells(current_row, 16).Value = total_amount - Int(total_amount * 0.7)  ' 公費再請求額
+                Else
+                    ws_database.Cells(current_row, 15).Value = 0  ' 主保険再請求額
+                    ws_database.Cells(current_row, 16).Value = 0  ' 公費再請求額
+                End If
+                
+                ' 日付フィールドの書式設定
+                For j = 7 To 9
+                    If ws_database.Cells(current_row, j).Value <> "" Then
+                        ws_database.Cells(current_row, j).NumberFormat = "yyyy/mm/dd"
+                    End If
+                Next j
+                
+                If ws_database.Cells(current_row, 13).Value <> "" Then
+                    ws_database.Cells(current_row, 13).NumberFormat = "yyyy/mm/dd"
                 End If
                 
                 ' 金額フィールドの書式設定
-                For j = 13 To 16
+                For j = 11 To 12
+                    ws_database.Cells(current_row, j).NumberFormat = "#,##0"
+                Next j
+                
+                For j = 15 To 16
                     ws_database.Cells(current_row, j).NumberFormat = "#,##0"
                 Next j
                 
