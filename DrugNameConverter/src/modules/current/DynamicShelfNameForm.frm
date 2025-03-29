@@ -131,7 +131,7 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
         .Height = frameHeight
            
         ' ボタン用の余白を追加（十分なスペースを確保）
-        formHeight = frameHeight + 80
+        formHeight = frameHeight + 120
            
         ' フォームの高さを制限し、必要に応じてスクロール可能に
         If formHeight > MAX_HEIGHT Then
@@ -231,13 +231,13 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
     Next i
        
     ' OKボタンの位置を調整
-    OKButton.Top = Me.Height - 40
+    OKButton.Top = Me.Height - 70
     OKButton.Left = 10
     OKButton.Width = 60
     OKButton.Height = 25
        
     ' キャンセルボタンの位置を調整
-    CancelButton.Top = Me.Height - 40
+    CancelButton.Top = Me.Height - 70
     CancelButton.Left = 80
     CancelButton.Width = 80
     CancelButton.Height = 25
