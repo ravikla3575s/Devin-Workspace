@@ -621,22 +621,22 @@ Public Sub CreateDatabaseSummaryReport()
     month_keys = months.Keys
     
     ' 月別集計をレポートに出力
-    Dim month_key As Variant
-    For Each month_key In month_keys
-        ws_report.Cells(row_index, 1).Value = month_key
-        ws_report.Cells(row_index, 2).Value = months(month_key)(0)
-        ws_report.Cells(row_index, 3).Value = months(month_key)(1)
+    Dim month_key_iter As Variant
+    For Each month_key_iter In month_keys
+        ws_report.Cells(row_index, 1).Value = month_key_iter
+        ws_report.Cells(row_index, 2).Value = months(month_key_iter)(0)
+        ws_report.Cells(row_index, 3).Value = months(month_key_iter)(1)
         ws_report.Cells(row_index, 3).NumberFormat = "#,##0"
-        ws_report.Cells(row_index, 4).Value = months(month_key)(2)
+        ws_report.Cells(row_index, 4).Value = months(month_key_iter)(2)
         ws_report.Cells(row_index, 4).NumberFormat = "#,##0"
-        ws_report.Cells(row_index, 5).Value = months(month_key)(3)
+        ws_report.Cells(row_index, 5).Value = months(month_key_iter)(3)
         ws_report.Cells(row_index, 5).NumberFormat = "#,##0"
-        ws_report.Cells(row_index, 6).Value = months(month_key)(4)
+        ws_report.Cells(row_index, 6).Value = months(month_key_iter)(4)
         ws_report.Cells(row_index, 6).NumberFormat = "#,##0"
-        ws_report.Cells(row_index, 7).Value = months(month_key)(5)
+        ws_report.Cells(row_index, 7).Value = months(month_key_iter)(5)
         ws_report.Cells(row_index, 7).NumberFormat = "#,##0"
         row_index = row_index + 1
-    Next month_key
+    Next month_key_iter
     
     ' 合計行を追加
     ws_report.Cells(row_index, 1).Value = "合計"
