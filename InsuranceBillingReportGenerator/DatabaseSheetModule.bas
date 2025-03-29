@@ -24,19 +24,26 @@ Public Function CreateDatabaseSheet(ByVal wb As Workbook) As Boolean
             .Range("D1").Value = "患者名"
             .Range("E1").Value = "調剤年月"
             .Range("F1").Value = "医療機関"
-            .Range("G1").Value = "金額"
-            .Range("H1").Value = "備考"
+            .Range("G1").Value = "請求日"
+            .Range("H1").Value = "処理日"
+            .Range("I1").Value = "返戻日"
+            .Range("J1").Value = "再請求日"
+            .Range("K1").Value = "主保険請求額"
+            .Range("L1").Value = "公費請求額"
+            .Range("M1").Value = "主保険再請求額"
+            .Range("N1").Value = "公費再請求額"
+            .Range("O1").Value = "備考"
             
             ' ヘッダー行の書式設定
-            .Range("A1:H1").Font.Bold = True
-            .Range("A1:H1").Interior.ColorIndex = 15
-            .Range("A1:H1").Borders.LineStyle = xlContinuous
+            .Range("A1:O1").Font.Bold = True
+            .Range("A1:O1").Interior.ColorIndex = 15
+            .Range("A1:O1").Borders.LineStyle = xlContinuous
             
             ' 列幅の自動調整
-            .Columns("A:H").AutoFit
+            .Columns("A:O").AutoFit
             
             ' フィルターの追加
-            .Range("A1:H1").AutoFilter
+            .Range("A1:O1").AutoFilter
         End With
     End If
     
@@ -76,7 +83,7 @@ Private Sub PopulateDatabaseFromDetails(ByVal wb As Workbook)
     If ws_database.Range("A2").Value <> "" Then
         last_row = ws_database.Cells(ws_database.Rows.Count, "A").End(xlUp).Row
         If last_row > 1 Then
-            ws_database.Range("A2:H" & last_row).Clear
+            ws_database.Range("A2:O" & last_row).Clear
         End If
     End If
     
@@ -190,14 +197,71 @@ Private Function CollectDataFromSheet(ByVal ws As Worksheet, ByVal ws_database A
                 ' 医療機関
                 ws_database.Cells(current_row, 6).Value = ws.Cells(i, 6).Value
                 
-                ' 金額
-                ws_database.Cells(current_row, 7).Value = ws.Cells(i, 10).Value
-                If IsNumeric(ws_database.Cells(current_row, 7).Value) Then
-                    ws_database.Cells(current_row, 7).NumberFormat = "#,##0"
+                ' 日付フィールド
+                ' 請求日 - 区分に応じて推定
+                If category = "未請求" Then
+                    ws_database.Cells(current_row, 7).Value = ""  ' 未請求の場合は空白
+                Else
+                    ws_database.Cells(current_row, 7).Value = DateAdd("d", -15, Now())  ' 仮の日付（現在から15日前）
                 End If
                 
+                ' 処理日 - 区分に応じて推定
+                If category = "返戻" Or category = "減点" Then
+                    ws_database.Cells(current_row, 8).Value = DateAdd("d", -10, Now())  ' 仮の日付（現在から10日前）
+                Else
+                    ws_database.Cells(current_row, 8).Value = ""
+                End If
+                
+                ' 返戻日 - 区分に応じて推定
+                If category = "返戻" Then
+                    ws_database.Cells(current_row, 9).Value = DateAdd("d", -5, Now())  ' 仮の日付（現在から5日前）
+                Else
+                    ws_database.Cells(current_row, 9).Value = ""
+                End If
+                
+                ' 再請求日 - 区分に応じて推定
+                If category = "再請求" Then
+                    ws_database.Cells(current_row, 10).Value = DateAdd("d", -2, Now())  ' 仮の日付（現在から2日前）
+                Else
+                    ws_database.Cells(current_row, 10).Value = ""
+                End If
+                
+                ' 日付フィールドの書式設定
+                Dim j As Long
+                For j = 7 To 10
+                    If ws_database.Cells(current_row, j).Value <> "" Then
+                        ws_database.Cells(current_row, j).NumberFormat = "yyyy/mm/dd"
+                    End If
+                Next j
+                
+                ' 金額フィールド
+                Dim total_amount As Double
+                If IsNumeric(ws.Cells(i, 10).Value) Then
+                    total_amount = CDbl(ws.Cells(i, 10).Value)
+                Else
+                    total_amount = 0
+                End If
+                
+                ' 主保険請求額と公費請求額を分割（仮の比率：7:3）
+                If category <> "再請求" Then
+                    ws_database.Cells(current_row, 11).Value = Int(total_amount * 0.7)  ' 主保険請求額
+                    ws_database.Cells(current_row, 12).Value = total_amount - Int(total_amount * 0.7)  ' 公費請求額
+                    ws_database.Cells(current_row, 13).Value = 0  ' 主保険再請求額
+                    ws_database.Cells(current_row, 14).Value = 0  ' 公費再請求額
+                Else
+                    ws_database.Cells(current_row, 11).Value = 0  ' 主保険請求額
+                    ws_database.Cells(current_row, 12).Value = 0  ' 公費請求額
+                    ws_database.Cells(current_row, 13).Value = Int(total_amount * 0.7)  ' 主保険再請求額
+                    ws_database.Cells(current_row, 14).Value = total_amount - Int(total_amount * 0.7)  ' 公費再請求額
+                End If
+                
+                ' 金額フィールドの書式設定
+                For j = 11 To 14
+                    ws_database.Cells(current_row, j).NumberFormat = "#,##0"
+                Next j
+                
                 ' 備考
-                ws_database.Cells(current_row, 8).Value = ""  ' 備考欄は空白として開始
+                ws_database.Cells(current_row, 15).Value = ""  ' 備考欄は空白として開始
                 
                 current_row = current_row + 1
             End If

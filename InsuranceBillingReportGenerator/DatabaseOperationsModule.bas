@@ -32,6 +32,18 @@ Public Sub SearchDatabase()
     Dim search_text As String
     Dim i As Long
     
+    ' 新しい日付フィールド用の変数
+    Dim billing_date_from As String, billing_date_to As String
+    Dim processing_date_from As String, processing_date_to As String
+    Dim return_date_from As String, return_date_to As String
+    Dim rebilling_date_from As String, rebilling_date_to As String
+    
+    ' 新しい金額フィールド用の変数
+    Dim primary_insurance_from As String, primary_insurance_to As String
+    Dim public_insurance_from As String, public_insurance_to As String
+    Dim primary_rebilling_from As String, primary_rebilling_to As String
+    Dim public_rebilling_from As String, public_rebilling_to As String
+    
     billing_destination = search_form.SelectedBillingDestination
     category = search_form.SelectedCategory
     date_from = search_form.DateFrom
@@ -40,12 +52,32 @@ Public Sub SearchDatabase()
     amount_to = search_form.AmountTo
     search_text = search_form.SearchText
     
+    ' 新しい日付フィールドの値を取得
+    billing_date_from = search_form.BillingDateFrom
+    billing_date_to = search_form.BillingDateTo
+    processing_date_from = search_form.ProcessingDateFrom
+    processing_date_to = search_form.ProcessingDateTo
+    return_date_from = search_form.ReturnDateFrom
+    return_date_to = search_form.ReturnDateTo
+    rebilling_date_from = search_form.RebillingDateFrom
+    rebilling_date_to = search_form.RebillingDateTo
+    
+    ' 新しい金額フィールドの値を取得
+    primary_insurance_from = search_form.PrimaryInsuranceFrom
+    primary_insurance_to = search_form.PrimaryInsuranceTo
+    public_insurance_from = search_form.PublicInsuranceFrom
+    public_insurance_to = search_form.PublicInsuranceTo
+    primary_rebilling_from = search_form.PrimaryRebillingFrom
+    primary_rebilling_to = search_form.PrimaryRebillingTo
+    public_rebilling_from = search_form.PublicRebillingFrom
+    public_rebilling_to = search_form.PublicRebillingTo
+    
     ' フィルターをクリア
     ws_database.AutoFilterMode = False
     
     ' フィルター条件の配列を作成
-    Dim criteria(1 To 8) As Variant
-    For i = 1 To 8
+    Dim criteria(1 To 15) As Variant
+    For i = 1 To 15
         criteria(i) = ""
     Next i
     
@@ -80,16 +112,104 @@ Public Sub SearchDatabase()
         End If
     End If
     
+    ' 請求日範囲の処理
+    If billing_date_from <> "" Or billing_date_to <> "" Then
+        If billing_date_from <> "" And billing_date_to <> "" Then
+            criteria(8) = ">=" & billing_date_from & " " & "<=" & billing_date_to
+        ElseIf billing_date_from <> "" Then
+            criteria(8) = ">=" & billing_date_from
+        ElseIf billing_date_to <> "" Then
+            criteria(8) = "<=" & billing_date_to
+        End If
+    End If
+    
+    ' 処理日範囲の処理
+    If processing_date_from <> "" Or processing_date_to <> "" Then
+        If processing_date_from <> "" And processing_date_to <> "" Then
+            criteria(9) = ">=" & processing_date_from & " " & "<=" & processing_date_to
+        ElseIf processing_date_from <> "" Then
+            criteria(9) = ">=" & processing_date_from
+        ElseIf processing_date_to <> "" Then
+            criteria(9) = "<=" & processing_date_to
+        End If
+    End If
+    
+    ' 返戻日範囲の処理
+    If return_date_from <> "" Or return_date_to <> "" Then
+        If return_date_from <> "" And return_date_to <> "" Then
+            criteria(10) = ">=" & return_date_from & " " & "<=" & return_date_to
+        ElseIf return_date_from <> "" Then
+            criteria(10) = ">=" & return_date_from
+        ElseIf return_date_to <> "" Then
+            criteria(10) = "<=" & return_date_to
+        End If
+    End If
+    
+    ' 再請求日範囲の処理
+    If rebilling_date_from <> "" Or rebilling_date_to <> "" Then
+        If rebilling_date_from <> "" And rebilling_date_to <> "" Then
+            criteria(11) = ">=" & rebilling_date_from & " " & "<=" & rebilling_date_to
+        ElseIf rebilling_date_from <> "" Then
+            criteria(11) = ">=" & rebilling_date_from
+        ElseIf rebilling_date_to <> "" Then
+            criteria(11) = "<=" & rebilling_date_to
+        End If
+    End If
+    
+    ' 主保険請求額範囲の処理
+    If primary_insurance_from <> "" Or primary_insurance_to <> "" Then
+        If IsNumeric(primary_insurance_from) And IsNumeric(primary_insurance_to) Then
+            criteria(12) = ">=" & primary_insurance_from & " " & "<=" & primary_insurance_to
+        ElseIf IsNumeric(primary_insurance_from) Then
+            criteria(12) = ">=" & primary_insurance_from
+        ElseIf IsNumeric(primary_insurance_to) Then
+            criteria(12) = "<=" & primary_insurance_to
+        End If
+    End If
+    
+    ' 公費請求額範囲の処理
+    If public_insurance_from <> "" Or public_insurance_to <> "" Then
+        If IsNumeric(public_insurance_from) And IsNumeric(public_insurance_to) Then
+            criteria(13) = ">=" & public_insurance_from & " " & "<=" & public_insurance_to
+        ElseIf IsNumeric(public_insurance_from) Then
+            criteria(13) = ">=" & public_insurance_from
+        ElseIf IsNumeric(public_insurance_to) Then
+            criteria(13) = "<=" & public_insurance_to
+        End If
+    End If
+    
+    ' 主保険再請求額範囲の処理
+    If primary_rebilling_from <> "" Or primary_rebilling_to <> "" Then
+        If IsNumeric(primary_rebilling_from) And IsNumeric(primary_rebilling_to) Then
+            criteria(14) = ">=" & primary_rebilling_from & " " & "<=" & primary_rebilling_to
+        ElseIf IsNumeric(primary_rebilling_from) Then
+            criteria(14) = ">=" & primary_rebilling_from
+        ElseIf IsNumeric(primary_rebilling_to) Then
+            criteria(14) = "<=" & primary_rebilling_to
+        End If
+    End If
+    
+    ' 公費再請求額範囲の処理
+    If public_rebilling_from <> "" Or public_rebilling_to <> "" Then
+        If IsNumeric(public_rebilling_from) And IsNumeric(public_rebilling_to) Then
+            criteria(15) = ">=" & public_rebilling_from & " " & "<=" & public_rebilling_to
+        ElseIf IsNumeric(public_rebilling_from) Then
+            criteria(15) = ">=" & public_rebilling_from
+        ElseIf IsNumeric(public_rebilling_to) Then
+            criteria(15) = "<=" & public_rebilling_to
+        End If
+    End If
+    
     ' テキスト検索の処理
     If search_text <> "" Then
         ' 複数列で検索（患者名、医療機関）
-        ws_database.Range("A1:H1").AutoFilter Field:=4, Criteria1:="*" & search_text & "*", Operator:=xlOr, Criteria2:="*" & search_text & "*"
+        ws_database.Range("A1:O1").AutoFilter Field:=4, Criteria1:="*" & search_text & "*", Operator:=xlOr, Criteria2:="*" & search_text & "*"
     End If
     
     ' 各列にフィルターを適用
-    For i = 1 To 8
+    For i = 1 To 15
         If criteria(i) <> "" Then
-            ws_database.Range("A1:H1").AutoFilter Field:=i, Criteria1:=criteria(i)
+            ws_database.Range("A1:O1").AutoFilter Field:=i, Criteria1:=criteria(i)
         End If
     Next i
     
@@ -153,7 +273,7 @@ Public Sub ExportDatabaseToCsv()
     Set temp_ws = temp_wb.Sheets(1)
     
     ' データをコピー（フィルターされた表示データのみ）
-    ws_database.Range("A1:H" & last_row).SpecialCells(xlCellTypeVisible).Copy
+    ws_database.Range("A1:O" & last_row).SpecialCells(xlCellTypeVisible).Copy
     temp_ws.Range("A1").PasteSpecial xlPasteValues
     
     ' CSV形式で保存
@@ -225,18 +345,30 @@ Public Sub CreateDatabaseSummaryReport()
         .Range("A4").Value = "請求先"
         .Range("B4").Value = "件数"
         .Range("C4").Value = "金額合計"
+        .Range("D4").Value = "主保険請求額合計"
+        .Range("E4").Value = "公費請求額合計"
+        .Range("F4").Value = "主保険再請求額合計"
+        .Range("G4").Value = "公費再請求額合計"
         
         .Range("A8").Value = "【区分別集計】"
         .Range("A8").Font.Bold = True
         .Range("A9").Value = "区分"
         .Range("B9").Value = "件数"
         .Range("C9").Value = "金額合計"
+        .Range("D9").Value = "主保険請求額合計"
+        .Range("E9").Value = "公費請求額合計"
+        .Range("F9").Value = "主保険再請求額合計"
+        .Range("G9").Value = "公費再請求額合計"
         
         .Range("A14").Value = "【月別集計】"
         .Range("A14").Font.Bold = True
         .Range("A15").Value = "調剤年月"
         .Range("B15").Value = "件数"
         .Range("C15").Value = "金額合計"
+        .Range("D15").Value = "主保険請求額合計"
+        .Range("E15").Value = "公費請求額合計"
+        .Range("F15").Value = "主保険再請求額合計"
+        .Range("G15").Value = "公費再請求額合計"
     End With
     
     ' データベースシートからデータを集計
@@ -244,23 +376,27 @@ Public Sub CreateDatabaseSummaryReport()
     ' 請求先別集計
     Dim billing_types As Object
     Set billing_types = CreateObject("Scripting.Dictionary")
-    billing_types.Add "社保", Array(0, 0)  ' 件数, 金額合計
-    billing_types.Add "国保", Array(0, 0)
-    billing_types.Add "その他", Array(0, 0)
+    billing_types.Add "社保", Array(0, 0, 0, 0, 0, 0)  ' 件数, 金額合計, 主保険請求額, 公費請求額, 主保険再請求額, 公費再請求額
+    billing_types.Add "国保", Array(0, 0, 0, 0, 0, 0)
+    billing_types.Add "その他", Array(0, 0, 0, 0, 0, 0)
     
     ' 区分別集計
     Dim categories As Object
     Set categories = CreateObject("Scripting.Dictionary")
-    categories.Add "未請求", Array(0, 0)
-    categories.Add "返戻", Array(0, 0)
-    categories.Add "減点", Array(0, 0)
-    categories.Add "再請求", Array(0, 0)
-    categories.Add "遅請求", Array(0, 0)
-    categories.Add "その他", Array(0, 0)
+    categories.Add "未請求", Array(0, 0, 0, 0, 0, 0)  ' 件数, 金額合計, 主保険請求額, 公費請求額, 主保険再請求額, 公費再請求額
+    categories.Add "返戻", Array(0, 0, 0, 0, 0, 0)
+    categories.Add "減点", Array(0, 0, 0, 0, 0, 0)
+    categories.Add "再請求", Array(0, 0, 0, 0, 0, 0)
+    categories.Add "遅請求", Array(0, 0, 0, 0, 0, 0)
+    categories.Add "その他", Array(0, 0, 0, 0, 0, 0)
     
     ' 月別集計
     Dim months As Object
     Set months = CreateObject("Scripting.Dictionary")
+    
+    ' 請求日別集計
+    Dim billing_dates As Object
+    Set billing_dates = CreateObject("Scripting.Dictionary")
     
     ' データの範囲を取得
     Dim last_row As Long
@@ -309,7 +445,7 @@ Public Sub CreateDatabaseSummaryReport()
             If month_key = "" Then month_key = "不明"
             
             If Not months.Exists(month_key) Then
-                months.Add month_key, Array(0, 0)
+                months.Add month_key, Array(0, 0, 0, 0, 0, 0)  ' 件数, 金額合計, 主保険請求額, 公費請求額, 主保険再請求額, 公費再請求額
             End If
             
             Dim month_array As Variant
@@ -321,7 +457,77 @@ Public Sub CreateDatabaseSummaryReport()
                 month_array(1) = month_array(1) + ws_database.Cells(i, 7).Value  ' 金額を加算
             End If
             
+            ' 主保険請求額が数値の場合のみ加算
+            If IsNumeric(ws_database.Cells(i, 8).Value) Then
+                month_array(2) = month_array(2) + ws_database.Cells(i, 8).Value  ' 主保険請求額を加算
+            End If
+            
+            ' 公費請求額が数値の場合のみ加算
+            If IsNumeric(ws_database.Cells(i, 9).Value) Then
+                month_array(3) = month_array(3) + ws_database.Cells(i, 9).Value  ' 公費請求額を加算
+            End If
+            
+            ' 主保険再請求額が数値の場合のみ加算
+            If IsNumeric(ws_database.Cells(i, 10).Value) Then
+                month_array(4) = month_array(4) + ws_database.Cells(i, 10).Value  ' 主保険再請求額を加算
+            End If
+            
+            ' 公費再請求額が数値の場合のみ加算
+            If IsNumeric(ws_database.Cells(i, 11).Value) Then
+                month_array(5) = month_array(5) + ws_database.Cells(i, 11).Value  ' 公費再請求額を加算
+            End If
+            
+            ' 主保険請求額が数値の場合のみ加算
+            If IsNumeric(ws_database.Cells(i, 8).Value) Then
+                month_array(2) = month_array(2) + ws_database.Cells(i, 8).Value
+            End If
+            
+            ' 公費請求額が数値の場合のみ加算
+            If IsNumeric(ws_database.Cells(i, 9).Value) Then
+                month_array(3) = month_array(3) + ws_database.Cells(i, 9).Value
+            End If
+            
+            ' 主保険再請求額が数値の場合のみ加算
+            If IsNumeric(ws_database.Cells(i, 10).Value) Then
+                month_array(4) = month_array(4) + ws_database.Cells(i, 10).Value
+            End If
+            
+            ' 公費再請求額が数値の場合のみ加算
+            If IsNumeric(ws_database.Cells(i, 11).Value) Then
+                month_array(5) = month_array(5) + ws_database.Cells(i, 11).Value
+            End If
+            
             months(month_key) = month_array
+            
+            ' 請求日別集計
+            Dim billing_date_key As String
+            billing_date_key = ws_database.Cells(i, 12).Value
+            If billing_date_key = "" Then billing_date_key = "不明"
+            
+            If Not billing_dates.Exists(billing_date_key) Then
+                billing_dates.Add billing_date_key, Array(0, 0, 0, 0)  ' 件数, 金額合計, 主保険請求額, 公費請求額
+            End If
+            
+            Dim billing_date_array As Variant
+            billing_date_array = billing_dates(billing_date_key)
+            billing_date_array(0) = billing_date_array(0) + 1  ' 件数を増加
+            
+            ' 金額が数値の場合のみ加算
+            If IsNumeric(ws_database.Cells(i, 7).Value) Then
+                billing_date_array(1) = billing_date_array(1) + ws_database.Cells(i, 7).Value  ' 金額を加算
+            End If
+            
+            ' 主保険請求額が数値の場合のみ加算
+            If IsNumeric(ws_database.Cells(i, 8).Value) Then
+                billing_date_array(2) = billing_date_array(2) + ws_database.Cells(i, 8).Value
+            End If
+            
+            ' 公費請求額が数値の場合のみ加算
+            If IsNumeric(ws_database.Cells(i, 9).Value) Then
+                billing_date_array(3) = billing_date_array(3) + ws_database.Cells(i, 9).Value
+            End If
+            
+            billing_dates(billing_date_key) = billing_date_array
         End If
     Next i
     
@@ -335,6 +541,14 @@ Public Sub CreateDatabaseSummaryReport()
         ws_report.Cells(row_index, 2).Value = billing_types(billing_key)(0)
         ws_report.Cells(row_index, 3).Value = billing_types(billing_key)(1)
         ws_report.Cells(row_index, 3).NumberFormat = "#,##0"
+        ws_report.Cells(row_index, 4).Value = billing_types(billing_key)(2)
+        ws_report.Cells(row_index, 4).NumberFormat = "#,##0"
+        ws_report.Cells(row_index, 5).Value = billing_types(billing_key)(3)
+        ws_report.Cells(row_index, 5).NumberFormat = "#,##0"
+        ws_report.Cells(row_index, 6).Value = billing_types(billing_key)(4)
+        ws_report.Cells(row_index, 6).NumberFormat = "#,##0"
+        ws_report.Cells(row_index, 7).Value = billing_types(billing_key)(5)
+        ws_report.Cells(row_index, 7).NumberFormat = "#,##0"
         row_index = row_index + 1
     Next billing_key
     
@@ -344,6 +558,14 @@ Public Sub CreateDatabaseSummaryReport()
     ws_report.Cells(row_index, 2).Formula = "=SUM(B5:B" & (row_index - 1) & ")"
     ws_report.Cells(row_index, 3).Formula = "=SUM(C5:C" & (row_index - 1) & ")"
     ws_report.Cells(row_index, 3).NumberFormat = "#,##0"
+    ws_report.Cells(row_index, 4).Formula = "=SUM(D5:D" & (row_index - 1) & ")"
+    ws_report.Cells(row_index, 4).NumberFormat = "#,##0"
+    ws_report.Cells(row_index, 5).Formula = "=SUM(E5:E" & (row_index - 1) & ")"
+    ws_report.Cells(row_index, 5).NumberFormat = "#,##0"
+    ws_report.Cells(row_index, 6).Formula = "=SUM(F5:F" & (row_index - 1) & ")"
+    ws_report.Cells(row_index, 6).NumberFormat = "#,##0"
+    ws_report.Cells(row_index, 7).Formula = "=SUM(G5:G" & (row_index - 1) & ")"
+    ws_report.Cells(row_index, 7).NumberFormat = "#,##0"
     
     ' 区分別集計をレポートに出力
     row_index = 10
@@ -354,6 +576,14 @@ Public Sub CreateDatabaseSummaryReport()
         ws_report.Cells(row_index, 2).Value = categories(category_key)(0)
         ws_report.Cells(row_index, 3).Value = categories(category_key)(1)
         ws_report.Cells(row_index, 3).NumberFormat = "#,##0"
+        ws_report.Cells(row_index, 4).Value = categories(category_key)(2)
+        ws_report.Cells(row_index, 4).NumberFormat = "#,##0"
+        ws_report.Cells(row_index, 5).Value = categories(category_key)(3)
+        ws_report.Cells(row_index, 5).NumberFormat = "#,##0"
+        ws_report.Cells(row_index, 6).Value = categories(category_key)(4)
+        ws_report.Cells(row_index, 6).NumberFormat = "#,##0"
+        ws_report.Cells(row_index, 7).Value = categories(category_key)(5)
+        ws_report.Cells(row_index, 7).NumberFormat = "#,##0"
         row_index = row_index + 1
     Next category_key
     
@@ -363,6 +593,14 @@ Public Sub CreateDatabaseSummaryReport()
     ws_report.Cells(row_index, 2).Formula = "=SUM(B10:B" & (row_index - 1) & ")"
     ws_report.Cells(row_index, 3).Formula = "=SUM(C10:C" & (row_index - 1) & ")"
     ws_report.Cells(row_index, 3).NumberFormat = "#,##0"
+    ws_report.Cells(row_index, 4).Formula = "=SUM(D10:D" & (row_index - 1) & ")"
+    ws_report.Cells(row_index, 4).NumberFormat = "#,##0"
+    ws_report.Cells(row_index, 5).Formula = "=SUM(E10:E" & (row_index - 1) & ")"
+    ws_report.Cells(row_index, 5).NumberFormat = "#,##0"
+    ws_report.Cells(row_index, 6).Formula = "=SUM(F10:F" & (row_index - 1) & ")"
+    ws_report.Cells(row_index, 6).NumberFormat = "#,##0"
+    ws_report.Cells(row_index, 7).Formula = "=SUM(G10:G" & (row_index - 1) & ")"
+    ws_report.Cells(row_index, 7).NumberFormat = "#,##0"
     
     ' 月別集計をレポートに出力
     row_index = 16
@@ -378,6 +616,14 @@ Public Sub CreateDatabaseSummaryReport()
         ws_report.Cells(row_index, 2).Value = months(month_key)(0)
         ws_report.Cells(row_index, 3).Value = months(month_key)(1)
         ws_report.Cells(row_index, 3).NumberFormat = "#,##0"
+        ws_report.Cells(row_index, 4).Value = months(month_key)(2)
+        ws_report.Cells(row_index, 4).NumberFormat = "#,##0"
+        ws_report.Cells(row_index, 5).Value = months(month_key)(3)
+        ws_report.Cells(row_index, 5).NumberFormat = "#,##0"
+        ws_report.Cells(row_index, 6).Value = months(month_key)(4)
+        ws_report.Cells(row_index, 6).NumberFormat = "#,##0"
+        ws_report.Cells(row_index, 7).Value = months(month_key)(5)
+        ws_report.Cells(row_index, 7).NumberFormat = "#,##0"
         row_index = row_index + 1
     Next month_key
     
@@ -387,9 +633,61 @@ Public Sub CreateDatabaseSummaryReport()
     ws_report.Cells(row_index, 2).Formula = "=SUM(B16:B" & (row_index - 1) & ")"
     ws_report.Cells(row_index, 3).Formula = "=SUM(C16:C" & (row_index - 1) & ")"
     ws_report.Cells(row_index, 3).NumberFormat = "#,##0"
+    ws_report.Cells(row_index, 4).Formula = "=SUM(D16:D" & (row_index - 1) & ")"
+    ws_report.Cells(row_index, 4).NumberFormat = "#,##0"
+    ws_report.Cells(row_index, 5).Formula = "=SUM(E16:E" & (row_index - 1) & ")"
+    ws_report.Cells(row_index, 5).NumberFormat = "#,##0"
+    ws_report.Cells(row_index, 6).Formula = "=SUM(F16:F" & (row_index - 1) & ")"
+    ws_report.Cells(row_index, 6).NumberFormat = "#,##0"
+    ws_report.Cells(row_index, 7).Formula = "=SUM(G16:G" & (row_index - 1) & ")"
+    ws_report.Cells(row_index, 7).NumberFormat = "#,##0"
+    
+    ' 請求日別集計のヘッダーを設定
+    ws_report.Range("A" & (row_index + 3)).Value = "【請求日別集計】"
+    ws_report.Range("A" & (row_index + 3)).Font.Bold = True
+    ws_report.Range("A" & (row_index + 4)).Value = "請求日"
+    ws_report.Range("B" & (row_index + 4)).Value = "件数"
+    ws_report.Range("C" & (row_index + 4)).Value = "金額合計"
+    ws_report.Range("D" & (row_index + 4)).Value = "主保険請求額合計"
+    ws_report.Range("E" & (row_index + 4)).Value = "公費請求額合計"
+    
+    ' 請求日別集計をレポートに出力
+    Dim billing_date_row_index As Long
+    billing_date_row_index = row_index + 5
+    
+    ' 請求日キーを日付順にソート
+    Dim billing_date_keys As Variant
+    billing_date_keys = billing_dates.Keys
+    
+    ' 請求日別集計をレポートに出力
+    Dim billing_date_key As Variant
+    For Each billing_date_key In billing_date_keys
+        ws_report.Cells(billing_date_row_index, 1).Value = billing_date_key
+        ws_report.Cells(billing_date_row_index, 2).Value = billing_dates(billing_date_key)(0)
+        ws_report.Cells(billing_date_row_index, 3).Value = billing_dates(billing_date_key)(1)
+        ws_report.Cells(billing_date_row_index, 3).NumberFormat = "#,##0"
+        ws_report.Cells(billing_date_row_index, 4).Value = billing_dates(billing_date_key)(2)
+        ws_report.Cells(billing_date_row_index, 4).NumberFormat = "#,##0"
+        ws_report.Cells(billing_date_row_index, 5).Value = billing_dates(billing_date_key)(3)
+        ws_report.Cells(billing_date_row_index, 5).NumberFormat = "#,##0"
+        billing_date_row_index = billing_date_row_index + 1
+    Next billing_date_key
+    
+    ' 合計行を追加
+    Dim start_row As Long
+    start_row = row_index + 5
+    ws_report.Cells(billing_date_row_index, 1).Value = "合計"
+    ws_report.Cells(billing_date_row_index, 1).Font.Bold = True
+    ws_report.Cells(billing_date_row_index, 2).Formula = "=SUM(B" & start_row & ":B" & (billing_date_row_index - 1) & ")"
+    ws_report.Cells(billing_date_row_index, 3).Formula = "=SUM(C" & start_row & ":C" & (billing_date_row_index - 1) & ")"
+    ws_report.Cells(billing_date_row_index, 3).NumberFormat = "#,##0"
+    ws_report.Cells(billing_date_row_index, 4).Formula = "=SUM(D" & start_row & ":D" & (billing_date_row_index - 1) & ")"
+    ws_report.Cells(billing_date_row_index, 4).NumberFormat = "#,##0"
+    ws_report.Cells(billing_date_row_index, 5).Formula = "=SUM(E" & start_row & ":E" & (billing_date_row_index - 1) & ")"
+    ws_report.Cells(billing_date_row_index, 5).NumberFormat = "#,##0"
     
     ' レポートの書式設定
-    ws_report.Columns("A:C").AutoFit
+    ws_report.Columns("A:G").AutoFit
     
     ' レポートを表示
     ws_report.Activate
