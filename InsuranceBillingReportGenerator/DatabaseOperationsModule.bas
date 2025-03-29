@@ -83,156 +83,152 @@ Public Sub SearchDatabase()
     ws_database.AutoFilterMode = False
     
     ' フィルター条件の配列を作成
-    Dim criteria(1 To 17) As Variant
-    For i = 1 To 17
+    Dim criteria(1 To 16) As Variant
+    For i = 1 To 16
         criteria(i) = ""
     Next i
     
     ' 検索条件が指定されている列にフィルター条件を設定
-    If billing_destination <> "" Then
-        criteria(2) = billing_destination
-    End If
-    
     If category <> "" Then
-        criteria(3) = category
+        criteria(2) = category
     End If
     
     ' 日付範囲の処理
     If date_from <> "" Or date_to <> "" Then
         If date_from <> "" And date_to <> "" Then
-            criteria(5) = ">=" & date_from & " " & "<=" & date_to
+            criteria(4) = ">=" & date_from & " " & "<=" & date_to
         ElseIf date_from <> "" Then
-            criteria(5) = ">=" & date_from
+            criteria(4) = ">=" & date_from
         ElseIf date_to <> "" Then
-            criteria(5) = "<=" & date_to
+            criteria(4) = "<=" & date_to
         End If
     End If
     
     ' 患者名の処理
     If search_form.txtPatientName.Value <> "" Then
-        criteria(4) = "*" & search_form.txtPatientName.Value & "*"
+        criteria(3) = "*" & search_form.txtPatientName.Value & "*"
     End If
     
     ' 金額範囲の処理
     If amount_from <> "" Or amount_to <> "" Then
         If IsNumeric(amount_from) And IsNumeric(amount_to) Then
-            criteria(7) = ">=" & amount_from & " " & "<=" & amount_to
+            criteria(6) = ">=" & amount_from & " " & "<=" & amount_to
         ElseIf IsNumeric(amount_from) Then
-            criteria(7) = ">=" & amount_from
+            criteria(6) = ">=" & amount_from
         ElseIf IsNumeric(amount_to) Then
-            criteria(7) = "<=" & amount_to
+            criteria(6) = "<=" & amount_to
         End If
     End If
     
     ' 請求日範囲の処理
     If billing_date_from <> "" Or billing_date_to <> "" Then
         If billing_date_from <> "" And billing_date_to <> "" Then
-            criteria(8) = ">=" & billing_date_from & " " & "<=" & billing_date_to
+            criteria(7) = ">=" & billing_date_from & " " & "<=" & billing_date_to
         ElseIf billing_date_from <> "" Then
-            criteria(8) = ">=" & billing_date_from
+            criteria(7) = ">=" & billing_date_from
         ElseIf billing_date_to <> "" Then
-            criteria(8) = "<=" & billing_date_to
+            criteria(7) = "<=" & billing_date_to
         End If
     End If
     
     ' 処理日範囲の処理
     If processing_date_from <> "" Or processing_date_to <> "" Then
         If processing_date_from <> "" And processing_date_to <> "" Then
-            criteria(9) = ">=" & processing_date_from & " " & "<=" & processing_date_to
+            criteria(8) = ">=" & processing_date_from & " " & "<=" & processing_date_to
         ElseIf processing_date_from <> "" Then
-            criteria(9) = ">=" & processing_date_from
+            criteria(8) = ">=" & processing_date_from
         ElseIf processing_date_to <> "" Then
-            criteria(9) = "<=" & processing_date_to
+            criteria(8) = "<=" & processing_date_to
         End If
     End If
     
     ' 返戻日範囲の処理
     If return_date_from <> "" Or return_date_to <> "" Then
         If return_date_from <> "" And return_date_to <> "" Then
-            criteria(10) = ">=" & return_date_from & " " & "<=" & return_date_to
+            criteria(9) = ">=" & return_date_from & " " & "<=" & return_date_to
         ElseIf return_date_from <> "" Then
-            criteria(10) = ">=" & return_date_from
+            criteria(9) = ">=" & return_date_from
         ElseIf return_date_to <> "" Then
-            criteria(10) = "<=" & return_date_to
+            criteria(9) = "<=" & return_date_to
         End If
     End If
     
     ' 再請求日範囲の処理
     If rebilling_date_from <> "" Or rebilling_date_to <> "" Then
         If rebilling_date_from <> "" And rebilling_date_to <> "" Then
-            criteria(11) = ">=" & rebilling_date_from & " " & "<=" & rebilling_date_to
+            criteria(10) = ">=" & rebilling_date_from & " " & "<=" & rebilling_date_to
         ElseIf rebilling_date_from <> "" Then
-            criteria(11) = ">=" & rebilling_date_from
+            criteria(10) = ">=" & rebilling_date_from
         ElseIf rebilling_date_to <> "" Then
-            criteria(11) = "<=" & rebilling_date_to
+            criteria(10) = "<=" & rebilling_date_to
         End If
     End If
     
     ' 主保険請求額範囲の処理
     If primary_insurance_from <> "" Or primary_insurance_to <> "" Then
         If IsNumeric(primary_insurance_from) And IsNumeric(primary_insurance_to) Then
-            criteria(12) = ">=" & primary_insurance_from & " " & "<=" & primary_insurance_to
+            criteria(11) = ">=" & primary_insurance_from & " " & "<=" & primary_insurance_to
         ElseIf IsNumeric(primary_insurance_from) Then
-            criteria(12) = ">=" & primary_insurance_from
+            criteria(11) = ">=" & primary_insurance_from
         ElseIf IsNumeric(primary_insurance_to) Then
-            criteria(12) = "<=" & primary_insurance_to
+            criteria(11) = "<=" & primary_insurance_to
         End If
     End If
     
     ' 公費請求額範囲の処理
     If public_insurance_from <> "" Or public_insurance_to <> "" Then
         If IsNumeric(public_insurance_from) And IsNumeric(public_insurance_to) Then
-            criteria(13) = ">=" & public_insurance_from & " " & "<=" & public_insurance_to
+            criteria(12) = ">=" & public_insurance_from & " " & "<=" & public_insurance_to
         ElseIf IsNumeric(public_insurance_from) Then
-            criteria(13) = ">=" & public_insurance_from
+            criteria(12) = ">=" & public_insurance_from
         ElseIf IsNumeric(public_insurance_to) Then
-            criteria(13) = "<=" & public_insurance_to
+            criteria(12) = "<=" & public_insurance_to
         End If
     End If
     
     ' 主保険再請求額範囲の処理
     If primary_rebilling_from <> "" Or primary_rebilling_to <> "" Then
         If IsNumeric(primary_rebilling_from) And IsNumeric(primary_rebilling_to) Then
-            criteria(14) = ">=" & primary_rebilling_from & " " & "<=" & primary_rebilling_to
+            criteria(13) = ">=" & primary_rebilling_from & " " & "<=" & primary_rebilling_to
         ElseIf IsNumeric(primary_rebilling_from) Then
-            criteria(14) = ">=" & primary_rebilling_from
+            criteria(13) = ">=" & primary_rebilling_from
         ElseIf IsNumeric(primary_rebilling_to) Then
-            criteria(14) = "<=" & primary_rebilling_to
+            criteria(13) = "<=" & primary_rebilling_to
         End If
     End If
     
     ' 公費再請求額範囲の処理
     If public_rebilling_from <> "" Or public_rebilling_to <> "" Then
         If IsNumeric(public_rebilling_from) And IsNumeric(public_rebilling_to) Then
-            criteria(15) = ">=" & public_rebilling_from & " " & "<=" & public_rebilling_to
+            criteria(14) = ">=" & public_rebilling_from & " " & "<=" & public_rebilling_to
         ElseIf IsNumeric(public_rebilling_from) Then
-            criteria(15) = ">=" & public_rebilling_from
+            criteria(14) = ">=" & public_rebilling_from
         ElseIf IsNumeric(public_rebilling_to) Then
-            criteria(15) = "<=" & public_rebilling_to
+            criteria(14) = "<=" & public_rebilling_to
         End If
     End If
     
     ' 請求先機関の処理
     If billing_institution <> "" Then
-        criteria(16) = "*" & billing_institution & "*"
+        criteria(15) = "*" & billing_institution & "*"
     End If
     
     ' 再請求先機関の処理
     If rebilling_institution <> "" Then
-        criteria(17) = "*" & rebilling_institution & "*"
+        criteria(16) = "*" & rebilling_institution & "*"
     End If
     
     ' テキスト検索の処理
     If search_text <> "" Then
         ' 複数列で検索（患者名、医療機関、請求先機関、再請求先機関）
-        ws_database.Range("A1:Q1").AutoFilter Field:=4, Criteria1:="*" & search_text & "*", Operator:=xlOr, _
+        ws_database.Range("A1:P1").AutoFilter Field:=3, Criteria1:="*" & search_text & "*", Operator:=xlOr, _
             Criteria2:=Array("*" & search_text & "*", "*" & search_text & "*", "*" & search_text & "*")
     End If
     
     ' 各列にフィルターを適用
-    For i = 1 To 17
+    For i = 1 To 16
         If criteria(i) <> "" Then
-            ws_database.Range("A1:Q1").AutoFilter Field:=i, Criteria1:=criteria(i)
+            ws_database.Range("A1:P1").AutoFilter Field:=i, Criteria1:=criteria(i)
         End If
     Next i
     
@@ -296,7 +292,7 @@ Public Sub ExportDatabaseToCsv()
     Set temp_ws = temp_wb.Sheets(1)
     
     ' データをコピー（フィルターされた表示データのみ）
-    ws_database.Range("A1:Q" & last_row).SpecialCells(xlCellTypeVisible).Copy
+    ws_database.Range("A1:P" & last_row).SpecialCells(xlCellTypeVisible).Copy
     temp_ws.Range("A1").PasteSpecial xlPasteValues
     
     ' CSV形式で保存
