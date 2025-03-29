@@ -139,7 +139,6 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
            
         ' フォームサイズを固定（ボタン用の余白を追加）
         formHeight = MAX_HEIGHT
-        Me.Height = formHeight
            
         ' スクロール設定
         If mFileCount > visibleFiles Then
@@ -235,16 +234,16 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
             .Text = ""
         End With
     Next i
-       
-    ' OKボタンの位置を固定（常に表示されるように）
-    OKButton.Top = formHeight - 40
+
+    ' OKボタンの位置を調整
+    OKButton.Top = Me.Height - 70
     OKButton.Left = 10
     OKButton.Width = 60
     OKButton.Height = 25
     OKButton.ZOrder (0) ' 前面に配置
-       
-    ' キャンセルボタンの位置を固定（常に表示されるように）
-    CancelButton.Top = formHeight - 40
+
+    ' キャンセルボタンの位置を調整
+    CancelButton.Top = Me.Height - 70
     CancelButton.Left = 80
     CancelButton.Width = 80
     CancelButton.Height = 25

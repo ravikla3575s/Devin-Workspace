@@ -8,11 +8,16 @@ Public Sub TestSheet3DrugCodeReference()
     ' テスト開始メッセージ
     Debug.Print "Sheet3を使用した医薬品コード参照機能のテストを開始します..."
     
+    ' まず、GTIN14パディング機能をテスト
+    TestPadGTIN14Function
+    
     ' テスト用のGTINコード（実際のテストでは既知のコードを使用）
-    Dim testGtinCodes(1 To 3) As String
-    testGtinCodes(1) = "12345678901234"  ' 存在するコード（テスト用）
-    testGtinCodes(2) = "23456789012345"  ' 存在しないコード（テスト用）
-    testGtinCodes(3) = "34567890123456"  ' 別のコード（テスト用）
+    Dim testGtinCodes(1 To 5) As String
+    testGtinCodes(1) = "1234567890123"   ' 13桁コード（F列と比較）
+    testGtinCodes(2) = "01234567890123"  ' 14桁コード、先頭0（F列と比較）
+    testGtinCodes(3) = "12345678901234"  ' 14桁コード、先頭1（H列と比較）
+    testGtinCodes(4) = "23456789012345"  ' 14桁コード、先頭2（I列と比較）
+    testGtinCodes(5) = "34567890123456"  ' 14桁コード、その他（F列と比較）
     
     ' 各GTINコードでテスト
     Dim i As Integer
@@ -112,6 +117,70 @@ Private Function GetDrugNameTest(gtin As String) As String
 ErrorHandler:
     GetDrugNameTest = ""
 End Function
+
+' GTIN14コードのパディング機能をテスト
+Public Sub TestPadGTIN14Function()
+    On Error GoTo ErrorHandler
+    
+    ' テスト開始メッセージ
+    Debug.Print "GTIN14コードのパディング機能テストを開始します..."
+    
+    ' テスト用のGTINコード
+    Dim testCodes(1 To 5) As String
+    testCodes(1) = "123"              ' 3桁（先頭に0を11個追加）
+    testCodes(2) = "1234567890123"    ' 13桁（先頭に0を1個追加）
+    testCodes(3) = "01234567890123"   ' 14桁（そのまま）
+    testCodes(4) = "12345678901234"   ' 14桁（そのまま）
+    testCodes(5) = "123abc456"        ' 数字以外を含む（数字のみ抽出して先頭に0を追加）
+    
+    ' 各コードでテスト
+    Dim i As Integer
+    For i = 1 To UBound(testCodes)
+        Dim originalCode As String
+        Dim paddedCode As String
+        
+        originalCode = testCodes(i)
+        paddedCode = GS1CodeProcessor.PadGTIN14(originalCode)
+        
+        ' 結果を表示
+        Debug.Print "元のコード: " & originalCode & " (長さ: " & Len(originalCode) & ")"
+        Debug.Print "変換後: " & paddedCode & " (長さ: " & Len(paddedCode) & ")"
+        
+        ' 検証
+        If Len(paddedCode) = 14 Then
+            Debug.Print "  ✓ 14桁に変換されました"
+        Else
+            Debug.Print "  ✗ 14桁に変換されていません"
+        End If
+        
+        ' 数字のみであることを確認
+        Dim isNumeric As Boolean
+        isNumeric = True
+        Dim j As Integer
+        For j = 1 To Len(paddedCode)
+            If Not IsNumeric(Mid(paddedCode, j, 1)) Then
+                isNumeric = False
+                Exit For
+            End If
+        Next j
+        
+        If isNumeric Then
+            Debug.Print "  ✓ 数字のみで構成されています"
+        Else
+            Debug.Print "  ✗ 数字以外の文字が含まれています"
+        End If
+        
+        Debug.Print "-------------------"
+    Next i
+    
+    ' テスト完了メッセージ
+    Debug.Print "GTIN14コードのパディング機能テストが完了しました。"
+    
+    Exit Sub
+    
+ErrorHandler:
+    Debug.Print "テスト中にエラーが発生しました: " & Err.Description
+End Sub
 
 ' 実際のSheet3のデータ構造を確認するテスト
 Public Sub TestSheet3Structure()
