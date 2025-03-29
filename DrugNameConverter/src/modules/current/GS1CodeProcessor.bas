@@ -27,13 +27,61 @@ Private Function ValidateGTIN14(ByVal gtinCode As String) As String
             result = result & Mid(gtinCode, i, 1)
         End If
     Next i
-    
-    ' 14桁であることを確認
-    If Len(result) <> 14 Then
+
+    ' 13桁の場合は先頭に0を追加して14桁にする
+    If Len(result) = 13 Then
+        result = "0" & result
+    ElseIf Len(result) <> 14 Then
+
         result = ""
     End If
     
     ValidateGTIN14 = result
+' GTIN-14コードが有効かどうかをチェックする関数
+Public Function IsValidGTIN14(ByVal gtinCode As String) As Boolean
+    ' 空文字チェック
+    If Trim(gtinCode) = "" Then
+        IsValidGTIN14 = False
+        Exit Function
+    End If
+    
+    ' 少なくとも1つの数字が含まれているかチェック
+    Dim i As Long
+    Dim hasNumeric As Boolean
+    
+    hasNumeric = False
+    For i = 1 To Len(gtinCode)
+        If IsNumeric(Mid(gtinCode, i, 1)) Then
+            hasNumeric = True
+            Exit For
+        End If
+    Next i
+    
+    ' 少なくとも1つの数字が含まれている場合は有効とする
+    IsValidGTIN14 = hasNumeric
+End Function
+
+End Function
+
+' GTIN14コードを14桁に揃える関数
+Public Function PadGTIN14(ByVal gtinCode As String) As String
+    ' 数字のみを抽出
+    Dim i As Long
+    Dim result As String
+    
+    result = ""
+    For i = 1 To Len(gtinCode)
+        If IsNumeric(Mid(gtinCode, i, 1)) Then
+            result = result & Mid(gtinCode, i, 1)
+        End If
+    Next i
+    
+    ' 14桁未満の場合は先頭に0を追加して14桁にする
+    While Len(result) < 14
+        result = "0" & result
+    Wend
+    
+    PadGTIN14 = result
 End Function
 
 ' GTIN-14コードからパッケージ・インジケーターを取得する関数
@@ -61,10 +109,13 @@ Public Function GetDrugInfoFromGS1Code(ByVal gs1Code As String) As DrugInfo
     validatedCode = ValidateGTIN14(gs1Code)
     
     ' 無効なコードの場合
-    If Len(validatedCode) <> 14 Then
-        MsgBox "入力されたコードは有効なGTIN-14形式ではありません。14桁の数字を入力してください。", vbExclamation
+    If Len(validatedCode) = 0 Then
+        MsgBox "入力されたコードは有効なGTIN形式ではありません。数字のみの13桁または14桁のコードを入力してください。", vbExclamation
         Exit Function
     End If
+    
+    ' 必ず14桁になるようにする
+    validatedCode = PadGTIN14(validatedCode)
     
     ' 医薬品コードシート（Sheet3）を取得
     Set ws3 = ThisWorkbook.Worksheets(3) ' 医薬品コードシート
@@ -83,9 +134,28 @@ Public Function GetDrugInfoFromGS1Code(ByVal gs1Code As String) As DrugInfo
     
     ' Sheet3でGTINコードに一致する医薬品を検索
     For i = 2 To lastRow ' ヘッダー行をスキップ
+        ' コードの最初の文字に基づいて列を選択
+        Dim targetColumn As String
+        Dim firstDigit As String
+        firstDigit = Left(validatedCode, 1)
+        
+        Select Case firstDigit
+            Case "0"
+                targetColumn = "F"
+            Case "1"
+                targetColumn = "H"
+            Case "2"
+                targetColumn = "I"
+            Case Else
+                targetColumn = "F"
+        End Select
+        
         ' データベース内のコードも検証して比較
         Dim dbCode As String
-        dbCode = ValidateGTIN14(CStr(ws3.Cells(i, "F").Value))
+        dbCode = CStr(ws3.Cells(i, targetColumn).Value)
+        
+        ' 数値のみを抽出し、14桁に揃える
+        dbCode = PadGTIN14(dbCode)
         
         If CStr(dbCode) = CStr(validatedCode) Then
             ' G列から医薬品名を取得

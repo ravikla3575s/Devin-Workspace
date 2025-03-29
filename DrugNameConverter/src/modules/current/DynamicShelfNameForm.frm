@@ -16,7 +16,7 @@ Attribute VB_Exposed = False
 Option Explicit
 
 ' 定数
-Private Const MAX_HEIGHT As Long = 600 ' 最大フォーム高さ（これを超えるとスクロール可能に）
+Private Const MAX_HEIGHT As Long = 250 ' 最大フォーム高さ（約5ファイル表示）
 Private Const ROWS_PER_FILE As Long = 2 ' ファイルごとの行数（ファイル名 + 棚名入力欄の行）
 Private Const ROW_HEIGHT As Long = 20   ' 1行の高さ
 Private Const CTRL_MARGIN As Long = 5  ' コントロール間のマージン
@@ -126,21 +126,26 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
         .Top = 5
         .Width = Me.Width - 20
            
-        ' フレームの高さを計算（ファイル数に基づく）
-        frameHeight = (mFileCount * ROWS_PER_FILE * ROW_HEIGHT) + 60
+        ' フレームの高さを計算（約5ファイル表示）
+        Dim visibleFiles As Integer
+        visibleFiles = 5 ' 最大表示ファイル数
+        
+        ' 実際のファイル数と表示ファイル数を比較して小さい方を使用
+        visibleFiles = IIf(mFileCount < visibleFiles, mFileCount, visibleFiles)
+        
+        ' ファイル表示領域の高さを計算
+        frameHeight = (visibleFiles * ROWS_PER_FILE * ROW_HEIGHT) + 30
         .Height = frameHeight
            
-        ' ボタン用の余白を追加（十分なスペースを確保）
-        formHeight = frameHeight + 80
+        ' フォームサイズを固定（ボタン用の余白を追加）
+        formHeight = MAX_HEIGHT
            
-        ' フォームの高さを制限し、必要に応じてスクロール可能に
-        If formHeight > MAX_HEIGHT Then
-            Me.Height = MAX_HEIGHT
+        ' スクロール設定
+        If mFileCount > visibleFiles Then
             .ScrollBars = fmScrollBarsVertical
-            .ScrollHeight = frameHeight + 20  ' スクロール領域の高さを設定（余裕を持たせる）
+            .ScrollHeight = (mFileCount * ROWS_PER_FILE * ROW_HEIGHT) + 20  ' スクロール領域の高さを設定
             .ScrollWidth = Me.Width - 30 ' スクロール領域の幅を設定
         Else
-            Me.Height = formHeight
             .ScrollBars = fmScrollBarsNone
         End If
         
@@ -229,18 +234,20 @@ Public Sub SetFileCount(ByVal fileCount As Integer, Optional ByVal fileNames As 
             .Text = ""
         End With
     Next i
-       
+
     ' OKボタンの位置を調整
-    OKButton.Top = Me.Height - 40
+    OKButton.Top = Me.Height - 70
     OKButton.Left = 10
     OKButton.Width = 60
     OKButton.Height = 25
-       
+    OKButton.ZOrder (0) ' 前面に配置
+
     ' キャンセルボタンの位置を調整
-    CancelButton.Top = Me.Height - 40
+    CancelButton.Top = Me.Height - 70
     CancelButton.Left = 80
     CancelButton.Width = 80
     CancelButton.Height = 25
+    CancelButton.ZOrder (0) ' 前面に配置
     
     ' ボタンが確実に表示されるようにスクロール領域の下端に余白を追加
     With scrollFrame
