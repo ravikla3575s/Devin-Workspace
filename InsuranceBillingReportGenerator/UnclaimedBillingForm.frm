@@ -456,6 +456,24 @@ Private Sub btnRegister_Click()
     m_BillingDestination = IIf(Me.frameBillingDestination.Controls("optShaho").Value, "社保", "国保")
     m_Remarks = IIf(Trim(Me.txtRemarks.Value) = "", Null, Trim(Me.txtRemarks.Value))
     
+    ' 売掛管理表に未請求データを追加
+    On Error Resume Next
+    Dim result As Boolean
+    result = DatabaseOperationsModule.AddUnclaimedBillingToDatabase( _
+        m_PatientName, _
+        m_DispensingDate, _
+        m_MedicalInstitution, _
+        m_UnclaimedReason, _
+        m_BillingDestination, _
+        m_InsuranceRatio, _
+        m_BillingPoints, _
+        m_Remarks)
+    
+    If Err.Number <> 0 Then
+        Debug.Print "Error in btnRegister_Click when adding to database: " & Err.Description
+    End If
+    On Error GoTo 0
+    
     m_DialogResult = True
     Me.Hide
-End Sub 
+End Sub  

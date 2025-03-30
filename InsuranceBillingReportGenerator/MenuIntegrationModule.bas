@@ -58,34 +58,34 @@ Public Sub CreateCustomMenu()
     ' セパレーター
     menu_item.Controls.Add Type:=msoControlSeparator, Temporary:=True
     
-    ' データベース機能メニュー
+    ' 売掛管理表機能メニュー
     Set sub_menu = menu_item.Controls.Add(Type:=msoControlPopup, Temporary:=True)
-    sub_menu.Caption = "データベース機能"
+    sub_menu.Caption = "売掛管理表機能"
     
-    ' データベース作成・更新サブメニュー
+    ' 売掛管理表作成・更新サブメニュー
     With sub_menu.Controls.Add(Type:=msoControlButton, Temporary:=True)
-        .Caption = "データベース作成・更新"
+        .Caption = "売掛管理表作成・更新"
         .OnAction = "DatabaseMenuModule.CreateOrUpdateDatabase"
         .FaceId = 37
     End With
     
-    ' データベース検索サブメニュー
+    ' 売掛管理表検索サブメニュー
     With sub_menu.Controls.Add(Type:=msoControlButton, Temporary:=True)
-        .Caption = "データベース検索・フィルタリング"
+        .Caption = "売掛管理表検索・フィルタリング"
         .OnAction = "DatabaseMenuModule.ShowDatabaseSearchForm"
         .FaceId = 52
     End With
     
-    ' データベースCSV出力サブメニュー
+    ' 売掛管理表CSV出力サブメニュー
     With sub_menu.Controls.Add(Type:=msoControlButton, Temporary:=True)
-        .Caption = "データベースCSV出力"
+        .Caption = "売掛管理表CSV出力"
         .OnAction = "DatabaseMenuModule.ExportDatabaseToCsv"
         .FaceId = 17
     End With
     
-    ' データベース集計レポート作成サブメニュー
+    ' 売掛管理表集計レポート作成サブメニュー
     With sub_menu.Controls.Add(Type:=msoControlButton, Temporary:=True)
-        .Caption = "データベース集計レポート作成"
+        .Caption = "売掛管理表集計レポート作成"
         .OnAction = "DatabaseMenuModule.CreateDatabaseSummaryReport"
         .FaceId = 184
     End With
@@ -114,11 +114,11 @@ Public Sub ShowHelp()
            "半期ごとの売掛金繰越額を計算します。" & vbCrLf & vbCrLf & _
            "【請求誤差追求報告書作成】" & vbCrLf & _
            "減点・査定データから請求誤差追求報告書を作成します。" & vbCrLf & vbCrLf & _
-           "【データベース機能】" & vbCrLf & _
-           "・データベース作成・更新：データベースシートを作成または更新します。" & vbCrLf & _
-           "・データベース検索・フィルタリング：データベースを検索・フィルタリングします。" & vbCrLf & _
-           "・データベースCSV出力：データベースをCSVファイルに出力します。" & vbCrLf & _
-           "・データベース集計レポート作成：データベースの集計レポートを作成します。", _
+           "【売掛管理表機能】" & vbCrLf & _
+           "・売掛管理表作成・更新：売掛管理表シートを作成または更新します。" & vbCrLf & _
+           "・売掛管理表検索・フィルタリング：売掛管理表を検索・フィルタリングします。" & vbCrLf & _
+           "・売掛管理表CSV出力：売掛管理表をCSVファイルに出力します。" & vbCrLf & _
+           "・売掛管理表集計レポート作成：売掛管理表の集計レポートを作成します。", _
            vbInformation, "ヘルプ"
 End Sub
 
