@@ -1,49 +1,49 @@
 Attribute VB_Name = "DateTransferModule"
 Option Explicit
 
-' ¿‹æ‚Ì’è”’è‹`
-Private Const BILLING_SHAHO As String = "Ğ•Û"
-Private Const BILLING_KOKUHO As String = "‘•Û"
+' ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì’è”ï¿½ï¿½`
+Private Const BILLING_SHAHO As String = "ï¿½Ğ•ï¿½"
+Private Const BILLING_KOKUHO As String = "ï¿½ï¿½ï¿½ï¿½"
 
-' ƒŒƒZƒvƒgó‹µ‚Ì’è”’è‹`
-Private Const STATUS_UNCLAIMED As Long = 1    ' –¢¿‹
-Private Const STATUS_RECLAIM As Long = 2      ' Ä¿‹
-Private Const STATUS_RETURN As Long = 3       ' •Ô–ß
-Private Const STATUS_ADJUSTMENT As Long = 4    ' ‰ÁŒ¸¸’è
+' ï¿½ï¿½ï¿½Zï¿½vï¿½gï¿½ó‹µ‚Ì’è”ï¿½ï¿½`
+Private Const STATUS_UNCLAIMED As Long = 1    ' ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Private Const STATUS_RECLAIM As Long = 2      ' ï¿½Äï¿½ï¿½ï¿½
+Private Const STATUS_RETURN As Long = 3       ' ï¿½Ô–ï¿½
+Private Const STATUS_ADJUSTMENT As Long = 4    ' ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-' Šeó‹µ‚ÌŠJns
+' ï¿½eï¿½ó‹µ‚ÌŠJï¿½nï¿½s
 Private Type StartRows
-    Unclaimed As Long    ' –¢¿‹ŠJns
-    Reclaim As Long      ' Ä¿‹ŠJns
-    Return As Long       ' •Ô–ßŠJns
-    Adjustment As Long   ' ‰ÁŒ¸¸’èŠJns
+    Unclaimed As Long    ' ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Jï¿½nï¿½s
+    Reclaim As Long      ' ï¿½Äï¿½ï¿½ï¿½ï¿½Jï¿½nï¿½s
+    Return As Long       ' ï¿½Ô–ßŠJï¿½nï¿½s
+    Adjustment As Long   ' ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Jï¿½nï¿½s
 End Type
 
-' ¿‹æ‚²‚Æ‚Ìƒ[ƒNƒV[ƒg–¼
-Private Const WS_SHAHO As String = "Ğ•Û–¢¿‹ˆê——"
-Private Const WS_KOKUHO As String = "‘•Û–¢¿‹ˆê——"
+' ï¿½ï¿½ï¿½ï¿½ï¿½æ‚²ï¿½Æ‚Ìƒï¿½ï¿½[ï¿½Nï¿½Vï¿½[ï¿½gï¿½ï¿½
+Private Const WS_SHAHO As String = "ï¿½Ğ•Û–ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê——"
+Private Const WS_KOKUHO As String = "ï¿½ï¿½ï¿½Û–ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê——"
 
-' ƒƒCƒ“ˆ—ŠÖ”
+' ï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öï¿½
 Private Function ProcessBillingData(ByVal dispensing_year As Integer, ByVal dispensing_month As Integer, _
                                   ByVal status As Long) As Boolean
     On Error GoTo ErrorHandler
     
-    ' Ğ•ÛE‘•Û‚»‚ê‚¼‚ê‚Ì”z—ñ‚ğ‰Šú‰»
+    ' ï¿½Ğ•ÛEï¿½ï¿½ï¿½Û‚ï¿½ï¿½ê‚¼ï¿½ï¿½Ì”zï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Dim shahoData() As Variant
     Dim kuhoData() As Variant
     ReDim shahoData(1 To 8, 1 To 1)
     ReDim kuhoData(1 To 8, 1 To 1)
     
-    ' ƒJƒEƒ“ƒ^[‰Šú‰»
+    ' ï¿½Jï¿½Eï¿½ï¿½ï¿½^ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Dim shahoCount As Long: shahoCount = 1
     Dim kuhoCount As Long: kuhoCount = 1
     
-    ' ŠJns‚Ìæ“¾
+    ' ï¿½Jï¿½nï¿½sï¿½Ìæ“¾
     Dim shahoStartRows As StartRows
     Dim kuhoStartRows As StartRows
     Call InitializeStartRows(shahoStartRows, kuhoStartRows)
     
-    ' ƒtƒH[ƒ€ˆ—
+    ' ï¿½tï¿½Hï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Dim billing_form As New UnclaimedBillingForm
     Dim continue_input As Boolean
     continue_input = True
@@ -54,26 +54,26 @@ Private Function ProcessBillingData(ByVal dispensing_year As Integer, ByVal disp
         
         If Not billing_form.DialogResult Then
             If shahoCount = 1 And kuhoCount = 1 Then
-                ' ƒf[ƒ^–¢“ü—Í‚ÅƒLƒƒƒ“ƒZƒ‹
+                ' ï¿½fï¿½[ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½Í‚ÅƒLï¿½ï¿½ï¿½ï¿½ï¿½Zï¿½ï¿½
                 ProcessBillingData = True
                 Exit Function
             Else
-                ' Šù‘¶ƒf[ƒ^‚ª‚ ‚éê‡‚ÍŠm”F
-                If MsgBox("“ü—ÍÏ‚İ‚Ìƒf[ƒ^‚ğ”jŠü‚µ‚Ä‚æ‚ë‚µ‚¢‚Å‚·‚©H", vbYesNo + vbQuestion) = vbYes Then
+                ' ï¿½ï¿½ï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‡ï¿½ÍŠmï¿½F
+                If MsgBox("ï¿½ï¿½ï¿½ÍÏ‚İ‚Ìƒfï¿½[ï¿½^ï¿½ï¿½jï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ë‚µï¿½ï¿½ï¿½Å‚ï¿½ï¿½ï¿½ï¿½H", vbYesNo + vbQuestion) = vbYes Then
                     Exit Do
                 End If
             End If
         Else
-            ' ¿‹æ‚É‰‚¶‚Ä“KØ‚È”z—ñ‚ÉŠi”[
+            ' ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É‰ï¿½ï¿½ï¿½ï¿½Ä“Kï¿½Ø‚È”zï¿½ï¿½ÉŠiï¿½[
             If billing_form.BillingDestination = BILLING_SHAHO Then
-                ' Ğ•Û”z—ñ‚ÌŠg’£ƒ`ƒFƒbƒN
+                ' ï¿½Ğ•Û”zï¿½ï¿½ÌŠgï¿½ï¿½ï¿½`ï¿½Fï¿½bï¿½N
                 If shahoCount > UBound(shahoData, 2) Then
                     ReDim Preserve shahoData(1 To 8, 1 To shahoCount)
                 End If
                 Call StoreDataInArray(shahoData, shahoCount, billing_form, dispensing_year, dispensing_month)
                 shahoCount = shahoCount + 1
             Else
-                ' ‘•Û”z—ñ‚ÌŠg’£ƒ`ƒFƒbƒN
+                ' ï¿½ï¿½ï¿½Û”zï¿½ï¿½ÌŠgï¿½ï¿½ï¿½`ï¿½Fï¿½bï¿½N
                 If kuhoCount > UBound(kuhoData, 2) Then
                     ReDim Preserve kuhoData(1 To 8, 1 To kuhoCount)
                 End If
@@ -85,7 +85,7 @@ Private Function ProcessBillingData(ByVal dispensing_year As Integer, ByVal disp
         End If
     Loop
     
-    ' ƒf[ƒ^‚Ì“]‹Lˆ—
+    ' ï¿½fï¿½[ï¿½^ï¿½Ì“]ï¿½Lï¿½ï¿½ï¿½ï¿½
     If shahoCount > 1 Then
         Call WriteDataToWorksheet(shahoData, shahoCount - 1, WS_SHAHO, GetStartRow(shahoStartRows, status))
     End If
@@ -98,21 +98,21 @@ Private Function ProcessBillingData(ByVal dispensing_year As Integer, ByVal disp
     Exit Function
     
 ErrorHandler:
-    MsgBox "ƒGƒ‰[‚ª”­¶‚µ‚Ü‚µ‚½: " & Err.Description, vbCritical
+    MsgBox "ï¿½Gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½: " & Err.Description, vbCritical
     ProcessBillingData = False
 End Function
 
-' ŠJns‚Ì‰Šú‰»
+' ï¿½Jï¿½nï¿½sï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½
 Private Sub InitializeStartRows(ByRef shahoRows As StartRows, ByRef kuhoRows As StartRows)
-    ' Ğ•Û‚ÌŠJns
+    ' ï¿½Ğ•Û‚ÌŠJï¿½nï¿½s
     With shahoRows
-        .Unclaimed = 2      ' –¢¿‹ŠJns
-        .Reclaim = 8        ' Ä¿‹ŠJns
-        .Return = 14        ' •Ô–ßŠJns
-        .Adjustment = 20    ' ‰ÁŒ¸¸’èŠJns
+        .Unclaimed = 2      ' ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Jï¿½nï¿½s
+        .Reclaim = 8        ' ï¿½Äï¿½ï¿½ï¿½ï¿½Jï¿½nï¿½s
+        .Return = 14        ' ï¿½Ô–ßŠJï¿½nï¿½s
+        .Adjustment = 20    ' ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Jï¿½nï¿½s
     End With
     
-    ' ‘•Û‚ÌŠJns
+    ' ï¿½ï¿½ï¿½Û‚ÌŠJï¿½nï¿½s
     With kuhoRows
         .Unclaimed = 2
         .Reclaim = 8
@@ -121,7 +121,7 @@ Private Sub InitializeStartRows(ByRef shahoRows As StartRows, ByRef kuhoRows As 
     End With
 End Sub
 
-' ó‘Ô‚É‰‚¶‚½ŠJns‚Ìæ“¾
+' ï¿½ï¿½Ô‚É‰ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Jï¿½nï¿½sï¿½Ìæ“¾
 Private Function GetStartRow(ByRef rows As StartRows, ByVal status As Long) As Long
     Select Case status
         Case STATUS_UNCLAIMED
@@ -135,7 +135,7 @@ Private Function GetStartRow(ByRef rows As StartRows, ByVal status As Long) As L
     End Select
 End Function
 
-' ”z—ñ‚Ö‚Ìƒf[ƒ^Ši”[
+' ï¿½zï¿½ï¿½Ö‚Ìƒfï¿½[ï¿½^ï¿½iï¿½[
 Private Sub StoreDataInArray(ByRef dataArray() As Variant, ByVal CurrentIndex As Long, _
                            ByVal form As UnclaimedBillingForm, ByVal year As Integer, ByVal month As Integer)
     With form
@@ -150,27 +150,27 @@ Private Sub StoreDataInArray(ByRef dataArray() As Variant, ByVal CurrentIndex As
     End With
 End Sub
 
-' ƒ[ƒNƒV[ƒg‚Ö‚Ìƒf[ƒ^“]‹L
+' ï¿½ï¿½ï¿½[ï¿½Nï¿½Vï¿½[ï¿½gï¿½Ö‚Ìƒfï¿½[ï¿½^ï¿½]ï¿½L
 Private Sub WriteDataToWorksheet(ByRef dataArray() As Variant, ByVal dataCount As Long, _
                                ByVal wsName As String, ByVal startRow As Long)
     Dim ws As Worksheet
     Set ws = ThisWorkbook.Worksheets(wsName)
     
-    ' Œ»İ‚Ìs”‚ğŠm”F
+    ' ï¿½ï¿½ï¿½İ‚Ìsï¿½ï¿½ï¿½ï¿½ï¿½mï¿½F
     Dim currentRows As Long
     currentRows = ws.Range("A" & startRow).End(xlDown).row - startRow + 1
     
-    ' 5sˆÈã‚Ìƒf[ƒ^‚ª‚ ‚éê‡As‚ğ’Ç‰Á
+    ' 5ï¿½sï¿½Èï¿½Ìƒfï¿½[ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‡ï¿½Aï¿½sï¿½ï¿½Ç‰ï¿½
     If currentRows >= 5 Then
         ws.rows(startRow + 5).Resize(dataCount).Insert Shift:=xlDown
     End If
     
-    ' ƒf[ƒ^‚Ì“]‹L
+    ' ï¿½fï¿½[ï¿½^ï¿½Ì“]ï¿½L
     With ws
         .Range(.Cells(startRow, 1), .Cells(startRow + dataCount - 1, 8)).value = _
             WorksheetFunction.Transpose(WorksheetFunction.Transpose(dataArray))
         
-        ' ‘®İ’è
+        ' ï¿½ï¿½ï¿½ï¿½ï¿½İ’ï¿½
         .Range(.Cells(startRow, 1), .Cells(startRow + dataCount - 1, 8)).Borders.LineStyle = xlContinuous
     End With
 End Sub
@@ -191,7 +191,7 @@ Sub ImportCsvData(csv_file_path As String, ws As Worksheet, file_type As String,
     Set text_stream = file_system_local.OpenTextFile(csv_file_path, 1, False, -2)
     Set column_map = GetColumnMapping(file_type)
 
-    ' ƒwƒbƒ_s‚ğì¬
+    ' ï¿½wï¿½bï¿½_ï¿½sï¿½ï¿½ï¿½ì¬
     ws.Cells.Clear
     col_index = 1
     For Each key In column_map.Keys
@@ -199,33 +199,33 @@ Sub ImportCsvData(csv_file_path As String, ws As Worksheet, file_type As String,
         col_index = col_index + 1
     Next key
 
-    ' CSVƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚İAƒf[ƒ^•”•ª‚ğ“]‹L
-    row_index = 2  ' ƒf[ƒ^‚Í2s–Ú‚©‚çŠJn
+    ' CSVï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½Ç‚İï¿½ï¿½İAï¿½fï¿½[ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½]ï¿½L
+    row_index = 2  ' ï¿½fï¿½[ï¿½^ï¿½ï¿½2ï¿½sï¿½Ú‚ï¿½ï¿½ï¿½Jï¿½n
     
-    ' CSV‚Ì1s–Ú‚Æ2s–Úiƒwƒbƒ_[j‚ğ“Ç‚İ”ò‚Î‚·
+    ' CSVï¿½ï¿½1ï¿½sï¿½Ú‚ï¿½2ï¿½sï¿½Úiï¿½wï¿½bï¿½_ï¿½[ï¿½jï¿½ï¿½Ç‚İ”ï¿½Î‚ï¿½
     If Not text_stream.AtEndOfStream Then
-        text_stream.SkipLine  ' 1s–Ú‚ğƒXƒLƒbƒv
+        text_stream.SkipLine  ' 1ï¿½sï¿½Ú‚ï¿½ï¿½Xï¿½Lï¿½bï¿½v
         If Not text_stream.AtEndOfStream Then
-            text_stream.SkipLine  ' 2s–Ú‚ğƒXƒLƒbƒv
+            text_stream.SkipLine  ' 2ï¿½sï¿½Ú‚ï¿½ï¿½Xï¿½Lï¿½bï¿½v
         End If
     End If
     
-    ' c‚è‚Ìƒf[ƒ^‚ğ“]‹L
+    ' ï¿½cï¿½ï¿½Ìƒfï¿½[ï¿½^ï¿½ï¿½]ï¿½L
     Do While Not text_stream.AtEndOfStream
         line_text = text_stream.ReadLine
         data_array = Split(line_text, ",")
         
-        ' ¿‹Šm’èó‹µ‚Ìƒ`ƒFƒbƒNicheck_status‚ªTrue‚Ìê‡j
+        ' ï¿½ï¿½ï¿½ï¿½ï¿½mï¿½ï¿½ó‹µ‚Ìƒ`ï¿½Fï¿½bï¿½Nï¿½icheck_statusï¿½ï¿½Trueï¿½Ìê‡ï¿½j
         Dim should_transfer As Boolean
         should_transfer = True
         
         If check_status Then
-            ' ¿‹Šm’èó‹µ‚Í30—ñ–ÚiƒCƒ“ƒfƒbƒNƒX29j‚É‚ ‚é
+            ' ï¿½ï¿½ï¿½ï¿½ï¿½mï¿½ï¿½ó‹µ‚ï¿½30ï¿½ï¿½Úiï¿½Cï¿½ï¿½ï¿½fï¿½bï¿½Nï¿½X29ï¿½jï¿½É‚ï¿½ï¿½ï¿½
             If UBound(data_array) >= 29 Then
-                ' ¿‹Šm’èó‹µ‚ª1ˆÈŠO‚Ìê‡‚É“]‹L
+                ' ï¿½ï¿½ï¿½ï¿½ï¿½mï¿½ï¿½ó‹µ‚ï¿½1ï¿½ÈŠOï¿½Ìê‡ï¿½É“]ï¿½L
                 should_transfer = (Trim(data_array(29)) <> "1")
                 
-                ' ƒfƒoƒbƒOo—Í‚ğ’Ç‰Á
+                ' ï¿½fï¿½oï¿½bï¿½Oï¿½oï¿½Í‚ï¿½Ç‰ï¿½
                 Debug.Print "Row " & row_index & " status: " & Trim(data_array(29)) & _
                           ", Transfer: " & should_transfer
             End If
@@ -250,14 +250,14 @@ Sub ImportCsvData(csv_file_path As String, ws As Worksheet, file_type As String,
     Application.Calculation = xlCalculationAutomatic
     Exit Sub
 ImportError:
-    MsgBox "CSVƒf[ƒ^“Ç’†‚ÉƒGƒ‰[‚ª”­¶‚µ‚Ü‚µ‚½: " & Err.Description, vbCritical, "ƒGƒ‰["
+    MsgBox "CSVï¿½fï¿½[ï¿½^ï¿½Çï¿½ï¿½ï¿½ï¿½ÉƒGï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½: " & Err.Description, vbCritical, "ï¿½Gï¿½ï¿½ï¿½["
     If Not text_stream Is Nothing Then text_stream.Close
     Set text_stream = Nothing
     Set file_system_local = Nothing
     Set column_map = Nothing
     Application.ScreenUpdating = True
     Application.Calculation = xlCalculationAutomatic
-    MsgBox "ƒGƒ‰[‚ª”­¶‚µ‚Ü‚µ‚½: " & Err.Description, vbCritical
+    MsgBox "ï¿½Gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½: " & Err.Description, vbCritical
 End Sub
 
 Function GetColumnMapping(file_type As String) As Object
@@ -266,55 +266,55 @@ Function GetColumnMapping(file_type As String) As Object
     Dim k As Integer
 
     Select Case file_type
-        Case "UŠz–¾×‘"
-            column_map.Add 2, "f—Ãi’²Üj”NŒ"
-            column_map.Add 5, "ó•t”Ô†"
-            column_map.Add 14, "–¼"
-            column_map.Add 16, "¶”NŒ“ú"
-            column_map.Add 22, "ˆã—Ã•ÛŒ¯_¿‹“_”"
-            column_map.Add 23, "ˆã—Ã•ÛŒ¯_Œˆ’è“_”"
-            column_map.Add 24, "ˆã—Ã•ÛŒ¯_ˆê•”•‰’S‹à"
-            column_map.Add 25, "ˆã—Ã•ÛŒ¯_‹àŠz"
-            ' ‘æ1`‘æ5Œö”ïiŠe10—ñŠÔŠu: ¿‹“_”EŒˆ’è“_”EŠ³Ò•‰’S‹àE‹àŠzj
+        Case "ï¿½Uï¿½ï¿½ï¿½zï¿½ï¿½ï¿½×ï¿½"
+            column_map.Add 2, "ï¿½fï¿½Ãiï¿½ï¿½ï¿½Üjï¿½Nï¿½ï¿½"
+            column_map.Add 5, "ï¿½ï¿½tï¿½Ôï¿½"
+            column_map.Add 14, "ï¿½ï¿½ï¿½ï¿½"
+            column_map.Add 16, "ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½ï¿½"
+            column_map.Add 22, "ï¿½ï¿½Ã•ÛŒï¿½_ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½"
+            column_map.Add 23, "ï¿½ï¿½Ã•ÛŒï¿½_ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½"
+            column_map.Add 24, "ï¿½ï¿½Ã•ÛŒï¿½_ï¿½ê•”ï¿½ï¿½ï¿½Sï¿½ï¿½"
+            column_map.Add 25, "ï¿½ï¿½Ã•ÛŒï¿½_ï¿½ï¿½ï¿½z"
+            ' ï¿½ï¿½1ï¿½`ï¿½ï¿½5ï¿½ï¿½ï¿½ï¿½iï¿½e10ï¿½ï¿½ÔŠu: ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½Eï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½Eï¿½ï¿½ï¿½Ò•ï¿½ï¿½Sï¿½ï¿½ï¿½Eï¿½ï¿½ï¿½zï¿½j
             For k = 1 To 5
-                column_map.Add 33 + (k - 1) * 10, "‘æ" & k & "Œö”ï_¿‹“_”"
-                column_map.Add 34 + (k - 1) * 10, "‘æ" & k & "Œö”ï_Œˆ’è“_”"
-                column_map.Add 35 + (k - 1) * 10, "‘æ" & k & "Œö”ï_Š³Ò•‰’S‹à"
-                column_map.Add 36 + (k - 1) * 10, "‘æ" & k & "Œö”ï_‹àŠz"
+                column_map.Add 33 + (k - 1) * 10, "ï¿½ï¿½" & k & "ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½"
+                column_map.Add 34 + (k - 1) * 10, "ï¿½ï¿½" & k & "ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½"
+                column_map.Add 35 + (k - 1) * 10, "ï¿½ï¿½" & k & "ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½Ò•ï¿½ï¿½Sï¿½ï¿½"
+                column_map.Add 36 + (k - 1) * 10, "ï¿½ï¿½" & k & "ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½z"
             Next k
-            column_map.Add 82, "Z’èŠz‡Œv"
-        Case "¿‹Šm’èó‹µ"
-            ' ¿‹Šm’èCSVifixfƒf[ƒ^j‚Ì—ñ‘Î‰
-            column_map.Add 4, "f—Ãi’²Üj”NŒ"
-            column_map.Add 5, "–¼"
-            column_map.Add 7, "¶”NŒ“ú"
-            column_map.Add 9, "ˆã—Ã‹@ŠÖ–¼Ì"
-            column_map.Add 13, "‘‡Œv“_”"
+            column_map.Add 82, "ï¿½Zï¿½ï¿½zï¿½ï¿½ï¿½v"
+        Case "ï¿½ï¿½ï¿½ï¿½ï¿½mï¿½ï¿½ï¿½"
+            ' ï¿½ï¿½ï¿½ï¿½ï¿½mï¿½ï¿½CSVï¿½ifixfï¿½fï¿½[ï¿½^ï¿½jï¿½Ì—ï¿½Î‰ï¿½
+            column_map.Add 4, "ï¿½fï¿½Ãiï¿½ï¿½ï¿½Üjï¿½Nï¿½ï¿½"
+            column_map.Add 5, "ï¿½ï¿½ï¿½ï¿½"
+            column_map.Add 7, "ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½ï¿½"
+            column_map.Add 9, "ï¿½ï¿½Ã‹@ï¿½Ö–ï¿½ï¿½ï¿½"
+            column_map.Add 13, "ï¿½ï¿½ï¿½ï¿½ï¿½vï¿½_ï¿½ï¿½"
             For k = 1 To 4
-                column_map.Add 16 + (k - 1) * 3, "‘æ" & k & "Œö”ï_¿‹“_”"
+                column_map.Add 16 + (k - 1) * 3, "ï¿½ï¿½" & k & "ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½"
             Next k
-            column_map.Add 30, "¿‹Šm’èó‹µ"
-            column_map.Add 31, "ƒGƒ‰[‹æ•ª"
-        Case "‘Œ¸“_˜A—‘"
-            column_map.Add 2, "’²Ü”NŒ"
-            column_map.Add 4, "ó•t”Ô†"
-            column_map.Add 11, "‹æ•ª"
-            column_map.Add 14, "˜VlŒ¸–Æ‹æ•ª"
-            column_map.Add 15, "–¼"
-            column_map.Add 21, "‘Œ¸“_”(‹àŠz)"
-            column_map.Add 22, "–—R"
-        Case "•Ô–ß“à–ó‘"
-            column_map.Add 2, "’²Ü”NŒ(YYMM)"
-            column_map.Add 3, "ó•t”Ô†"
-            column_map.Add 4, "•ÛŒ¯Ò”Ô†"
-            column_map.Add 7, "–¼"
-            column_map.Add 9, "¿‹“_”"
-            column_map.Add 10, "–òÜˆê•”•‰’S‹à"
-            column_map.Add 12, "ˆê•”•‰’S‹àŠz"
-            column_map.Add 13, "Œö”ï•‰’S‹àŠz"
-            column_map.Add 14, "–—RƒR[ƒh"
+            column_map.Add 30, "ï¿½ï¿½ï¿½ï¿½ï¿½mï¿½ï¿½ï¿½"
+            column_map.Add 31, "ï¿½Gï¿½ï¿½ï¿½[ï¿½æ•ª"
+        Case "ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½Aï¿½ï¿½ï¿½ï¿½"
+            column_map.Add 2, "ï¿½ï¿½ï¿½Ü”Nï¿½ï¿½"
+            column_map.Add 4, "ï¿½ï¿½tï¿½Ôï¿½"
+            column_map.Add 11, "ï¿½æ•ª"
+            column_map.Add 14, "ï¿½Vï¿½lï¿½ï¿½ï¿½Æ‹æ•ª"
+            column_map.Add 15, "ï¿½ï¿½ï¿½ï¿½"
+            column_map.Add 21, "ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½(ï¿½ï¿½ï¿½z)"
+            column_map.Add 22, "ï¿½ï¿½ï¿½R"
+        Case "ï¿½Ô–ß“ï¿½ï¿½ï¿½"
+            column_map.Add 2, "ï¿½ï¿½ï¿½Ü”Nï¿½ï¿½(YYMM)"
+            column_map.Add 3, "ï¿½ï¿½tï¿½Ôï¿½"
+            column_map.Add 4, "ï¿½ÛŒï¿½ï¿½Ò”Ôï¿½"
+            column_map.Add 7, "ï¿½ï¿½ï¿½ï¿½"
+            column_map.Add 9, "ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½"
+            column_map.Add 10, "ï¿½ï¿½Üˆê•”ï¿½ï¿½ï¿½Sï¿½ï¿½"
+            column_map.Add 12, "ï¿½ê•”ï¿½ï¿½ï¿½Sï¿½ï¿½ï¿½z"
+            column_map.Add 13, "ï¿½ï¿½ï¿½ï•‰ï¿½Sï¿½ï¿½ï¿½z"
+            column_map.Add 14, "ï¿½ï¿½ï¿½Rï¿½Rï¿½[ï¿½h"
         Case Else
-            ' ‚»‚Ì‘¼‚Ìƒf[ƒ^í•Ê‚ª‚ ‚ê‚Î’Ç‰Á
+            ' ï¿½ï¿½ï¿½Ì‘ï¿½ï¿½Ìƒfï¿½[ï¿½^ï¿½ï¿½Ê‚ï¿½ï¿½ï¿½ï¿½ï¿½Î’Ç‰ï¿½
     End Select
 
     Set GetColumnMapping = column_map
@@ -330,49 +330,49 @@ Sub TransferBillingDetails(report_wb As Workbook, csv_file_name As String, dispe
     Dim start_row_dict As Object
     Dim rebill_dict As Object, late_dict As Object, unpaid_dict As Object, assessment_dict As Object
     
-    ' ŠÛ•t”š‚ÌŒ‚ğæ“¾
+    ' ï¿½Û•tï¿½ï¿½ï¿½ï¿½ï¿½ÌŒï¿½ï¿½ï¿½ï¿½æ“¾
     Dim details_sheet_name As String
     details_sheet_name = UtilityModule.ConvertToCircledNumber(CInt(dispensing_month))
     
     Debug.Print "Looking for details sheet: " & details_sheet_name
     
-    ' Ú×ƒV[ƒg‚Ì‘¶İŠm”F
+    ' ï¿½Ú×ƒVï¿½[ï¿½gï¿½Ì‘ï¿½ï¿½İŠmï¿½F
     On Error Resume Next
     Set ws_details = report_wb.Sheets(details_sheet_name)
     On Error GoTo ErrorHandler
     
     If ws_details Is Nothing Then
-        MsgBox "Ú×ƒV[ƒg '" & details_sheet_name & "' ‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñB", vbExclamation, "ƒGƒ‰["
+        MsgBox "ï¿½Ú×ƒVï¿½[ï¿½g '" & details_sheet_name & "' ï¿½ï¿½ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½B", vbExclamation, "ï¿½Gï¿½ï¿½ï¿½["
         Exit Sub
     End If
     
-    ' ƒƒCƒ“ƒV[ƒg‚Í‘¶İŠm”F‚¹‚¸‚Éæ“¾
+    ' ï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½Vï¿½[ï¿½gï¿½Í‘ï¿½ï¿½İŠmï¿½Fï¿½ï¿½ï¿½ï¿½ï¿½Éæ“¾
     Set ws_main = report_wb.Sheets(1)
     
-    ' ’²Ü”NŒ‚Æ¿‹æ‹æ•ª‚Ìæ“¾
+    ' ï¿½ï¿½ï¿½Ü”Nï¿½ï¿½ï¿½Æï¿½ï¿½ï¿½ï¿½ï¿½æ•ªï¿½Ìæ“¾
     csv_yymm = GetDispenseYearMonth(ws_main)
     payer_type = GetPayerType(csv_file_name)
     
-    If payer_type = "˜JĞ" Then
-        Debug.Print "˜JĞƒf[ƒ^‚Ì‚½‚ßAˆ—‚ğƒXƒLƒbƒv‚µ‚Ü‚·B"
+    If payer_type = "ï¿½Jï¿½ï¿½" Then
+        Debug.Print "ï¿½Jï¿½Ğƒfï¿½[ï¿½^ï¿½Ì‚ï¿½ï¿½ßAï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½Lï¿½bï¿½vï¿½ï¿½ï¿½Ü‚ï¿½ï¿½B"
         Exit Sub
     End If
     
-    ' Ú×ƒV[ƒgã‚ÌŠeƒJƒeƒSƒŠŠJns‚ğæ“¾
+    ' ï¿½Ú×ƒVï¿½[ï¿½gï¿½ï¿½ÌŠeï¿½Jï¿½eï¿½Sï¿½ï¿½ï¿½Jï¿½nï¿½sï¿½ï¿½ï¿½æ“¾
     Set start_row_dict = UtilityModule.GetCategoryStartRows(ws_details, payer_type)
     
     If start_row_dict.count = 0 Then
-        Debug.Print "WARNING: ƒJƒeƒSƒŠ‚ÌŠJns‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ: " & payer_type
+        Debug.Print "WARNING: ï¿½Jï¿½eï¿½Sï¿½ï¿½ï¿½ÌŠJï¿½nï¿½sï¿½ï¿½ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½: " & payer_type
         Exit Sub
     End If
     
-    ' ƒf[ƒ^‚Ì•ª—Ş‚Æ«‘‚Ìì¬
+    ' ï¿½fï¿½[ï¿½^ï¿½Ì•ï¿½ï¿½Ş‚Æï¿½ï¿½ï¿½ï¿½Ìì¬
     Set rebill_dict = CreateObject("Scripting.Dictionary")
     Set late_dict = CreateObject("Scripting.Dictionary")
     Set unpaid_dict = CreateObject("Scripting.Dictionary")
     Set assessment_dict = CreateObject("Scripting.Dictionary")
     
-    ' ƒƒCƒ“ƒV[ƒg‚Ìƒf[ƒ^‚ğ•ª—Ş
+    ' ï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½Vï¿½[ï¿½gï¿½Ìƒfï¿½[ï¿½^ï¿½ğ•ª—ï¿½
     If check_status Then
         Call ClassifyMainSheetDataWithStatus(ws_main, csv_yymm, csv_file_name, _
                                            rebill_dict, late_dict, unpaid_dict, assessment_dict)
@@ -381,13 +381,13 @@ Sub TransferBillingDetails(report_wb As Workbook, csv_file_name As String, dispe
                                  rebill_dict, late_dict, unpaid_dict, assessment_dict)
     End If
     
-    ' s‚Ì’Ç‰Áˆ—
+    ' ï¿½sï¿½Ì’Ç‰ï¿½ï¿½ï¿½ï¿½ï¿½
     Call InsertAdditionalRows(ws_details, start_row_dict, rebill_dict.count, late_dict.count, assessment_dict.count)
     
-    ' ƒf[ƒ^‚Ì“]‹L
+    ' ï¿½fï¿½[ï¿½^ï¿½Ì“]ï¿½L
     Call WriteDataToDetails(ws_details, start_row_dict, rebill_dict, late_dict, unpaid_dict, assessment_dict, payer_type)
     
-    ' FIXFƒtƒ@ƒCƒ‹‚Ìê‡A–¢¿‹ƒŒƒZƒvƒg‚ÌŠm”FiÚ×ƒV[ƒg‚ğ“n‚·j
+    ' FIXFï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Ìê‡ï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Zï¿½vï¿½gï¿½ÌŠmï¿½Fï¿½iï¿½Ú×ƒVï¿½[ï¿½gï¿½ï¿½nï¿½ï¿½ï¿½j
     If InStr(LCase(csv_file_name), "fixf") > 0 Then
         Call CheckAndRegisterUnclaimedBilling(CInt(dispensing_year), CInt(dispensing_month), ws_details)
     End If
@@ -404,19 +404,19 @@ ErrorHandler:
     Debug.Print "Payer type: " & payer_type
     Debug.Print "=================================="
     
-    MsgBox "ƒf[ƒ^“]‹L’†‚ÉƒGƒ‰[‚ª”­¶‚µ‚Ü‚µ‚½B" & vbCrLf & _
-           "ƒGƒ‰[”Ô†: " & Err.Number & vbCrLf & _
-           "ƒGƒ‰[“à—e: " & Err.Description & vbCrLf & _
-           "Ú×ƒV[ƒg: " & details_sheet_name, _
-           vbCritical, "ƒGƒ‰["
+    MsgBox "ï¿½fï¿½[ï¿½^ï¿½]ï¿½Lï¿½ï¿½ï¿½ÉƒGï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½ï¿½B" & vbCrLf & _
+           "ï¿½Gï¿½ï¿½ï¿½[ï¿½Ôï¿½: " & Err.Number & vbCrLf & _
+           "ï¿½Gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½e: " & Err.Description & vbCrLf & _
+           "ï¿½Ú×ƒVï¿½[ï¿½g: " & details_sheet_name, _
+           vbCritical, "ï¿½Gï¿½ï¿½ï¿½["
 End Sub
 
 Private Function GetDispenseYearMonth(ws As Worksheet) As String
     GetDispenseYearMonth = ""
     If ws.Cells(2, 2).value <> "" Then
         GetDispenseYearMonth = Right(CStr(ws.Cells(2, 2).value), 4)
-        If InStr(GetDispenseYearMonth, "”N") > 0 Or InStr(GetDispenseYearMonth, "Œ") > 0 Then
-            GetDispenseYearMonth = Replace(Replace(GetDispenseYearMonth, "”N", ""), "Œ", "")
+        If InStr(GetDispenseYearMonth, "ï¿½N") > 0 Or InStr(GetDispenseYearMonth, "ï¿½ï¿½") > 0 Then
+            GetDispenseYearMonth = Replace(Replace(GetDispenseYearMonth, "ï¿½N", ""), "ï¿½ï¿½", "")
         End If
     End If
 End Function
@@ -434,9 +434,9 @@ Private Function GetPayerType(csv_file_name As String) As String
     End If
     
     Select Case payer_code
-        Case "1": GetPayerType = "Ğ•Û"
-        Case "2": GetPayerType = "‘•Û"
-        Case Else: GetPayerType = "˜JĞ"
+        Case "1": GetPayerType = "ï¿½Ğ•ï¿½"
+        Case "2": GetPayerType = "ï¿½ï¿½ï¿½ï¿½"
+        Case Else: GetPayerType = "ï¿½Jï¿½ï¿½"
     End Select
 End Function
 
@@ -479,7 +479,7 @@ Private Sub ClassifyMainSheetDataWithStatus(ws As Worksheet, csv_yymm As String,
     last_row = ws.Cells(ws.rows.count, "D").End(xlUp).row
     
     For row = 2 To last_row
-        ' ¿‹Šm’èó‹µ‚ğƒ`ƒFƒbƒNiAD—ñ = 30—ñ–Új
+        ' ï¿½ï¿½ï¿½ï¿½ï¿½mï¿½ï¿½ó‹µ‚ï¿½ï¿½`ï¿½Fï¿½bï¿½Nï¿½iADï¿½ï¿½ = 30ï¿½ï¿½Új
         If ws.Cells(row, 30).value = "2" Then
             dispensing_code = ws.Cells(row, 2).value
             dispensing_ym = UtilityModule.ConvertToWesternDate(dispensing_code)
@@ -517,10 +517,10 @@ Private Function CheckAndRegisterUnclaimedBilling(ByVal dispensing_year As Integ
     On Error GoTo ErrorHandler
     
     Dim response As VbMsgBoxResult
-    response = MsgBox("–¢¿‹ƒŒƒZƒvƒg‚Ì“ü—Í‚ğŠJn‚µ‚Ü‚·‚©H", vbYesNo + vbQuestion)
+    response = MsgBox("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Zï¿½vï¿½gï¿½Ì“ï¿½ï¿½Í‚ï¿½ï¿½Jï¿½nï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½ï¿½H", vbYesNo + vbQuestion)
     
     If response = vbYes Then
-        ' –¢¿‹ƒŒƒZƒvƒgƒf[ƒ^‚ğŠi”[‚·‚é“ñŸŒ³”z—ñ
+        ' ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Zï¿½vï¿½gï¿½fï¿½[ï¿½^ï¿½ï¿½ï¿½iï¿½[ï¿½ï¿½ï¿½ï¿½ñŸŒï¿½ï¿½zï¿½ï¿½
         Dim unclaimedData() As Variant
         ReDim unclaimedData(1 To 8, 1 To 1)
         Dim currentColumn As Long
@@ -531,10 +531,10 @@ Private Function CheckAndRegisterUnclaimedBilling(ByVal dispensing_year As Integ
         continue_input = True
         
         Do While continue_input
-            ' ’²Ü”NŒ‚ğİ’è
+            ' ï¿½ï¿½ï¿½Ü”Nï¿½ï¿½ï¿½ï¿½İ’ï¿½
             unclaimed_form.SetDispensingDate dispensing_year, dispensing_month
             
-            ' •ÒWƒ‚[ƒh‚Ìê‡Aƒf[ƒ^‚ğƒ[ƒh
+            ' ï¿½ÒWï¿½ï¿½ï¿½[ï¿½hï¿½Ìê‡ï¿½Aï¿½fï¿½[ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½h
             If unclaimed_form.CurrentIndex < currentColumn Then
                 unclaimed_form.LoadData unclaimedData, unclaimed_form.CurrentIndex
             End If
@@ -542,24 +542,24 @@ Private Function CheckAndRegisterUnclaimedBilling(ByVal dispensing_year As Integ
             unclaimed_form.Show
             
             If Not unclaimed_form.DialogResult Then
-                ' ƒLƒƒƒ“ƒZƒ‹ƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½ê‡
+                ' ï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½Zï¿½ï¿½ï¿½{ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ï¿½ê‡
                 If currentColumn = 1 Then
-                    ' ƒf[ƒ^–¢“ü—Í‚ÅƒLƒƒƒ“ƒZƒ‹
+                    ' ï¿½fï¿½[ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½Í‚ÅƒLï¿½ï¿½ï¿½ï¿½ï¿½Zï¿½ï¿½
                     CheckAndRegisterUnclaimedBilling = True
                     Exit Function
                 Else
-                    ' Šù‘¶ƒf[ƒ^‚ª‚ ‚éê‡‚ÍŠm”F
-                    If MsgBox("“ü—ÍÏ‚İ‚Ìƒf[ƒ^‚ğ”jŠü‚µ‚Ä‚æ‚ë‚µ‚¢‚Å‚·‚©H", vbYesNo + vbQuestion) = vbYes Then
+                    ' ï¿½ï¿½ï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‡ï¿½ÍŠmï¿½F
+                    If MsgBox("ï¿½ï¿½ï¿½ÍÏ‚İ‚Ìƒfï¿½[ï¿½^ï¿½ï¿½jï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ë‚µï¿½ï¿½ï¿½Å‚ï¿½ï¿½ï¿½ï¿½H", vbYesNo + vbQuestion) = vbYes Then
                         Exit Do
                     End If
                 End If
             Else
-                ' ”z—ñ‚ÌƒTƒCƒY‚ğŠg’£i•K—v‚Èê‡j
+                ' ï¿½zï¿½ï¿½ÌƒTï¿½Cï¿½Yï¿½ï¿½ï¿½gï¿½ï¿½ï¿½iï¿½Kï¿½vï¿½Èê‡ï¿½j
                 If currentColumn > UBound(unclaimedData, 2) Then
                     ReDim Preserve unclaimedData(1 To 8, 1 To currentColumn)
                 End If
                 
-                ' ƒf[ƒ^‚ğ”z—ñ‚ÉŠi”[
+                ' ï¿½fï¿½[ï¿½^ï¿½ï¿½zï¿½ï¿½ÉŠiï¿½[
                 With unclaimed_form
                     unclaimedData(1, currentColumn) = .PatientName
                     unclaimedData(2, currentColumn) = "R" & dispensing_year & "." & Format(dispensing_month, "00")
@@ -572,32 +572,32 @@ Private Function CheckAndRegisterUnclaimedBilling(ByVal dispensing_year As Integ
                 End With
                 
                 If .ContinueInput Then
-                    ' Ÿ‚Öƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½ê‡
+                    ' ï¿½ï¿½ï¿½Öƒ{ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ï¿½ê‡
                     currentColumn = currentColumn + 1
                     continue_input = True
                 Else
-                    ' Š®—¹ƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½ê‡
+                    ' ï¿½ï¿½ï¿½ï¿½ï¿½{ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ï¿½ê‡
                     continue_input = False
                 End If
             End If
         Loop
         
-        ' ƒf[ƒ^‚ª1ŒˆÈã“ü—Í‚³‚ê‚Ä‚¢‚éê‡‚Ì‚İAExcel‚É“]‹L
+        ' ï¿½fï¿½[ï¿½^ï¿½ï¿½1ï¿½ï¿½ï¿½Èï¿½ï¿½ï¿½Í‚ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ê‡ï¿½Ì‚İAExcelï¿½É“]ï¿½L
         If currentColumn > 0 Then
             If ws_details Is Nothing Then
-                Set ws_details = ThisWorkbook.Worksheets("–¢¿‹ˆê——")
+                Set ws_details = ThisWorkbook.Worksheets("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê——")
             End If
             
-            ' ÅIs‚Ìæ“¾
+            ' ï¿½ÅIï¿½sï¿½Ìæ“¾
             Dim lastRow As Long
             lastRow = ws_details.Cells(ws_details.rows.count, "A").End(xlUp).row
             
-            ' ƒf[ƒ^‚Ì“]‹L
+            ' ï¿½fï¿½[ï¿½^ï¿½Ì“]ï¿½L
             With ws_details
                 .Range(.Cells(lastRow + 1, 1), .Cells(lastRow + currentColumn, 8)).value = _
                     WorksheetFunction.Transpose(WorksheetFunction.Transpose(unclaimedData))
                 
-                ' ‘®İ’è
+                ' ï¿½ï¿½ï¿½ï¿½ï¿½İ’ï¿½
                 .Range(.Cells(lastRow + 1, 1), .Cells(lastRow + currentColumn, 8)).Borders.LineStyle = xlContinuous
             End With
         End If
@@ -607,7 +607,7 @@ Private Function CheckAndRegisterUnclaimedBilling(ByVal dispensing_year As Integ
     Exit Function
 
 ErrorHandler:
-    MsgBox "ƒGƒ‰[‚ª”­¶‚µ‚Ü‚µ‚½: " & Err.Description, vbCritical
+    MsgBox "ï¿½Gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½: " & Err.Description, vbCritical
     CheckAndRegisterUnclaimedBilling = False
 End Function
 
@@ -618,26 +618,26 @@ Private Sub InsertAdditionalRows(ws As Worksheet, start_row_dict As Object, rebi
     Dim row_index As Long
     Dim start_row As Long
     Dim end_row As Long
-    Dim i As Long
+    Dim i_key As Long
     
-    ' ŠeƒJƒeƒSƒŠ‚ÌŠJns‚ğæ“¾
+    ' ï¿½eï¿½Jï¿½eï¿½Sï¿½ï¿½ï¿½ÌŠJï¿½nï¿½sï¿½ï¿½ï¿½æ“¾
     For Each key In start_row_dict.Keys
         start_row = start_row_dict(key)
         end_row = start_row + 1
         
-        ' s‚Ì’Ç‰Á
+        ' ï¿½sï¿½Ì’Ç‰ï¿½
         ws_details.rows(end_row).Insert Shift:=xlDown, CopyOrigin:=xlFormatFromLeftOrAbove
         ws_details.Cells(end_row, 1).value = key
         
-        ' ƒf[ƒ^‚Ì“]‹L
+        ' ï¿½fï¿½[ï¿½^ï¿½Ì“]ï¿½L
         If rebill_count > 0 Then
-            ws_details.Cells(end_row, 2).value = "Ä¿‹"
+            ws_details.Cells(end_row, 2).value = "ï¿½Äï¿½ï¿½ï¿½"
             rebill_count = rebill_count - 1
         ElseIf late_count > 0 Then
-            ws_details.Cells(end_row, 2).value = "’x¿‹"
+            ws_details.Cells(end_row, 2).value = "ï¿½xï¿½ï¿½ï¿½ï¿½"
             late_count = late_count - 1
         ElseIf assessment_count > 0 Then
-            ws_details.Cells(end_row, 2).value = "Z’è"
+            ws_details.Cells(end_row, 2).value = "ï¿½Zï¿½ï¿½"
             assessment_count = assessment_count - 1
         End If
     Next key
@@ -650,14 +650,14 @@ Private Sub WriteDataToDetails(ws As Worksheet, start_row_dict As Object, rebill
     Dim row_index As Long
     Dim start_row As Long
     Dim end_row As Long
-    Dim i As Long
+    Dim i_key As Long
     
-    ' ŠeƒJƒeƒSƒŠ‚ÌŠJns‚ğæ“¾
+    ' ï¿½eï¿½Jï¿½eï¿½Sï¿½ï¿½ï¿½ÌŠJï¿½nï¿½sï¿½ï¿½ï¿½æ“¾
     For Each key In start_row_dict.Keys
         start_row = start_row_dict(key)
         end_row = start_row + 1
         
-        ' ƒf[ƒ^‚Ì“]‹L
+        ' ï¿½fï¿½[ï¿½^ï¿½Ì“]ï¿½L
         If rebill_dict.exists(key) Then
             ws_details.Cells(end_row, 2).value = rebill_dict(key)(0)
             ws_details.Cells(end_row, 3).value = rebill_dict(key)(1)
