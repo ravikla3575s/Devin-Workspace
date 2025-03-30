@@ -8,11 +8,11 @@ Public Sub SearchDatabase()
     ' データベースシートが存在するか確認
     Dim ws_database As Worksheet
     On Error Resume Next
-    Set ws_database = ThisWorkbook.Worksheets("データベース")
+    Set ws_database = ThisWorkbook.Worksheets("売掛管理表")
     On Error GoTo ErrorHandler
     
     If ws_database Is Nothing Then
-        MsgBox "データベースシートが見つかりません。先にデータベースを作成してください。", vbExclamation, "エラー"
+        MsgBox "売掛管理表シートが見つかりません。先にデータベースを作成してください。", vbExclamation, "エラー"
         Exit Sub
     End If
     
@@ -261,11 +261,11 @@ Public Sub ExportDatabaseToCsv()
     ' データベースシートが存在するか確認
     Dim ws_database As Worksheet
     On Error Resume Next
-    Set ws_database = ThisWorkbook.Worksheets("データベース")
+    Set ws_database = ThisWorkbook.Worksheets("売掛管理表")
     On Error GoTo ErrorHandler
     
     If ws_database Is Nothing Then
-        MsgBox "データベースシートが見つかりません。先にデータベースを作成してください。", vbExclamation, "エラー"
+        MsgBox "売掛管理表シートが見つかりません。先にデータベースを作成してください。", vbExclamation, "エラー"
         Exit Sub
     End If
     
@@ -273,7 +273,7 @@ Public Sub ExportDatabaseToCsv()
     Dim save_path As String
     With Application.FileDialog(msoFileDialogSaveAs)
         .Title = "CSVファイルの保存先を選択"
-        .InitialFileName = "保険請求データベース_" & Format(Date, "yyyymmdd") & ".csv"
+        .InitialFileName = "売掛管理表_" & Format(Date, "yyyymmdd") & ".csv"
         .FilterIndex = 3  ' CSVフィルター
         If .Show = -1 Then
             save_path = .SelectedItems(1)
@@ -332,11 +332,11 @@ Public Sub CreateDatabaseSummaryReport()
     ' データベースシートが存在するか確認
     Dim ws_database As Worksheet
     On Error Resume Next
-    Set ws_database = ThisWorkbook.Worksheets("データベース")
+    Set ws_database = ThisWorkbook.Worksheets("売掛管理表")
     On Error GoTo ErrorHandler
     
     If ws_database Is Nothing Then
-        MsgBox "データベースシートが見つかりません。先にデータベースを作成してください。", vbExclamation, "エラー"
+        MsgBox "売掛管理表シートが見つかりません。先にデータベースを作成してください。", vbExclamation, "エラー"
         Exit Sub
     End If
     
@@ -355,7 +355,7 @@ Public Sub CreateDatabaseSummaryReport()
     
     ' レポートのヘッダーを設定
     With ws_report
-        .Range("A1").Value = "保険請求データベース集計レポート"
+        .Range("A1").Value = "売掛管理表集計レポート"
         .Range("A1").Font.Size = 14
         .Range("A1").Font.Bold = True
         
@@ -492,27 +492,6 @@ Public Sub CreateDatabaseSummaryReport()
             If IsNumeric(ws_database.Cells(i_data, 11).Value) Then
                 month_array(4) = month_array(4) + ws_database.Cells(i_data, 11).Value  ' 公費再請求額を加算
             End If
-            
-            ' 削除：この部分は上記コード（477-494行）と重複しているため、削除します
-            ' 主保険請求額が数値の場合のみ加算
-            ' If IsNumeric(ws_database.Cells(i_data, 8).Value) Then
-            '     month_array(2) = month_array(2) + ws_database.Cells(i_data, 8).Value
-            ' End If
-            ' 
-            ' ' 公費請求額が数値の場合のみ加算
-            ' If IsNumeric(ws_database.Cells(i_data, 9).Value) Then
-            '     month_array(3) = month_array(3) + ws_database.Cells(i_data, 9).Value
-            ' End If
-            ' 
-            ' ' 主保険再請求額が数値の場合のみ加算
-            ' If IsNumeric(ws_database.Cells(i_data, 10).Value) Then
-            '     month_array(4) = month_array(4) + ws_database.Cells(i_data, 10).Value
-            ' End If
-            ' 
-            ' ' 公費再請求額が数値の場合のみ加算
-            ' If IsNumeric(ws_database.Cells(i_data, 11).Value) Then
-            '     month_array(5) = month_array(5) + ws_database.Cells(i_data, 11).Value
-            ' End If
             
             months(month_key) = month_array
             
