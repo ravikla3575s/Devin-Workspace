@@ -339,6 +339,190 @@ Public Sub CreateDatabaseSummaryReport()
         MsgBox "売掛管理表シートが見つかりません。先にデータベースを作成してください。", vbExclamation, "エラー"
         Exit Sub
     End If
+
+' henrファイル（返戻）データを売掛管理表に追加する関数
+Public Function AddHenrDataToDatabase(ByVal patient_name As String, ByVal dispensing_date As String, _
+                                     ByVal medical_institution As String, ByVal billing_amount As Double, _
+                                     Optional ByVal billing_date As Date = 0, _
+                                     Optional ByVal billing_destination As String = "", _
+                                     Optional ByVal remarks As String = "") As Boolean
+    On Error GoTo ErrorHandler
+    
+    ' 売掛管理表シートの確認
+    Dim ws_database As Worksheet
+    On Error Resume Next
+    Set ws_database = ThisWorkbook.Worksheets("売掛管理表")
+    On Error GoTo ErrorHandler
+    
+    If ws_database Is Nothing Then
+        ' 売掛管理表シートが存在しない場合は作成
+        If Not DatabaseSheetModule.CreateDatabaseSheet(ThisWorkbook) Then
+            MsgBox "売掛管理表シートの作成に失敗しました。", vbCritical, "エラー"
+            AddHenrDataToDatabase = False
+            Exit Function
+        End If
+        Set ws_database = ThisWorkbook.Worksheets("売掛管理表")
+    End If
+    
+    ' 最終行を取得
+    Dim last_row As Long
+    last_row = ws_database.Cells(ws_database.Rows.Count, "A").End(xlUp).Row
+    
+    ' 新しい行にデータを追加
+    Dim new_row As Long
+    new_row = last_row + 1
+    
+    ' IDを設定
+    ws_database.Cells(new_row, 1).Value = new_row - 1
+    
+    ' 区分を設定（返戻）
+    ws_database.Cells(new_row, 2).Value = "返戻"
+    
+    ' 患者名を設定
+    ws_database.Cells(new_row, 3).Value = patient_name
+    
+    ' 調剤年月を設定
+    ws_database.Cells(new_row, 4).Value = dispensing_date
+    
+    ' 医療機関を設定
+    ws_database.Cells(new_row, 5).Value = medical_institution
+    
+    ' 請求日を設定
+    If billing_date <> 0 Then
+        ws_database.Cells(new_row, 7).Value = billing_date
+    Else
+        ws_database.Cells(new_row, 7).Value = Date
+    End If
+    
+    ' 請求先を設定
+    If Len(billing_destination) > 0 Then
+        ws_database.Cells(new_row, 8).Value = billing_destination
+    End If
+    
+    ' 主保険請求額を設定
+    If billing_amount > 0 Then
+        ws_database.Cells(new_row, 11).Value = billing_amount
+    End If
+    
+    ' 請求先機関を設定
+    ws_database.Cells(new_row, 15).Value = medical_institution
+    
+    ' 備考を設定
+    If Len(remarks) > 0 Then
+        ws_database.Cells(new_row, 16).Value = remarks
+    End If
+    
+    ' データベースの書式を整える
+    FormatDatabaseRow ws_database, new_row
+    
+    AddHenrDataToDatabase = True
+    Exit Function
+    
+ErrorHandler:
+    Debug.Print "========== ERROR DETAILS =========="
+    Debug.Print "Error in AddHenrDataToDatabase"
+    Debug.Print "Error number: " & Err.Number
+    Debug.Print "Error description: " & Err.Description
+    Debug.Print "=================================="
+    
+    MsgBox "返戻データの追加中にエラーが発生しました。" & vbCrLf & _
+           "エラー番号: " & Err.Number & vbCrLf & _
+           "エラー内容: " & Err.Description, _
+           vbCritical, "エラー"
+    AddHenrDataToDatabase = False
+End Function
+
+' zognファイル（減点査定）データを売掛管理表に追加する関数
+Public Function AddZognDataToDatabase(ByVal patient_name As String, ByVal dispensing_date As String, _
+                                     ByVal medical_institution As String, ByVal billing_amount As Double, _
+                                     Optional ByVal billing_date As Date = 0, _
+                                     Optional ByVal billing_destination As String = "", _
+                                     Optional ByVal remarks As String = "") As Boolean
+    On Error GoTo ErrorHandler
+    
+    ' 売掛管理表シートの確認
+    Dim ws_database As Worksheet
+    On Error Resume Next
+    Set ws_database = ThisWorkbook.Worksheets("売掛管理表")
+    On Error GoTo ErrorHandler
+    
+    If ws_database Is Nothing Then
+        ' 売掛管理表シートが存在しない場合は作成
+        If Not DatabaseSheetModule.CreateDatabaseSheet(ThisWorkbook) Then
+            MsgBox "売掛管理表シートの作成に失敗しました。", vbCritical, "エラー"
+            AddZognDataToDatabase = False
+            Exit Function
+        End If
+        Set ws_database = ThisWorkbook.Worksheets("売掛管理表")
+    End If
+    
+    ' 最終行を取得
+    Dim last_row As Long
+    last_row = ws_database.Cells(ws_database.Rows.Count, "A").End(xlUp).Row
+    
+    ' 新しい行にデータを追加
+    Dim new_row As Long
+    new_row = last_row + 1
+    
+    ' IDを設定
+    ws_database.Cells(new_row, 1).Value = new_row - 1
+    
+    ' 区分を設定（減点査定）
+    ws_database.Cells(new_row, 2).Value = "減点査定"
+    
+    ' 患者名を設定
+    ws_database.Cells(new_row, 3).Value = patient_name
+    
+    ' 調剤年月を設定
+    ws_database.Cells(new_row, 4).Value = dispensing_date
+    
+    ' 医療機関を設定
+    ws_database.Cells(new_row, 5).Value = medical_institution
+    
+    ' 請求日を設定
+    If billing_date <> 0 Then
+        ws_database.Cells(new_row, 7).Value = billing_date
+    Else
+        ws_database.Cells(new_row, 7).Value = Date
+    End If
+    
+    ' 請求先を設定
+    If Len(billing_destination) > 0 Then
+        ws_database.Cells(new_row, 8).Value = billing_destination
+    End If
+    
+    ' 主保険請求額を設定
+    If billing_amount > 0 Then
+        ws_database.Cells(new_row, 11).Value = billing_amount
+    End If
+    
+    ' 請求先機関を設定
+    ws_database.Cells(new_row, 15).Value = medical_institution
+    
+    ' 備考を設定
+    If Len(remarks) > 0 Then
+        ws_database.Cells(new_row, 16).Value = remarks
+    End If
+    
+    ' データベースの書式を整える
+    FormatDatabaseRow ws_database, new_row
+    
+    AddZognDataToDatabase = True
+    Exit Function
+    
+ErrorHandler:
+    Debug.Print "========== ERROR DETAILS =========="
+    Debug.Print "Error in AddZognDataToDatabase"
+    Debug.Print "Error number: " & Err.Number
+    Debug.Print "Error description: " & Err.Description
+    Debug.Print "=================================="
+    
+    MsgBox "減点査定データの追加中にエラーが発生しました。" & vbCrLf & _
+           "エラー番号: " & Err.Number & vbCrLf & _
+           "エラー内容: " & Err.Description, _
+           vbCritical, "エラー"
+    AddZognDataToDatabase = False
+End Function
     
     ' 集計レポートシートが存在するか確認し、存在しない場合は作成
     Dim ws_report As Worksheet
