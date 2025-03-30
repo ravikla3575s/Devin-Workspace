@@ -650,7 +650,7 @@ Private Sub WriteDataToDetails(ws As Worksheet, start_row_dict As Object, rebill
     Dim row_index As Long
     Dim start_row As Long
     Dim end_row As Long
-    Dim i As Long
+    Dim i_transfer As Long
     
     ' 各カテゴリの開始行を取得
     For Each key In start_row_dict.Keys

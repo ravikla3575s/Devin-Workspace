@@ -425,41 +425,41 @@ Public Sub CreateDatabaseSummaryReport()
     last_row = ws_database.Cells(ws_database.Rows.Count, "A").End(xlUp).Row
     
     ' データを集計
-    Dim i As Long
-    For i = 2 To last_row  ' ヘッダー行をスキップ
+    Dim i_data As Long
+    For i_data = 2 To last_row  ' ヘッダー行をスキップ
         ' 非表示行はスキップ（フィルターが適用されている場合）
-        If ws_database.Rows(i).Hidden = False Then
+        If ws_database.Rows(i_data).Hidden = False Then
             ' 請求先別集計
             Dim billing_type As String
-            billing_type = ws_database.Cells(i, 2).Value
+            billing_type = ws_database.Cells(i_data, 2).Value
             If billing_type = "" Then billing_type = "その他"
             
             Dim billing_array As Variant
             billing_array = billing_types(billing_type)
             ' 金額が数値の場合のみ加算
-            If IsNumeric(ws_database.Cells(i, 7).Value) Then
-                billing_array(0) = billing_array(0) + ws_database.Cells(i, 7).Value  ' 金額を加算
+            If IsNumeric(ws_database.Cells(i_data, 7).Value) Then
+                billing_array(0) = billing_array(0) + ws_database.Cells(i_data, 7).Value  ' 金額を加算
             End If
             
             billing_types(billing_type) = billing_array
             
             ' 区分別集計
             Dim category As String
-            category = ws_database.Cells(i, 3).Value
+            category = ws_database.Cells(i_data, 3).Value
             If category = "" Then category = "その他"
             
             Dim category_array As Variant
             category_array = categories(category)
             ' 金額が数値の場合のみ加算
-            If IsNumeric(ws_database.Cells(i, 7).Value) Then
-                category_array(0) = category_array(0) + ws_database.Cells(i, 7).Value  ' 金額を加算
+            If IsNumeric(ws_database.Cells(i_data, 7).Value) Then
+                category_array(0) = category_array(0) + ws_database.Cells(i_data, 7).Value  ' 金額を加算
             End If
             
             categories(category) = category_array
             
             ' 月別集計
             Dim month_key As String
-            month_key = ws_database.Cells(i, 5).Value
+            month_key = ws_database.Cells(i_data, 5).Value
             If month_key = "" Then month_key = "不明"
             
             If Not months.Exists(month_key) Then
@@ -469,55 +469,56 @@ Public Sub CreateDatabaseSummaryReport()
             Dim month_array As Variant
             month_array = months(month_key)
             ' 金額が数値の場合のみ加算
-            If IsNumeric(ws_database.Cells(i, 7).Value) Then
-                month_array(0) = month_array(0) + ws_database.Cells(i, 7).Value  ' 金額を加算
+            If IsNumeric(ws_database.Cells(i_data, 7).Value) Then
+                month_array(0) = month_array(0) + ws_database.Cells(i_data, 7).Value  ' 金額を加算
             End If
             
             ' 主保険請求額が数値の場合のみ加算
-            If IsNumeric(ws_database.Cells(i, 8).Value) Then
-                month_array(1) = month_array(1) + ws_database.Cells(i, 8).Value  ' 主保険請求額を加算
+            If IsNumeric(ws_database.Cells(i_data, 8).Value) Then
+                month_array(1) = month_array(1) + ws_database.Cells(i_data, 8).Value  ' 主保険請求額を加算
             End If
             
             ' 公費請求額が数値の場合のみ加算
-            If IsNumeric(ws_database.Cells(i, 9).Value) Then
-                month_array(2) = month_array(2) + ws_database.Cells(i, 9).Value  ' 公費請求額を加算
+            If IsNumeric(ws_database.Cells(i_data, 9).Value) Then
+                month_array(2) = month_array(2) + ws_database.Cells(i_data, 9).Value  ' 公費請求額を加算
             End If
             
             ' 主保険再請求額が数値の場合のみ加算
-            If IsNumeric(ws_database.Cells(i, 10).Value) Then
-                month_array(3) = month_array(3) + ws_database.Cells(i, 10).Value  ' 主保険再請求額を加算
+            If IsNumeric(ws_database.Cells(i_data, 10).Value) Then
+                month_array(3) = month_array(3) + ws_database.Cells(i_data, 10).Value  ' 主保険再請求額を加算
             End If
             
             ' 公費再請求額が数値の場合のみ加算
-            If IsNumeric(ws_database.Cells(i, 11).Value) Then
-                month_array(4) = month_array(4) + ws_database.Cells(i, 11).Value  ' 公費再請求額を加算
+            If IsNumeric(ws_database.Cells(i_data, 11).Value) Then
+                month_array(4) = month_array(4) + ws_database.Cells(i_data, 11).Value  ' 公費再請求額を加算
             End If
             
+            ' 削除：この部分は上記コード（477-494行）と重複しているため、削除します
             ' 主保険請求額が数値の場合のみ加算
-            If IsNumeric(ws_database.Cells(i, 8).Value) Then
-                month_array(2) = month_array(2) + ws_database.Cells(i, 8).Value
-            End If
-            
-            ' 公費請求額が数値の場合のみ加算
-            If IsNumeric(ws_database.Cells(i, 9).Value) Then
-                month_array(3) = month_array(3) + ws_database.Cells(i, 9).Value
-            End If
-            
-            ' 主保険再請求額が数値の場合のみ加算
-            If IsNumeric(ws_database.Cells(i, 10).Value) Then
-                month_array(4) = month_array(4) + ws_database.Cells(i, 10).Value
-            End If
-            
-            ' 公費再請求額が数値の場合のみ加算
-            If IsNumeric(ws_database.Cells(i, 11).Value) Then
-                month_array(5) = month_array(5) + ws_database.Cells(i, 11).Value
-            End If
+            ' If IsNumeric(ws_database.Cells(i_data, 8).Value) Then
+            '     month_array(2) = month_array(2) + ws_database.Cells(i_data, 8).Value
+            ' End If
+            ' 
+            ' ' 公費請求額が数値の場合のみ加算
+            ' If IsNumeric(ws_database.Cells(i_data, 9).Value) Then
+            '     month_array(3) = month_array(3) + ws_database.Cells(i_data, 9).Value
+            ' End If
+            ' 
+            ' ' 主保険再請求額が数値の場合のみ加算
+            ' If IsNumeric(ws_database.Cells(i_data, 10).Value) Then
+            '     month_array(4) = month_array(4) + ws_database.Cells(i_data, 10).Value
+            ' End If
+            ' 
+            ' ' 公費再請求額が数値の場合のみ加算
+            ' If IsNumeric(ws_database.Cells(i_data, 11).Value) Then
+            '     month_array(5) = month_array(5) + ws_database.Cells(i_data, 11).Value
+            ' End If
             
             months(month_key) = month_array
             
             ' 請求日別集計
             Dim billing_date_key As String
-            billing_date_key = ws_database.Cells(i, 12).Value
+            billing_date_key = ws_database.Cells(i_data, 12).Value
             If billing_date_key = "" Then billing_date_key = "不明"
             
             If Not billing_dates.Exists(billing_date_key) Then
@@ -528,23 +529,23 @@ Public Sub CreateDatabaseSummaryReport()
             billing_date_array = billing_dates(billing_date_key)
             
             ' 金額が数値の場合のみ加算
-            If IsNumeric(ws_database.Cells(i, 7).Value) Then
-                billing_date_array(0) = billing_date_array(0) + ws_database.Cells(i, 7).Value  ' 金額を加算
+            If IsNumeric(ws_database.Cells(i_data, 7).Value) Then
+                billing_date_array(0) = billing_date_array(0) + ws_database.Cells(i_data, 7).Value  ' 金額を加算
             End If
             
             ' 主保険請求額が数値の場合のみ加算
-            If IsNumeric(ws_database.Cells(i, 8).Value) Then
-                billing_date_array(1) = billing_date_array(1) + ws_database.Cells(i, 8).Value
+            If IsNumeric(ws_database.Cells(i_data, 8).Value) Then
+                billing_date_array(1) = billing_date_array(1) + ws_database.Cells(i_data, 8).Value
             End If
             
             ' 公費請求額が数値の場合のみ加算
-            If IsNumeric(ws_database.Cells(i, 9).Value) Then
-                billing_date_array(2) = billing_date_array(2) + ws_database.Cells(i, 9).Value
+            If IsNumeric(ws_database.Cells(i_data, 9).Value) Then
+                billing_date_array(2) = billing_date_array(2) + ws_database.Cells(i_data, 9).Value
             End If
             
             billing_dates(billing_date_key) = billing_date_array
         End If
-    Next i
+    Next i_data
     
     ' 請求先別集計をレポートに出力
     Dim row_index As Long
