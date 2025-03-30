@@ -1,18 +1,18 @@
 Attribute VB_Name = "DatabaseOperationsModule"
 Option Explicit
 
-' データベースシートを検索する関数
+' 売掛管理表シートを検索する関数
 Public Sub SearchDatabase()
     On Error GoTo ErrorHandler
     
-    ' データベースシートが存在するか確認
+    ' 売掛管理表シートが存在するか確認
     Dim ws_database As Worksheet
     On Error Resume Next
     Set ws_database = ThisWorkbook.Worksheets("売掛管理表")
     On Error GoTo ErrorHandler
     
     If ws_database Is Nothing Then
-        MsgBox "売掛管理表シートが見つかりません。先にデータベースを作成してください。", vbExclamation, "エラー"
+        MsgBox "売掛管理表シートが見つかりません。先に売掛管理表を作成してください。", vbExclamation, "エラー"
         Exit Sub
     End If
     
@@ -248,24 +248,24 @@ ErrorHandler:
     Debug.Print "Error description: " & Err.Description
     Debug.Print "=================================="
     
-    MsgBox "データベース検索中にエラーが発生しました。" & vbCrLf & _
+    MsgBox "売掛管理表検索中にエラーが発生しました。" & vbCrLf & _
            "エラー番号: " & Err.Number & vbCrLf & _
            "エラー内容: " & Err.Description, _
            vbCritical, "エラー"
 End Sub
 
-' データベースの内容をCSVファイルにエクスポートする関数
+' 売掛管理表の内容をCSVファイルにエクスポートする関数
 Public Sub ExportDatabaseToCsv()
     On Error GoTo ErrorHandler
     
-    ' データベースシートが存在するか確認
+    ' 売掛管理表シートが存在するか確認
     Dim ws_database As Worksheet
     On Error Resume Next
     Set ws_database = ThisWorkbook.Worksheets("売掛管理表")
     On Error GoTo ErrorHandler
     
     If ws_database Is Nothing Then
-        MsgBox "売掛管理表シートが見つかりません。先にデータベースを作成してください。", vbExclamation, "エラー"
+        MsgBox "売掛管理表シートが見つかりません。先に売掛管理表を作成してください。", vbExclamation, "エラー"
         Exit Sub
     End If
     
@@ -301,7 +301,7 @@ Public Sub ExportDatabaseToCsv()
     temp_wb.Close SaveChanges:=False
     Application.DisplayAlerts = True
     
-    MsgBox "データベースを正常にCSVファイルにエクスポートしました。" & vbCrLf & _
+    MsgBox "売掛管理表を正常にCSVファイルにエクスポートしました。" & vbCrLf & _
            "ファイル: " & save_path, vbInformation, "エクスポート完了"
     
     Exit Sub
@@ -325,18 +325,18 @@ ErrorHandler:
            vbCritical, "エラー"
 End Sub
 
-' データベースの集計レポートを作成する関数
+' 売掛管理表の集計レポートを作成する関数
 Public Sub CreateDatabaseSummaryReport()
     On Error GoTo ErrorHandler
     
-    ' データベースシートが存在するか確認
+    ' 売掛管理表シートが存在するか確認
     Dim ws_database As Worksheet
     On Error Resume Next
     Set ws_database = ThisWorkbook.Worksheets("売掛管理表")
     On Error GoTo ErrorHandler
     
     If ws_database Is Nothing Then
-        MsgBox "売掛管理表シートが見つかりません。先にデータベースを作成してください。", vbExclamation, "エラー"
+        MsgBox "売掛管理表シートが見つかりません。先に売掛管理表を作成してください。", vbExclamation, "エラー"
         Exit Sub
     End If
     
@@ -393,7 +393,7 @@ Public Sub CreateDatabaseSummaryReport()
         .Range("H15").Value = "再請求先機関"
     End With
     
-    ' データベースシートからデータを集計
+    ' 売掛管理表シートからデータを集計
     
     ' 請求先別集計
     Dim billing_types As Object
@@ -700,21 +700,21 @@ ErrorHandler:
            vbCritical, "エラー"
 End Sub
 
-' データベースメニューを表示する関数
+' 売掛管理表メニューを表示する関数
 Public Sub ShowDatabaseMenu()
     On Error GoTo ErrorHandler
     
-    ' データベースメニューフォームを表示
+    ' 売掛管理表メニューフォームを表示
     Dim result As VbMsgBoxResult
-    result = MsgBox("データベース機能を選択してください：" & vbCrLf & vbCrLf & _
-                    "「はい」：データベース検索・フィルタリング" & vbCrLf & _
-                    "「いいえ」：データベースをCSVにエクスポート" & vbCrLf & _
+    result = MsgBox("売掛管理表機能を選択してください：" & vbCrLf & vbCrLf & _
+                    "「はい」：売掛管理表検索・フィルタリング" & vbCrLf & _
+                    "「いいえ」：売掛管理表をCSVにエクスポート" & vbCrLf & _
                     "「キャンセル」：集計レポート作成", _
-                    vbYesNoCancel + vbQuestion, "データベース機能")
+                    vbYesNoCancel + vbQuestion, "売掛管理表機能")
     
     Select Case result
         Case vbYes
-            ' データベース検索
+            ' 売掛管理表検索
             SearchDatabase
         Case vbNo
             ' CSVエクスポート
@@ -733,7 +733,7 @@ ErrorHandler:
     Debug.Print "Error description: " & Err.Description
     Debug.Print "=================================="
     
-    MsgBox "データベースメニュー表示中にエラーが発生しました。" & vbCrLf & _
+    MsgBox "売掛管理表メニュー表示中にエラーが発生しました。" & vbCrLf & _
            "エラー番号: " & Err.Number & vbCrLf & _
            "エラー内容: " & Err.Description, _
            vbCritical, "エラー"

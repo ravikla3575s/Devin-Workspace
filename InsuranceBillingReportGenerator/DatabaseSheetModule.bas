@@ -1,20 +1,20 @@
 Attribute VB_Name = "DatabaseSheetModule"
 Option Explicit
 
-' データベース形式のシート3を作成・更新する関数
+' 売掛管理表形式のシート3を作成・更新する関数
 Public Function CreateDatabaseSheet(ByVal wb As Workbook) As Boolean
     On Error GoTo ErrorHandler
 
-    ' データベースシートが存在するか確認し、存在しない場合は作成
+    ' 売掛管理表シートが存在するか確認し、存在しない場合は作成
     Dim ws_database As Worksheet
     On Error Resume Next
-    Set ws_database = wb.Worksheets("データベース")
+    Set ws_database = wb.Worksheets("売掛管理表")
     On Error GoTo ErrorHandler
 
     If ws_database Is Nothing Then
-        ' データベースシートを作成
+        ' 売掛管理表シートを作成
         Set ws_database = wb.Worksheets.Add(After:=wb.Worksheets("まとめ"))
-        ws_database.Name = "データベース"
+        ws_database.Name = "売掛管理表"
 
         ' ヘッダーの設定
         With ws_database
@@ -68,14 +68,14 @@ ErrorHandler:
     Debug.Print "Error description: " & Err.Description
     Debug.Print "=================================="
 
-    MsgBox "データベースシートの作成中にエラーが発生しました。" & vbCrLf & _
+    MsgBox "売掛管理表シートの作成中にエラーが発生しました。" & vbCrLf & _
            "エラー番号: " & Err.Number & vbCrLf & _
            "エラー内容: " & Err.Description, _
            vbCritical, "エラー"
     CreateDatabaseSheet = False
 End Function
 
-' 詳細シートからデータを収集してデータベースシートに入力する関数
+' 詳細シートからデータを収集して売掛管理表シートに入力する関数
 Private Sub PopulateDatabaseFromDetails(ByVal wb As Workbook)
     On Error GoTo ErrorHandler
 
@@ -84,8 +84,8 @@ Private Sub PopulateDatabaseFromDetails(ByVal wb As Workbook)
     Dim current_row As Long
     Dim last_row As Long
 
-    ' データベースシートを取得
-    Set ws_database = wb.Worksheets("データベース")
+    ' 売掛管理表シートを取得
+    Set ws_database = wb.Worksheets("売掛管理表")
 
     ' 既存のデータをクリア（ヘッダー行を除く）
     If ws_database.Range("A2").Value <> "" Then
@@ -122,7 +122,7 @@ ErrorHandler:
     Debug.Print "Error description: " & Err.Description
     Debug.Print "=================================="
 
-    MsgBox "データベースへのデータ入力中にエラーが発生しました。" & vbCrLf & _
+    MsgBox "売掛管理表へのデータ入力中にエラーが発生しました。" & vbCrLf & _
            "エラー番号: " & Err.Number & vbCrLf & _
            "エラー内容: " & Err.Description, _
            vbCritical, "エラー"
@@ -323,27 +323,27 @@ ErrorHandler:
     CollectDataFromSheet = current_row
 End Function
 
-' データベースシートを更新する関数（既存のデータベースシートがある場合）
+' 売掛管理表シートを更新する関数（既存の売掛管理表シートがある場合）
 Public Sub UpdateDatabaseSheet()
     On Error GoTo ErrorHandler
 
-    ' データベースシートが存在するか確認
+    ' 売掛管理表シートが存在するか確認
     Dim ws_database As Worksheet
     On Error Resume Next
-    Set ws_database = ThisWorkbook.Worksheets("データベース")
+    Set ws_database = ThisWorkbook.Worksheets("売掛管理表")
     On Error GoTo ErrorHandler
 
     If ws_database Is Nothing Then
-        ' データベースシートが存在しない場合は新規作成
+        ' 売掛管理表シートが存在しない場合は新規作成
         If CreateDatabaseSheet(ThisWorkbook) Then
-            MsgBox "データベースシートを新規作成しました。", vbInformation, "完了"
+            MsgBox "売掛管理表シートを新規作成しました。", vbInformation, "完了"
         Else
-            MsgBox "データベースシートの作成に失敗しました。", vbCritical, "エラー"
+            MsgBox "売掛管理表シートの作成に失敗しました。", vbCritical, "エラー"
         End If
     Else
-        ' 既存のデータベースシートを更新
+        ' 既存の売掛管理表シートを更新
         PopulateDatabaseFromDetails ThisWorkbook
-        MsgBox "データベースシートを更新しました。", vbInformation, "完了"
+        MsgBox "売掛管理表シートを更新しました。", vbInformation, "完了"
     End If
 
     Exit Sub
@@ -355,13 +355,13 @@ ErrorHandler:
     Debug.Print "Error description: " & Err.Description
     Debug.Print "=================================="
 
-    MsgBox "データベースシートの更新中にエラーが発生しました。" & vbCrLf & _
+    MsgBox "売掛管理表シートの更新中にエラーが発生しました。" & vbCrLf & _
            "エラー番号: " & Err.Number & vbCrLf & _
            "エラー内容: " & Err.Description, _
            vbCritical, "エラー"
 End Sub
 
-' CSVファイル処理後にデータベースシートを更新するサブルーチン
+' CSVファイル処理後に売掛管理表シートを更新するサブルーチン
 Public Sub UpdateDatabaseAfterProcessing()
     On Error Resume Next
 
@@ -370,7 +370,7 @@ Public Sub UpdateDatabaseAfterProcessing()
     save_folder = ThisWorkbook.Sheets(1).Range("B3").Value
 
     If save_folder <> "" Then
-        ' 現在のワークブックのデータベースシートを更新
+        ' 現在のワークブックの売掛管理表シートを更新
         UpdateDatabaseSheet
     End If
 End Sub

@@ -1,24 +1,24 @@
 Attribute VB_Name = "DatabaseImportModule"
 Option Explicit
 
-' CSVファイルからデータベースにデータをインポートする関数
+' CSVファイルから売掛管理表にデータをインポートする関数
 Public Function ImportFromCsvToDatabase(csv_file_path As String) As Boolean
     On Error GoTo ErrorHandler
     
-    ' データベースシートの確認
+    ' 売掛管理表シートの確認
     Dim ws_database As Worksheet
     On Error Resume Next
-    Set ws_database = ThisWorkbook.Worksheets("データベース")
+    Set ws_database = ThisWorkbook.Worksheets("売掛管理表")
     On Error GoTo ErrorHandler
     
     If ws_database Is Nothing Then
-        ' データベースシートが存在しない場合は作成
+        ' 売掛管理表シートが存在しない場合は作成
         If Not DatabaseSheetModule.CreateDatabaseSheet(ThisWorkbook) Then
-            MsgBox "データベースシートの作成に失敗しました。", vbCritical, "エラー"
+            MsgBox "売掛管理表シートの作成に失敗しました。", vbCritical, "エラー"
             ImportFromCsvToDatabase = False
             Exit Function
         End If
-        Set ws_database = ThisWorkbook.Worksheets("データベース")
+        Set ws_database = ThisWorkbook.Worksheets("売掛管理表")
     End If
     
     ' CSVファイル処理
@@ -55,7 +55,7 @@ Public Function ImportFromCsvToDatabase(csv_file_path As String) As Boolean
             
             ' ヘッダー行をスキップ
             If csv_data(0) <> "ID" And IsNumeric(csv_data(0)) Then
-                ' データをデータベースに追加
+                ' データを売掛管理表に追加
                 ws_database.Cells(row_index, 1).Value = row_index - 1 ' ID
                 
                 ' 残りのデータを追加（CSVの列順に応じて調整が必要）
@@ -73,10 +73,10 @@ Public Function ImportFromCsvToDatabase(csv_file_path As String) As Boolean
     ' ファイルを閉じる
     text_stream.Close
     
-    ' データベースの書式を整える
+    ' 売掛管理表の書式を整える
     FormatDatabaseSheet ws_database
     
-    MsgBox "CSVファイルからデータベースへのインポートが完了しました。", vbInformation, "完了"
+    MsgBox "CSVファイルから売掛管理表へのインポートが完了しました。", vbInformation, "完了"
     ImportFromCsvToDatabase = True
     
     Exit Function
@@ -95,24 +95,24 @@ ErrorHandler:
     ImportFromCsvToDatabase = False
 End Function
 
-' マクロ有効ファイルからデータベースにデータをインポートする関数
+' マクロ有効ファイルから売掛管理表にデータをインポートする関数
 Public Function ImportFromExcelToDatabase(excel_file_path As String, sheet_name As String) As Boolean
     On Error GoTo ErrorHandler
     
-    ' データベースシートの確認
+    ' 売掛管理表シートの確認
     Dim ws_database As Worksheet
     On Error Resume Next
-    Set ws_database = ThisWorkbook.Worksheets("データベース")
+    Set ws_database = ThisWorkbook.Worksheets("売掛管理表")
     On Error GoTo ErrorHandler
     
     If ws_database Is Nothing Then
-        ' データベースシートが存在しない場合は作成
+        ' 売掛管理表シートが存在しない場合は作成
         If Not DatabaseSheetModule.CreateDatabaseSheet(ThisWorkbook) Then
-            MsgBox "データベースシートの作成に失敗しました。", vbCritical, "エラー"
+            MsgBox "売掛管理表シートの作成に失敗しました。", vbCritical, "エラー"
             ImportFromExcelToDatabase = False
             Exit Function
         End If
-        Set ws_database = ThisWorkbook.Worksheets("データベース")
+        Set ws_database = ThisWorkbook.Worksheets("売掛管理表")
     End If
     
     ' ソースワークブックを開く
@@ -148,7 +148,7 @@ Public Function ImportFromExcelToDatabase(excel_file_path As String, sheet_name 
     src_last_row = source_ws.Cells(source_ws.Rows.Count, "A").End(xlUp).Row
     src_last_col = source_ws.Cells(1, source_ws.Columns.Count).End(xlToLeft).Column
     
-    ' データベースの最終行を取得
+    ' 売掛管理表の最終行を取得
     db_last_row = ws_database.Cells(ws_database.Rows.Count, "A").End(xlUp).Row
     row_index = db_last_row + 1
     
@@ -170,10 +170,10 @@ Public Function ImportFromExcelToDatabase(excel_file_path As String, sheet_name 
     ' ソースワークブックを閉じる
     source_wb.Close SaveChanges:=False
     
-    ' データベースの書式を整える
+    ' 売掛管理表の書式を整える
     FormatDatabaseSheet ws_database
     
-    MsgBox "Excelファイルからデータベースへのインポートが完了しました。", vbInformation, "完了"
+    MsgBox "Excelファイルから売掛管理表へのインポートが完了しました。", vbInformation, "完了"
     ImportFromExcelToDatabase = True
     
     Exit Function
@@ -199,7 +199,7 @@ ErrorHandler:
     ImportFromExcelToDatabase = False
 End Function
 
-' データベースシートの書式を整える関数
+' 売掛管理表シートの書式を整える関数
 Private Sub FormatDatabaseSheet(ws As Worksheet)
     On Error Resume Next
     

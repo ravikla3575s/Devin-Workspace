@@ -1,32 +1,32 @@
 Attribute VB_Name = "DatabaseMenuModule"
 Option Explicit
 
-' メニューからデータベース作成・更新機能を呼び出すサブルーチン
+' メニューから売掛管理表作成・更新機能を呼び出すサブルーチン
 Public Sub CreateOrUpdateDatabase()
-    ' データベースシートを作成・更新する
+    ' 売掛管理表シートを作成・更新する
     DatabaseSheetModule.UpdateDatabaseSheet
 End Sub
 
-' メニューからデータベース機能メニューを呼び出すサブルーチン
+' メニューから売掛管理表機能メニューを呼び出すサブルーチン
 Public Sub ShowDatabaseMenu()
-    ' データベース機能メニューを表示
+    ' 売掛管理表機能メニューを表示
     DatabaseOperationsModule.ShowDatabaseMenu
 End Sub
 
-' メニューからデータベース検索機能を呼び出すサブルーチン
+' メニューから売掛管理表検索機能を呼び出すサブルーチン
 Public Sub ShowDatabaseSearchForm()
-    ' データベース検索機能を呼び出す
+    ' 売掛管理表検索機能を呼び出す
     DatabaseOperationsModule.SearchDatabase
 End Sub
 
-' メニューからデータベースCSV出力機能を呼び出すサブルーチン
+' メニューから売掛管理表CSV出力機能を呼び出すサブルーチン
 Public Sub ExportDatabaseToCsv()
-    ' データベースCSV出力機能を呼び出す
+    ' 売掛管理表CSV出力機能を呼び出す
     DatabaseOperationsModule.ExportDatabaseToCsv
 End Sub
 
-' メニューからデータベース集計レポート作成機能を呼び出すサブルーチン
+' メニューから売掛管理表集計レポート作成機能を呼び出すサブルーチン
 Public Sub CreateDatabaseSummaryReport()
-    ' データベース集計レポート作成機能を呼び出す
+    ' 売掛管理表集計レポート作成機能を呼び出す
     DatabaseOperationsModule.CreateDatabaseSummaryReport
 End Sub

@@ -5,7 +5,7 @@ Option Explicit
 Public Function ArchiveCompletedData() As Boolean
     On Error GoTo ErrorHandler
 
-    ' データベースシートの確認
+    ' 売掛管理表シートの確認
     Dim ws_database As Worksheet
     On Error Resume Next
     Set ws_database = ThisWorkbook.Worksheets("売掛管理表")
@@ -72,11 +72,11 @@ ErrorHandler:
            vbCritical, "エラー"
     ArchiveCompletedData = False
 End Function
-' 未完了データを次期データベースファイルに転記する関数
+' 未完了データを次期売掛管理表ファイルに転記する関数
 Public Function TransferIncompleteData(target_workbook_path As String) As Boolean
     On Error GoTo ErrorHandler
     
-    ' データベースシートの確認
+    ' 売掛管理表シートの確認
     Dim ws_database As Worksheet
     On Error Resume Next
     Set ws_database = ThisWorkbook.Worksheets("売掛管理表")
@@ -108,13 +108,13 @@ Public Function TransferIncompleteData(target_workbook_path As String) As Boolea
         Set target_wb = Workbooks.Open(target_workbook_path)
     End If
     
-    ' 転記先のデータベースシートを確認
+    ' 転記先の売掛管理表シートを確認
     On Error Resume Next
     Set target_ws = target_wb.Worksheets("売掛管理表")
     On Error GoTo ErrorHandler
     
     If target_ws Is Nothing Then
-        ' データベースシートを作成
+        ' 売掛管理表シートを作成
         If Not DatabaseSheetModule.CreateDatabaseSheet(target_wb) Then
             MsgBox "転記先ワークブックに売掛管理表シートを作成できませんでした。", vbCritical, "エラー"
             target_wb.Close SaveChanges:=False
@@ -161,7 +161,7 @@ Public Function TransferIncompleteData(target_workbook_path As String) As Boolea
         End If
     Next i
     
-    ' データベースの書式を整える
+    ' 売掛管理表の書式を整える
     FormatTransferredDatabase target_ws
     
     ' ファイルを保存
@@ -177,7 +177,7 @@ Public Function TransferIncompleteData(target_workbook_path As String) As Boolea
     target_wb.Close SaveChanges:=False
     
     If transfer_count > 0 Then
-        MsgBox transfer_count & " 件の未完了データを次期データベースファイルに転記しました。" & vbCrLf & _
+        MsgBox transfer_count & " 件の未完了データを次期売掛管理表ファイルに転記しました。" & vbCrLf & _
                "保存先: " & target_workbook_path, vbInformation, "完了"
     Else
         MsgBox "転記対象の未完了データがありませんでした。", vbInformation, "完了"
@@ -207,7 +207,7 @@ ErrorHandler:
     TransferIncompleteData = False
 End Function
 
-' 転記先データベースの書式を整える関数
+' 転記先売掛管理表の書式を整える関数
 Private Sub FormatTransferredDatabase(ws As Worksheet)
     On Error Resume Next
     
@@ -255,7 +255,7 @@ Public Function ManageHalfYearData() As Boolean
     
     ' 保存先の選択
     With Application.FileDialog(msoFileDialogSaveAs)
-        .Title = "次期データベースファイルの保存先を選択"
+        .Title = "次期売掛管理表ファイルの保存先を選択"
         .InitialFileName = "保険請求売掛管理表_" & year_val & "_" & period_type & ".xlsm"
         .FilterIndex = 2  ' Excelマクロ有効ブック
         If .Show = -1 Then
@@ -272,7 +272,7 @@ Public Function ManageHalfYearData() As Boolean
         Exit Function
     End If
     
-    ' 未完了データを次期データベースファイルに転記
+    ' 未完了データを次期売掛管理表ファイルに転記
     If Not TransferIncompleteData(target_workbook_path) Then
         MsgBox "データの転記に失敗しました。", vbCritical, "エラー"
         ManageHalfYearData = False

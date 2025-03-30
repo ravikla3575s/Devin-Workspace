@@ -1,6 +1,6 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} DatabaseSearchForm 
-   Caption         =   "データベース検索・フィルタリング"
+   Caption         =   "売掛管理表検索・フィルタリング"
    ClientHeight    =   8400
    ClientLeft      =   120
    ClientTop       =   465
@@ -21,7 +21,7 @@ Private mCancelled As Boolean
 ' フォーム初期化
 Private Sub UserForm_Initialize()
     ' フォームの初期化
-    Me.Caption = "データベース検索・フィルタリング"
+    Me.Caption = "売掛管理表検索・フィルタリング"
     
     ' コンボボックスに請求先の選択肢を追加
     With Me.cmbBillingDestination
