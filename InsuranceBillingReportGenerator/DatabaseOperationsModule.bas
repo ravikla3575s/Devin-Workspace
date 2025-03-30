@@ -738,3 +738,129 @@ ErrorHandler:
            "エラー内容: " & Err.Description, _
            vbCritical, "エラー"
 End Sub
+
+' 未請求レセプト入力フォームからデータを売掛管理表に追加する関数
+Public Function AddUnclaimedBillingToDatabase(ByVal patient_name As String, ByVal dispensing_month As String, _
+                                           ByVal medical_institution As String, ByVal unclaimed_reason As String, _
+                                           ByVal billing_destination As String, ByVal insurance_ratio As Variant, _
+                                           ByVal billing_points As Variant, ByVal remarks As Variant) As Boolean
+    On Error GoTo ErrorHandler
+    
+    ' 売掛管理表シートの確認
+    Dim ws_database As Worksheet
+    On Error Resume Next
+    Set ws_database = ThisWorkbook.Worksheets("売掛管理表")
+    On Error GoTo ErrorHandler
+    
+    If ws_database Is Nothing Then
+        ' 売掛管理表シートが存在しない場合は作成
+        If Not DatabaseSheetModule.CreateDatabaseSheet(ThisWorkbook) Then
+            MsgBox "売掛管理表シートの作成に失敗しました。", vbCritical, "エラー"
+            AddUnclaimedBillingToDatabase = False
+            Exit Function
+        End If
+        Set ws_database = ThisWorkbook.Worksheets("売掛管理表")
+    End If
+    
+    ' 最終行を取得
+    Dim last_row As Long
+    last_row = ws_database.Cells(ws_database.Rows.Count, "A").End(xlUp).Row
+    
+    ' 新しい行にデータを追加
+    Dim new_row As Long
+    new_row = last_row + 1
+    
+    ' IDを設定
+    ws_database.Cells(new_row, 1).Value = new_row - 1
+    
+    ' 区分を設定（未請求）
+    ws_database.Cells(new_row, 2).Value = "未請求"
+    
+    ' 患者名を設定
+    ws_database.Cells(new_row, 3).Value = patient_name
+    
+    ' 調剤年月を設定
+    ws_database.Cells(new_row, 4).Value = dispensing_month
+    
+    ' 医療機関を設定
+    ws_database.Cells(new_row, 5).Value = medical_institution
+    
+    ' 未請求理由を設定
+    ws_database.Cells(new_row, 6).Value = unclaimed_reason
+    
+    ' 請求日を設定（現在の日付）
+    ws_database.Cells(new_row, 7).Value = Date
+    
+    ' 請求先を設定
+    ws_database.Cells(new_row, 8).Value = billing_destination
+    
+    ' 保険割合を設定
+    If Not IsNull(insurance_ratio) And insurance_ratio > 0 Then
+        ws_database.Cells(new_row, 9).Value = insurance_ratio
+    End If
+    
+    ' 請求点数を設定
+    If Not IsNull(billing_points) And billing_points > 0 Then
+        ws_database.Cells(new_row, 10).Value = billing_points
+        
+        ' 主保険請求額を計算（請求点数 × 10円 × 保険割合）
+        If Not IsNull(insurance_ratio) And insurance_ratio > 0 Then
+            ws_database.Cells(new_row, 11).Value = billing_points * 10 * (insurance_ratio / 10)
+        End If
+        
+        ' 公費請求額を計算（請求点数 × 10円 × (10 - 保険割合)）
+        If Not IsNull(insurance_ratio) And insurance_ratio > 0 And insurance_ratio < 10 Then
+            ws_database.Cells(new_row, 12).Value = billing_points * 10 * ((10 - insurance_ratio) / 10)
+        End If
+    End If
+    
+    ' 請求先機関を設定
+    ws_database.Cells(new_row, 15).Value = medical_institution
+    
+    ' 備考を設定
+    If Not IsNull(remarks) And Len(remarks) > 0 Then
+        ws_database.Cells(new_row, 16).Value = remarks
+    End If
+    
+    ' データベースの書式を整える
+    FormatDatabaseRow ws_database, new_row
+    
+    ' 成功メッセージを表示
+    MsgBox "未請求データを売掛管理表に追加しました。", vbInformation, "完了"
+    
+    AddUnclaimedBillingToDatabase = True
+    Exit Function
+    
+ErrorHandler:
+    Debug.Print "========== ERROR DETAILS =========="
+    Debug.Print "Error in AddUnclaimedBillingToDatabase"
+    Debug.Print "Error number: " & Err.Number
+    Debug.Print "Error description: " & Err.Description
+    Debug.Print "=================================="
+    
+    MsgBox "未請求データの追加中にエラーが発生しました。" & vbCrLf & _
+           "エラー番号: " & Err.Number & vbCrLf & _
+           "エラー内容: " & Err.Description, _
+           vbCritical, "エラー"
+    AddUnclaimedBillingToDatabase = False
+End Function
+
+' データベース行の書式を整える関数
+Private Sub FormatDatabaseRow(ws As Worksheet, row_index As Long)
+    On Error Resume Next
+    
+    ' 金額列の書式設定
+    ws.Cells(row_index, 11).NumberFormat = "#,##0"
+    ws.Cells(row_index, 12).NumberFormat = "#,##0"
+    ws.Cells(row_index, 13).NumberFormat = "#,##0"
+    ws.Cells(row_index, 14).NumberFormat = "#,##0"
+    
+    ' 日付列の書式設定
+    ws.Cells(row_index, 7).NumberFormat = "yyyy/mm/dd"
+    ws.Cells(row_index, 8).NumberFormat = "yyyy/mm/dd"
+    ws.Cells(row_index, 9).NumberFormat = "yyyy/mm/dd"
+    ws.Cells(row_index, 10).NumberFormat = "yyyy/mm/dd"
+    
+    ' 罫線の設定
+    ws.Range("A" & row_index & ":P" & row_index).Borders.LineStyle = xlContinuous
+End Sub
