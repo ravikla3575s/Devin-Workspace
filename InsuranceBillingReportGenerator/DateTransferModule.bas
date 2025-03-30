@@ -328,7 +328,7 @@ Sub TransferBillingDetails(report_wb As Workbook, csv_file_name As String, dispe
     Dim csv_yymm As String
     Dim payer_type As String
     Dim start_row_dict As Object
-    Dim rebill_dict As Object, late_dict As Object, unpaid_dict As Object, assessment_dict As Object
+    Dim rebill_dict As Object, late_dict As Object, deduction_dict As Object, return_dict As Object
     
     ' �ەt�����̌����擾
     Dim details_sheet_name As String
@@ -369,23 +369,23 @@ Sub TransferBillingDetails(report_wb As Workbook, csv_file_name As String, dispe
     ' �f�[�^�̕��ނƎ����̍쐬
     Set rebill_dict = CreateObject("Scripting.Dictionary")
     Set late_dict = CreateObject("Scripting.Dictionary")
-    Set unpaid_dict = CreateObject("Scripting.Dictionary")
-    Set assessment_dict = CreateObject("Scripting.Dictionary")
+    Set deduction_dict = CreateObject("Scripting.Dictionary")
+    Set return_dict = CreateObject("Scripting.Dictionary")
     
     ' ���C���V�[�g�̃f�[�^�𕪗�
     If check_status Then
         Call ClassifyMainSheetDataWithStatus(ws_main, csv_yymm, csv_file_name, _
-                                           rebill_dict, late_dict, unpaid_dict, assessment_dict)
+                                           rebill_dict, late_dict, deduction_dict, return_dict)
     Else
         Call ClassifyMainSheetData(ws_main, csv_yymm, csv_file_name, _
-                                 rebill_dict, late_dict, unpaid_dict, assessment_dict)
+                                 rebill_dict, late_dict, deduction_dict, return_dict)
     End If
     
     ' �s�̒ǉ�����
-    Call InsertAdditionalRows(ws_details, start_row_dict, rebill_dict.count, late_dict.count, assessment_dict.count)
+    Call InsertAdditionalRows(ws_details, start_row_dict, rebill_dict.count, late_dict.count, return_dict.count)
     
     ' �f�[�^�̓]�L
-    Call WriteDataToDetails(ws_details, start_row_dict, rebill_dict, late_dict, unpaid_dict, assessment_dict, payer_type)
+    Call WriteDataToDetails(ws_details, start_row_dict, rebill_dict, late_dict, deduction_dict, return_dict, payer_type)
     
     ' FIXF�t�@�C���̏ꍇ�A���������Z�v�g�̊m�F�i�ڍ׃V�[�g��n���j
     If InStr(LCase(csv_file_name), "fixf") > 0 Then
@@ -441,7 +441,7 @@ Private Function GetPayerType(csv_file_name As String) As String
 End Function
 
 Private Sub ClassifyMainSheetData(ws As Worksheet, csv_yymm As String, csv_file_name As String, _
-    ByRef rebill_dict As Object, ByRef late_dict As Object, ByRef unpaid_dict As Object, ByRef assessment_dict As Object)
+    ByRef rebill_dict As Object, ByRef late_dict As Object, ByRef deduction_dict As Object, ByRef return_dict As Object)
     
     Dim last_row As Long, row As Long
     Dim dispensing_code As String, dispensing_ym As String
@@ -461,16 +461,16 @@ Private Sub ClassifyMainSheetData(ws As Worksheet, csv_yymm As String, csv_file_
             ElseIf InStr(LCase(csv_file_name), "fmei") > 0 Then
                 rebill_dict(ws.Cells(row, 1).value) = row_data
             ElseIf InStr(LCase(csv_file_name), "zogn") > 0 Then
-                unpaid_dict(ws.Cells(row, 1).value) = row_data
+                deduction_dict(ws.Cells(row, 1).value) = row_data
             ElseIf InStr(LCase(csv_file_name), "henr") > 0 Then
-                assessment_dict(ws.Cells(row, 1).value) = row_data
+                return_dict(ws.Cells(row, 1).value) = row_data
             End If
         End If
     Next row
 End Sub
 
 Private Sub ClassifyMainSheetDataWithStatus(ws As Worksheet, csv_yymm As String, csv_file_name As String, _
-    ByRef rebill_dict As Object, ByRef late_dict As Object, ByRef unpaid_dict As Object, ByRef assessment_dict As Object)
+    ByRef rebill_dict As Object, ByRef late_dict As Object, ByRef deduction_dict As Object, ByRef return_dict As Object)
     
     Dim last_row As Long, row As Long
     Dim dispensing_code As String, dispensing_ym As String
@@ -492,9 +492,9 @@ Private Sub ClassifyMainSheetDataWithStatus(ws As Worksheet, csv_yymm As String,
                 ElseIf InStr(LCase(csv_file_name), "fmei") > 0 Then
                     rebill_dict(ws.Cells(row, 1).value) = row_data
                 ElseIf InStr(LCase(csv_file_name), "zogn") > 0 Then
-                    unpaid_dict(ws.Cells(row, 1).value) = row_data
+                    deduction_dict(ws.Cells(row, 1).value) = row_data
                 ElseIf InStr(LCase(csv_file_name), "henr") > 0 Then
-                    assessment_dict(ws.Cells(row, 1).value) = row_data
+                    return_dict(ws.Cells(row, 1).value) = row_data
                 End If
             End If
         End If
@@ -643,7 +643,7 @@ Private Sub InsertAdditionalRows(ws As Worksheet, start_row_dict As Object, rebi
     Next key
 End Sub
 
-Private Sub WriteDataToDetails(ws As Worksheet, start_row_dict As Object, rebill_dict As Object, late_dict As Object, unpaid_dict As Object, assessment_dict As Object, payer_type As String)
+Private Sub WriteDataToDetails(ws As Worksheet, start_row_dict As Object, rebill_dict As Object, late_dict As Object, deduction_dict As Object, return_dict As Object, payer_type As String)
     Dim ws_details As Worksheet
     Set ws_details = ws
     
